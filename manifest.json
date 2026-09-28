@@ -1,20 +1,23 @@
 {
-    "name": "القرآن الكريم | The Noble Quran",
-    "short_name": "القرآن",
-    "start_url": "index.html",
-    "display": "standalone",
-    "background_color": "#f5f2e8",
-    "theme_color": "#0b3d2e",
-    "icons": [
-      {
-        "src": "icon.png",
-        "sizes": "192x192",
-        "type": "image/png"
-      },
-      {
-        "src": "icon.png",
-        "sizes": "512x512",
-        "type": "image/png"
-      }
-    ]
-  }
+  "name": "القرآن الكريم | The Noble Quran",
+  "short_name": "القرآن الكريم",
+  "description": "منصة إسلامية شاملة لقراءة واستماع القرآن الكريم، أذكار حصن المسلم، ومواقيت الصلاة.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f5f2e8",
+  "theme_color": "#0b3d2e",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
