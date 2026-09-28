@@ -11,9 +11,8 @@
     ====================================================== -->
     <title>القرآن الكريم | تلاوة، قراءة، أذكار وتفسير - The Noble Quran</title>
     <meta name="description" content="استمع واقرأ القرآن الكريم بصوت أشهر القراء. منصة إسلامية شاملة تضم مواقيت الصلاة، حصن المسلم، أذكار الصباح والمساء، التفسير الميسر، ورسالة الإسلام بـ 4 لغات.">
-    <meta name="keywords" content="القرآن الكريم, تلاوة القرآن, استماع القرآن, قراءة المصحف, أذكار الصباح والمساء, حصن المسلم, مواقيت الصلاة, تفسير القرآن, رسالة الإسلام, سورة البقرة, سورة الكهف, عبد الباسط, الدوسري, العفاسي, Quran online, Islamic encyclopedia, The Holy Quran, read quran, listen quran, islam, muslim, azkar, prayer times">
-    <meta name="author" content="Obada Najeeb Abu Fardeh">
-    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="keywords" content="القرآن الكريم, تلاوة القرآن, استماع القرآن, قراءة المصحف, أذكار الصباح والمساء, حصن المسلم, مواقيت الصلاة, تفسير القرآن, رسالة الإسلام, سورة البقرة, سورة الكهف, عبد الباسط, الدوسري, العفاسي, وديع اليمني, خليفة الطنيجي, Quran online, Islamic encyclopedia, The Holy Quran, read quran, listen quran, islam, muslim, azkar, prayer times">
+    <meta name="author" content="Obada najeeb AL-Qaisee #عبادة ابوفردة #">    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
     <link rel="canonical" href="https://yourdomain.com/"> <!-- ضع رابط موقعك هنا لاحقاً -->
     <meta name="theme-color" content="#0b3d2e">
 
@@ -70,43 +69,47 @@
     ====================================================== -->
     <style>
         :root {
-            --bg-gradient: linear-gradient(rgba(245, 242, 232, 0.96), rgba(245, 242, 232, 0.96));
+            /* الألوان النهارية (مريحة، راقية، ومستوحاة من ألوان المصحف الكلاسيكية الحديثة) */
+            --bg-gradient: linear-gradient(rgba(249, 248, 243, 0.98), rgba(249, 248, 243, 0.98));
             --card-bg: #ffffff;
-            --text-color: #1d2924;
-            --text-muted: #66736d;
-            --green-dark: #0b3d2e;
-            --green: #126b4f;
-            --green-light: #198754;
-            --gold: #d4af37;
-            --border-color: #e8eee9;
-            --shadow: 0 10px 35px rgba(0, 0, 0, 0.10);
-            --surah-num-bg: #e8f3ed;
-            --quran-text: #4e164a;
-            --nav-bg: rgba(11, 61, 46, 0.96);
-            --hero-overlay: linear-gradient(rgba(5, 42, 30, 0.78), rgba(5, 42, 30, 0.88));
-            --player-bg: linear-gradient(135deg, #0b3d2e, #126b4f);
-            --footer-bg: #082d21;
+            --text-color: #27302c;
+            --text-muted: #6b7280;
+            --green-dark: #0f3d3e; /* لون كحلي مخضر غامق راقي جداً */
+            --green: #217373;     /* لون زمردي هادئ */
+            --green-light: #2c9797;
+            --gold: #c0964b;      /* ذهبي مطفأ غير مزعج للعين */
+            --border-color: #e5e7eb;
+            --shadow: 0 10px 40px rgba(0, 0, 0, 0.06);
+            --surah-num-bg: #f0f4f4;
+            --quran-text: #1a2c26;
+            --nav-bg: rgba(15, 61, 62, 0.98);
+            --hero-overlay: linear-gradient(rgba(15, 61, 62, 0.85), rgba(15, 61, 62, 0.92));
+            --player-bg: linear-gradient(135deg, #0f3d3e, #217373);
+            --footer-bg: #0b2b2b;
             --input-bg: #ffffff;
-            --modal-overlay: rgba(0, 0, 0, 0.5);
+            --modal-overlay: rgba(0, 0, 0, 0.55);
         }
 
         body.dark-mode {
-            --bg-gradient: linear-gradient(rgba(18, 24, 20, 0.96), rgba(18, 24, 20, 0.96));
-            --card-bg: #15221c;
-            --text-color: #e8eee9;
-            --text-muted: #9ba5a0;
-            --green-dark: #6ee7b7;
-            --green: #34d399;
-            --border-color: #24382e;
-            --shadow: 0 10px 35px rgba(0, 0, 0, 0.50);
-            --surah-num-bg: #0a1712;
-            --quran-text: #dcf2e8;
-            --nav-bg: rgba(8, 20, 16, 0.96);
-            --hero-overlay: linear-gradient(rgba(2, 15, 10, 0.85), rgba(2, 15, 10, 0.92));
-            --player-bg: linear-gradient(135deg, #061711, #0b2d22);
-            --footer-bg: #05140f;
-            --input-bg: #1a2822;
-            --modal-overlay: rgba(0, 0, 0, 0.8);
+            /* الألوان الليلية (كحلي ليلي عميق جداً مريح للقراءة في الظلام ومريح للعين) */
+            --bg-gradient: linear-gradient(rgba(15, 23, 42, 0.98), rgba(15, 23, 42, 0.98));
+            --card-bg: #1e293b;
+            --text-color: #f1f5f9;
+            --text-muted: #94a3b8;
+            --green-dark: #5eead4; /* تركوازي فاتح ناعم */
+            --green: #2dd4bf;
+            --green-light: #14b8a6;
+            --gold: #deb86d;       /* ذهبي مشرق ليلائم الخلفية الداكنة */
+            --border-color: #334155;
+            --shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+            --surah-num-bg: #0f172a;
+            --quran-text: #f8fafc;
+            --nav-bg: rgba(11, 17, 32, 0.98);
+            --hero-overlay: linear-gradient(rgba(11, 17, 32, 0.85), rgba(11, 17, 32, 0.92));
+            --player-bg: linear-gradient(135deg, #0f172a, #1e293b);
+            --footer-bg: #070b14;
+            --input-bg: #1e293b;
+            --modal-overlay: rgba(0, 0, 0, 0.85);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -376,6 +379,11 @@
 
                     <div class="reciter-box">
                         <select id="reciterSelect" class="reciter-select" onchange="changeReciter()" aria-label="Select Reciter">
+                            <!-- القراء الجدد -->
+                            <option value="https://server6.mp3quran.net/wdee3/">الشيخ وديع اليمني</option>
+                            <option value="https://server12.mp3quran.net/tnjy/">الشيخ خليفة الطنيجي</option>
+                            
+                            <!-- القراء السابقون -->
                             <option value="https://server11.mp3quran.net/yasser/" data-i18n="reciter_yasser">الشيخ ياسر الدوسري</option>
                             <option value="https://server11.mp3quran.net/shatri/" data-i18n="reciter_shatri">الشيخ أبو بكر الشاطري</option>
                             <option value="https://server8.mp3quran.net/afs/" data-i18n="reciter_afasy">الشيخ مشاري العفاسي</option>
@@ -450,8 +458,7 @@
         <h2 data-i18n="footer_title">القرآن الكريم</h2>
         <p data-i18n="footer_desc">موقع تعليمي وتجريبي لخدمة كتاب الله</p>
         <div class="developer">
-            <span style="margin-inline-end: 10px;">Developed by Obada Al Qaisee</span>
-            
+            <span style="margin-inline-end: 10px; color: var(--gold); font-size: 16px; font-weight: 800;">Developed by Obada najeeb AL-Qaisee #عبادة ابوفردة #</span>            
             <a href="https://www.instagram.com/obaalqaisee/" target="_blank" class="social-link" title="Instagram">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
             </a>
@@ -891,7 +898,5 @@
             .catch(err => console.error('Service Worker Failed', err));
         }
     </script>
-</body>
-</html>
 </body>
 </html>
