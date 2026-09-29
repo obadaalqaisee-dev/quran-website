@@ -307,6 +307,7 @@
                 <li><button class="nav-btn" onclick="openAdhkar()" style="font-weight: 700; color: var(--gold);" data-i18n="nav_adhkar">📿 حصن المسلم</button></li>
                 <li><a href="#prayerSection" data-i18n="nav_prayer">مواقيت الصلاة</a></li>
                 <li><a href="#surahs" data-i18n="nav_surahs">السور</a></li>
+                <li><button class="nav-btn" onclick="shareApp()" style="font-weight: 800; color: #14b8a6;" data-i18n="nav_share">📤 مشاركة الأجر</button></li>
             </ul>
         </div>
     </nav>
@@ -896,6 +897,28 @@
             navigator.serviceWorker.register('./sw.js')
             .then(() => console.log('Service Worker Registered'))
             .catch(err => console.error('Service Worker Failed', err));
+        }
+        // ==========================================
+        // وظيفة مشاركة التطبيق (صدقة جارية)
+        // ==========================================
+        function shareApp() {
+            const shareText = "تطبيق القرآن الكريم والأذكار الشامل. جربه الآن واستمتع بقراءة والاستماع للقرآن: " + window.location.href;
+
+            // التحقق مما إذا كان الجهاز يدعم المشاركة الرسمية (الهواتف الذكية)
+            if (navigator.share) {
+                navigator.share({
+                    title: 'القرآن الكريم',
+                    text: 'تطبيق إسلامي شامل للقرآن والأذكار ومواقيت الصلاة',
+                    url: window.location.href
+                }).catch(() => {});
+            } else {
+                // للكمبيوتر: نسخ الرابط مباشرة بدون أي أخطاء
+                navigator.clipboard.writeText(shareText).then(() => {
+                    alert('تم نسخ رابط التطبيق بنجاح! شاركه مع أصدقائك ليعم الأجر.');
+                }).catch(() => {
+                    alert(window.location.href);
+                });
+            }
         }
     </script>
 </body>
