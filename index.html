@@ -1,15 +1,7 @@
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl" id="htmlTag">
 
 <head>
-    <link rel="canonical" href="https://obadaalqaisee-dev.github.io/quran-website/">
-
-<link rel="alternate" hreflang="ar"
-      href="https://obadaalqaisee-dev.github.io/quran-website/">
-
-<link rel="alternate" hreflang="x-default"
-      href="https://obadaalqaisee-dev.github.io/quran-website/">
     <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-PMNKGK1Y97"></script>
 <script>
@@ -25,7 +17,8 @@
     
     <title>القرآن الكريم | تلاوة، قراءة، أذكار وتفسير - The Noble Quran</title>
     <meta name="description" content="استمع واقرأ القرآن الكريم بصوت أشهر القراء. منصة إسلامية شاملة تضم مواقيت الصلاة، حصن المسلم، أذكار، تفسير ميسر، وتعليم الصلاة.">
-    <meta name="keywords" content="القرآن الكريم, القرآن, المصحف الشريف, قراءة القرآن, استماع القرآن, تلاوة القرآن, سور القرآن, آيات القرآن, تفسير القرآن, ترجمة القرآن, أذكار الصباح والمساء, أذكار المساء, أذكار الصباح, حصن المسلم, الأدعية الإسلامية, الدعاء, تعليم الصلاة, كيفية الصلاة, مواقيت الصلاة, Quran, Holy Quran, Noble Quran, Quran online, Read Quran, Listen to Quran, Quran recitation, Quran translation, Quran tafsir, Islamic duas, morning adhkar, evening adhkar, Hisn al-Muslim, Muslim prayer, Learn Salah, Learn Prayer, Prayer Times, Coran, Saint Coran, lire le Coran, écouter le Coran, récitation du Coran, traduction du Coran, tafsir du Coran, invocations islamiques, prières musulmanes, apprendre la prière, Corán, Sagrado Corán, leer el Corán, escuchar el Corán, recitación del Corán, traducción del Corán, tafsir del Corán, súplicas islámicas, oración musulmana, aprender a rezar, Коран, Священный Коран, читать Коран, слушать Коран, чтение Корана, перевод Корана, толкование Корана, исламские дуа, мусульманская молитва, время намаза">    <meta name="author" content="Obada najeeb AL-Qaisee #عبادة ابوفردة #">    
+    <meta name="keywords" content="القرآن الكريم, تلاوة القرآن, استماع القرآن, قراءة المصحف, أذكار الصباح والمساء, حصن المسلم, مواقيت الصلاة, تفسير القرآن, تعليم الصلاة">
+    <meta name="author" content="Obada najeeb AL-Qaisee #عبادة ابوفردة #">    
     <meta name="robots" content="index, follow, max-image-preview:large">
     <link rel="canonical" href="https://yourdomain.com/">
     <meta name="theme-color" content="#0b3d2e">
@@ -134,11 +127,13 @@
         .stat-card strong { display: block; font-size: 35px; color: var(--green); margin-bottom: 5px; }
         .stat-card span { color: var(--text-muted); }
 
+        /* مواقيت الصلاة */
         .prayer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; }
         .prayer-card { background: var(--card-bg); padding: 20px; border-radius: 15px; text-align: center; box-shadow: var(--shadow); border-bottom: 4px solid var(--gold); transition: 0.4s;}
         .prayer-card h3 { color: var(--green); font-size: 22px; margin-bottom: 5px;}
         .prayer-card p { font-size: 24px; font-weight: bold; color: var(--text-color); direction: ltr; }
 
+        /* نوافذ (Modals) المشتركة */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--modal-overlay); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
         .modal-content { background: var(--card-bg); width: 95%; max-width: 900px; max-height: 85vh; border-radius: 20px; padding: 30px; position: relative; overflow-y: auto; box-shadow: var(--shadow); transition: 0.4s; }
         .close-modal { position: absolute; top: 15px; right: 20px; background: none; border: none; font-size: 30px; color: var(--text-muted); cursor: pointer; transition: 0.3s; }
@@ -146,6 +141,7 @@
         .close-modal:hover { color: #ff4d4d; transform: scale(1.1); }
         .modal-title { text-align: center; color: var(--green-dark); font-size: 30px; margin-bottom: 15px; border-bottom: 2px solid var(--gold); padding-bottom: 10px; }
         
+        /* الأذكار */
         .adhkar-tabs { display: flex; justify-content: center; gap: 10px; margin-bottom: 25px; flex-wrap: wrap; }
         .tab-btn { background: var(--input-bg); border: 2px solid var(--border-color); color: var(--text-color); padding: 8px 18px; border-radius: 30px; cursor: pointer; font-family: inherit; font-size: 16px; font-weight: bold; transition: 0.3s; }
         .tab-btn.active { background: var(--green); color: white; border-color: var(--green); }
@@ -157,10 +153,12 @@
         .adhkar-text { font-size: 22px; color: var(--text-color); margin-bottom: 20px; font-family: "Amiri", serif; line-height: 1.8; direction: rtl;}
         .adhkar-count { display: flex; justify-content: center; align-items: center; background: var(--green); color: white; width: 60px; height: 60px; border-radius: 50%; font-size: 22px; font-weight: bold; transition: 0.3s; box-shadow: 0 4px 10px rgba(0,0,0,0.2);}
 
+        /* رسالة الإسلام */
         .islam-content { text-align: justify; line-height: 1.9; font-size: 18px; color: var(--text-color); padding: 10px; }
         .islam-content h3 { color: var(--green); font-size: 24px; margin-top: 25px; margin-bottom: 10px; border-bottom: 1px dashed var(--gold); padding-bottom: 5px;}
         .islam-content p { margin-bottom: 15px; }
         
+        /* السور والبحث والمشغل */
         .search-box { max-width: 650px; margin: 0 auto 35px; position: relative; }
         .search-box input { width: 100%; padding: 16px 22px; border: 2px solid var(--border-color); border-radius: 50px; font-family: inherit; font-size: 16px; outline: none; background: var(--input-bg); color: var(--text-color); transition: 0.4s; }
         .search-box input:focus { border-color: var(--green); }
@@ -187,6 +185,7 @@
         .player-button { border: none; background: var(--card-bg); color: var(--green-dark); padding: 10px 25px; border-radius: 30px; cursor: pointer; font-family: inherit; font-weight: 700; transition: 0.4s; }
         .player-button:hover { background: var(--gold); color: #1c1c1c; }
 
+        /* شاشة القراءة والتفسير */
         .reading-box { background: var(--card-bg); border-radius: 25px; padding: 45px 35px; box-shadow: var(--shadow); border-top: 5px solid var(--gold); transition: 0.4s; }
         .surah-label { text-align: center; color: var(--green); font-size: 16px; margin-bottom: 5px; }
         .surah-name { text-align: center; color: var(--gold); font-family: "Amiri", serif; font-size: 42px; margin-bottom: 20px; }
@@ -209,12 +208,14 @@
         .bookmark-banner { text-align: center; margin-bottom: 25px; display: none; }
         .loading { text-align: center; padding: 30px; color: var(--green); font-weight: 700; }
 
+        /* ستايلات الإضافات الجديدة */
         .rosary-circle { width: 200px; height: 200px; border-radius: 50%; background: var(--player-bg); color: white; display: flex; align-items: center; justify-content: center; font-size: 60px; font-weight: bold; margin: 30px auto; cursor: pointer; box-shadow: 0 10px 30px rgba(33, 115, 115, 0.4); user-select: none; transition: 0.1s;}
         .rosary-circle:active { transform: scale(0.92); }
         .mic-btn { font-size: 50px; background: var(--surah-num-bg); border: 2px solid var(--green); color: var(--green); width: 100px; height: 100px; border-radius: 50%; cursor: pointer; transition: 0.3s; margin: 20px auto; display: flex; align-items: center; justify-content: center;}
         .mic-btn.recording { color: red; border-color: red; animation: pulse 1s infinite; background: rgba(255,0,0,0.1);}
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
         
+        /* القائمة الجانبية الجديدة */
         .menu-btn { background: transparent; border: none; color: white; font-size: 26px; cursor: pointer; transition: 0.3s; display: flex; align-items: center; }
         .menu-btn:hover { color: var(--gold); }
         .side-menu { position: fixed; top: 0; right: -320px; width: 300px; height: 100vh; background: var(--card-bg); z-index: 3000; transition: right 0.4s, left 0.4s; padding: 25px; box-shadow: -5px 0 25px rgba(0,0,0,0.1); overflow-y: auto; }
@@ -229,12 +230,14 @@
         html[dir="ltr"] .side-menu-links a:hover { transform: translateX(5px); }
         .side-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--modal-overlay); z-index: 2999; display: none; backdrop-filter: blur(3px); }
 
+        /* ستايل نافذة تعليم الصلاة وتضمين صور فوتوغرافية حقيقية عالية الجودة */
         .prayer-step { display: flex; align-items: flex-start; gap: 20px; margin-bottom: 25px; padding: 20px; background: var(--surah-num-bg); border-radius: 15px; border-right: 4px solid var(--gold); }
         html[dir="ltr"] .prayer-step { border-right: none; border-left: 4px solid var(--gold); }
         .prayer-step img { width: 130px; height: 130px; object-fit: cover; border-radius: 10px; box-shadow: var(--shadow); flex-shrink: 0; border: 2px solid var(--border-color); }
         .prayer-step-content h4 { color: var(--green-dark); font-size: 22px; margin-bottom: 10px; font-weight: bold; border-bottom: 1px dashed var(--border-color); padding-bottom: 5px; }
         .prayer-step-content p { margin: 0; color: var(--text-color); font-size: 17px; line-height: 1.8;}
 
+        /* الفوتر وأيقونات التواصل */
         footer { background: var(--footer-bg); color: white; text-align: center; padding: 45px 20px; margin-top: 30px; transition: 0.4s; }
         footer h2 { font-family: "Amiri", serif; color: var(--gold); margin-bottom: 10px; }
         footer p { color: #c9d8d1; margin: 5px 0; }
@@ -317,7 +320,7 @@
             <p style="text-align: center; color: var(--text-muted); margin-bottom: 25px; font-size: 16px;" data-i18n="modal_learn_desc">شرح تفصيلي دقيق لخطوات الصلاة الصحيحة وفق منهج أهل السنة والجماعة، كما ثبت عن النبي ﷺ بأنه قال: "صلوا كما رأيتموني أصلي".</p>
             
             <div class="prayer-step">
-                <img src="https://image.pollinations.ai/prompt/A%20realistic%20photography%20of%20a%20Muslim%20man%20praying%20salah%20standing%20in%20a%20beautiful%20mosque?width=300&height=300&nologo=true" alt="القيام وتكبيرة الإحرام">
+                <img src="https://images.pexels.com/photos/8164382/pexels-photo-8164382.jpeg?auto=compress&cs=tinysrgb&w=300" alt="القيام وتكبيرة الإحرام">
                 <div class="prayer-step-content">
                     <h4 data-i18n="step1_title">1. الوضوء، النية، وتكبيرة الإحرام (القيام)</h4>
                     <p data-i18n="step1_desc">بعد إسباغ الوضوء واستقبال القبلة، ينوي المسلم الصلاة بقلبه (فالتلفظ بالنية بدعة). ثم يكبر تكبيرة الإحرام قائلاً: <strong>(الله أكبر)</strong> ويرفع يديه ممدودة الأصابع حذو منكبيه (أكتافه) أو حذو فروع أذنيه. ثم يضع يده اليمنى على ظهر كفه اليسرى أو يرسغهما ويضعهما على صدره. ويكون نظره في هذه الأثناء وأثناء القيام إلى موضع سجوده خضوعاً وتذللاً لله.</p>
@@ -325,7 +328,7 @@
             </div>
 
             <div class="prayer-step">
-                <img src="https://image.pollinations.ai/prompt/A%20close%20up%20realistic%20photography%20of%20a%20holy%20quran%20book%20open%20in%20a%20mosque?width=300&height=300&nologo=true" alt="القراءة">
+                <img src="https://images.pexels.com/photos/8164373/pexels-photo-8164373.jpeg?auto=compress&cs=tinysrgb&w=300" alt="القراءة">
                 <div class="prayer-step-content">
                     <h4 data-i18n="step2_title">2. دعاء الاستفتاح وقراءة الفاتحة</h4>
                     <p data-i18n="step2_desc">يستحب أن يقرأ دعاء الاستفتاح سراً، وأشهره: <strong>(سبحانك اللهم وبحمدك وتبارك اسمك وتعالى جدك ولا إله غيرك)</strong>. ثم يستعيذ بالله من الشيطان الرجيم ويبسمل سراً. ثم يقرأ <strong>سورة الفاتحة</strong> وهي ركن لا تصح الصلاة بدونها في كل ركعة للمنفرد والإمام. وبعد الفاتحة يقرأ ما تيسر من القرآن الكريم في الركعتين الأولى والثانية من كل صلاة.</p>
@@ -333,7 +336,7 @@
             </div>
 
             <div class="prayer-step">
-                <img src="https://image.pollinations.ai/prompt/A%20realistic%20photography%20of%20a%20Muslim%20man%20praying%20salah%20ruku%20bowing%20in%20a%20beautiful%20mosque?width=300&height=300&nologo=true" alt="الركوع والرفع منه">
+                <img src="https://images.pexels.com/photos/8164378/pexels-photo-8164378.jpeg?auto=compress&cs=tinysrgb&w=300" alt="الركوع والرفع منه">
                 <div class="prayer-step-content">
                     <h4 data-i18n="step3_title">3. الركوع والاعتدال منه</h4>
                     <p data-i18n="step3_desc">يكبر ويرفع يديه كما فعل في تكبيرة الإحرام، ثم يركع بحيث يستوي ظهره (يصبح كالمائدة) ويقبض بيديه على ركبتيه ويفرق أصابعه. ويقول في ركوعه: <strong>(سبحان ربي العظيم)</strong> ثلاث مرات أو أكثر. ثم يرفع رأسه من الركوع رافعاً يديه ويقول للإمام والمنفرد: <strong>(سمع الله لمن حمده)</strong>، فإذا استوى قائماً قال: <strong>(ربنا ولك الحمد حمداً كثيراً طيباً مباركاً فيه)</strong>.</p>
@@ -341,7 +344,7 @@
             </div>
 
             <div class="prayer-step">
-                <img src="https://image.pollinations.ai/prompt/A%20realistic%20photography%20of%20a%20Muslim%20man%20praying%20salah%20sujud%20prostrating%20in%20a%20beautiful%20mosque?width=300&height=300&nologo=true" alt="السجود">
+                <img src="https://images.pexels.com/photos/8164434/pexels-photo-8164434.jpeg?auto=compress&cs=tinysrgb&w=300" alt="السجود">
                 <div class="prayer-step-content">
                     <h4 data-i18n="step4_title">4. السجود والجلوس بين السجدتين</h4>
                     <p data-i18n="step4_desc">يكبر ويهوي للسجود (بدون رفع اليدين)، ويسجد على الأعضاء السبعة: (الجبهة والأنف، باطن الكفين، الركبتين، وأطراف أصابع القدمين متجهة للقبلة)، ويجافي عضديه عن جنبيه. ويقول: <strong>(سبحان ربي الأعلى)</strong> ثلاث مرات، ويكثر من الدعاء. ثم يرفع رأسه مكبراً ويجلس مفترشاً (ينصب رجله اليمنى ويجلس على اليسرى) ويقول: <strong>(رب اغفر لي وارحمني واهدني وعافني وارزقني)</strong>، ثم يسجد السجدة الثانية كالأولى.</p>
@@ -349,7 +352,7 @@
             </div>
 
             <div class="prayer-step">
-                <img src="https://image.pollinations.ai/prompt/A%20realistic%20photography%20of%20a%20Muslim%20man%20praying%20salah%20sitting%20tashahhud%20pointing%20finger%20in%20a%20mosque?width=300&height=300&nologo=true" alt="التشهد">
+                <img src="https://images.pexels.com/photos/8164448/pexels-photo-8164448.jpeg?auto=compress&cs=tinysrgb&w=300" alt="التشهد">
                 <div class="prayer-step-content">
                     <h4 data-i18n="step5_title">5. التشهد الأخير والتسليم</h4>
                     <p data-i18n="step5_desc">يجلس للتشهد ويضع يديه على فخذيه، ويقبض أصابع يده اليمنى ويشير بالسبابة عند الدعاء، ويقرأ التشهد: <strong>(التحيات لله والصلوات والطيبات، السلام عليك أيها النبي ورحمة الله وبركاته، السلام علينا وعلى عباد الله الصالحين، أشهد أن لا إله إلا الله وأشهد أن محمداً عبده ورسوله)</strong>. ثم يقرأ الصلاة الإبراهيمية (اللهم صل على محمد...). وبعدها يلتفت بوجهه لليمين قائلاً: <strong>(السلام عليكم ورحمة الله)</strong>، ثم لليسار بنفس العبارة.</p>
@@ -360,8 +363,8 @@
                 <h3 style="color: var(--green-dark); margin-bottom: 15px;" data-i18n="video_title">شرح مرئي عملي لصفة صلاة النبي ﷺ</h3>
                 <p style="color: var(--text-muted); margin-bottom: 20px;" data-i18n="video_desc">لصاحب الفضيلة الشيخ أ.د عثمان الخميس حفظه الله</p>
                 
-                <a href="https://www.youtube.com/watch?v=sU4JIFbPhDI" target="_blank" style="display: block; position: relative; border-radius: 15px; overflow: hidden; box-shadow: var(--shadow); max-width: 600px; margin: auto; text-decoration: none; cursor: pointer;">
-                    <img src="https://i.ytimg.com/vi/sU4JIFbPhDI/hqdefault.jpg.jpg" alt="فيديو شرح صلاة النبي عثمان الخميس" style="width: 100%; display: block; border-radius: 15px;">
+                <a href="https://www.youtube.com/watch?v=W-jX2kY0vR8" target="_blank" style="display: block; position: relative; border-radius: 15px; overflow: hidden; box-shadow: var(--shadow); max-width: 600px; margin: auto; text-decoration: none; cursor: pointer;">
+                    <img src="https://i.ytimg.com/vi/W-jX2kY0vR8/hqdefault.jpg" alt="فيديو شرح صلاة النبي عثمان الخميس" style="width: 100%; display: block; border-radius: 15px;">
                     <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(255, 0, 0, 0.9); width: 80px; height: 55px; border-radius: 15px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.5);">
                         <div style="width: 0; height: 0; border-top: 15px solid transparent; border-bottom: 15px solid transparent; border-left: 25px solid white; margin-left: 5px;"></div>
                     </div>
@@ -440,7 +443,7 @@
                 </select>
             </div>
 
-            <button class="mic-btn" id="micBtn" onclick="startVoiceTest()" style="flex-shrink:0;">🎙</button>
+            <button class="mic-btn" id="micBtn" onclick="startVoiceTest()" style="flex-shrink:0;">🎙️</button>
             
             <div id="voiceResultText" style="font-size: 18px; color: var(--text-muted); margin: 10px 0;">جاهز للاستماع...</div>
             <div id="voiceFeedback" style="margin-top: 5px; margin-bottom: 10px;"></div>
@@ -459,10 +462,10 @@
             <ul class="nav-links">
                 <li>
                     <select id="langSelect" class="lang-select" onchange="changeLanguage(this.value)" aria-label="Select Language">
-                        <option value="ar" selected>العربية</option>
-                        <option value="en">English</option>
-                        <option value="es">Español</option>
-                        <option value="fr">Français</option>
+                        <option value="ar" selected>🌐 العربية / Arabic</option>
+                        <option value="en">🌐 English / الإنجليزية</option>
+                        <option value="es">🌐 Español / الإسبانية</option>
+                        <option value="fr">🌐 Français / الفرنسية</option>
                     </select>
                 </li>
                 <li><button id="themeToggle" class="theme-toggle" title="Mode" aria-label="Dark Mode">🌙</button></li>
@@ -627,7 +630,7 @@
         <h2 data-i18n="footer_title">القرآن الكريم</h2>
         <p data-i18n="footer_desc">موقع تعليمي وتجريبي لخدمة كتاب الله</p>
         <div class="developer">
-            <span style="margin-inline-end: 10px; color: var(--gold); font-size: 16px; font-weight: 800;">Developed by Obada najeeb AL-Qaisee #عبادة ابوفردة #</span>            
+            <span style="margin-inline-end: 10px; color: var(--gold); font-size: 16px; font-weight: 800;">Developed by Obada najeeb AL-Qaisee #</span>            
             <a href="https://www.instagram.com/obaalqaisee/" target="_blank" class="social-link" title="Instagram">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
             </a>
@@ -640,8 +643,8 @@
 
     <button id="topButton" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" aria-label="Scroll to top">↑</button>
 
-    <!-- الأكواد البرمجية (بدون المساس بأي عملية) -->
     <script>
+        // إزالة التشكيل المسبب للتشوه عن كلمة سورة فقط
         function fixSurahName(text) {
             return text.replace('سُورَةُ ', 'سورة ').replace('سُورَةِ ', 'سورة ');
         }
@@ -735,7 +738,7 @@
                 islam_sec3_title: "دعوة إلى النور", 
                 islam_sec3_desc: "ندعو كل باحث عن الحق، والطمأنينة، والسلام الداخلي، أن يقرأ القرآن الكريم بتجرد وبعقل مفتوح.",
                 footer_title: "القرآن الكريم", footer_desc: "موقع تعليمي وتجريبي لخدمة كتاب الله", search_placeholder: "ابحث عن سورة...", surah_label_prefix: "السورة رقم",
-                reciter_yasser: "الشيخ ياسر الدوسري", reciter_shatri: "الشيخ أبو بكر الشاطري", reciter_afasy: "الشيخ مشاري العفاسي", reciter_maher: "الشيخ ماهر المعيقلي", reciter_ajmi: "الشيخ أحمد العجمي", reciter_fares: "الشيخ فارس عباد", reciter_luhaidan: "الشيخ محمد اللحيدان", reciter_idrees: "الشيخ إدريس أبكر", reciter_ghamdi: "الشيخ سعد الغامدي", reciter_qatami: "الشيخ ناصر القطامي"
+                reciter_yasser: "الشيخ ياسر الدوسري", reciter_shatri: "الشيخ أبو بكر الشاطري", reciter_afasy: "الشيخ مشاري العفاسي", reciter_maher: "Maher Al-Muaiqly", reciter_ajmi: "الشيخ أحمد العجمي", reciter_fares: "الشيخ فارس عباد", reciter_luhaidan: "الشيخ محمد اللحيدان", reciter_idrees: "الشيخ إدريس أبكر", reciter_ghamdi: "الشيخ سعد الغامدي", reciter_qatami: "الشيخ ناصر القطامي"
             },
             en: {
                 logo_text: "The Noble <span>Quran</span>", nav_prayer: "Prayer Times", nav_adhkar: "📿 Hisn Almuslim", nav_islam: "🕌 Islam", nav_surahs: "Surahs",
@@ -776,7 +779,7 @@
                 modal_login_title: "Iniciar Sesión", modal_login_msg: "Crear una cuenta o iniciar sesión no está disponible actualmente.",
                 modal_donate_title: "Donar", modal_donate_msg: "Las donaciones no están disponibles actualmente.",
                 modal_contact_title: "Contáctenos", modal_contact_msg1: "Estaremos encantados de recibir sus comentarios por correo electrónico:", modal_contact_msg2: "O a través de nuestras cuentas:",
-                modal_learn_title: "La oración del Profeta ﷺ", modal_learn_desc: "Explicación detallada de los pasos correctos de la oración según la metodología de Ahl as-Sunnah wal-Jama'ah, tal como se estableció del Profeta ﷺ, quien dijo: \"Orad como me habéis visto orar.\"",
+                modal_learn_title: "Oración del Profeta ﷺ", modal_learn_desc: "Explicación detallada de los pasos correctos de la oración según la metodología de Ahl as-Sunnah wal-Jama'ah, tal como se estableció del Profeta ﷺ, quien dijo: \"Orad como me habéis visto orar.\"",
                 step1_title: "1. Ablución, intención y Takbir al-Ihram (de pie)", step1_desc: "Después de completar la ablución y orientarse hacia la Qibla, el musulmán tiene la intención de rezar en su corazón (pronunciar la intención en voz alta es una innovación). Luego pronuncia el Takbir de apertura: <strong>(Allahu Akbar)</strong>, levantando las manos con los dedos extendidos hasta la altura de los hombros o de la parte superior de las orejas. Después coloca la mano derecha sobre la izquierda, o sobre la muñeca, y las coloca sobre el pecho. Durante este tiempo y mientras está de pie, mira hacia el lugar de la postración con humildad ante Allah.",
                 step2_title: "2. Súplica de apertura y recitación de Al-Fatihah", step2_desc: "Se recomienda recitar en voz baja la súplica de apertura. Una de las más conocidas es: <strong>(Subhanaka Allahumma wa bihamdika, wa tabarakasmuka, wa ta'ala jadduka, wa la ilaha ghayruk)</strong>. Luego busca refugio en Allah contra Satanás y dice la Basmalah en voz baja. Después recita <strong>la sura Al-Fatihah</strong>, que es un pilar sin el cual la oración no es válida en cada rak'ah para quien reza solo y para el imam. Después de Al-Fatihah, recita lo que le resulte fácil del Corán en la primera y segunda rak'ah de cada oración.",
                 step3_title: "3. Ruku (inclinación) y levantarse de él", step3_desc: "Pronuncia el Takbir y levanta las manos como lo hizo en el Takbir de apertura. Luego se inclina manteniendo la espalda recta, como una mesa, colocando las manos sobre las rodillas con los dedos separados. En el Ruku dice: <strong>(Subhana Rabbiyal-Adheem)</strong> tres veces o más. Luego levanta la cabeza del Ruku levantando las manos, y el imam y quien reza solo dicen: <strong>(Sami'a Allahu liman hamidah)</strong>. Al quedar completamente de pie dice: <strong>(Rabbana wa lakal-hamd, hamdan kathiran tayyiban mubarakan fih)</strong>.",
@@ -871,8 +874,8 @@
                 populateVoiceSelect();
             }
             if(adhkarState) renderAdhkar();
-            renderPrayerTimes();
-            updateAyahDetails();
+            if(globalPrayerTimings.length > 0) renderPrayerTimes();
+            if(currentActiveAyahGlobalNumber) updateAyahDetails();
             checkBookmark();
         }
 
@@ -1050,47 +1053,48 @@
         });
 
         let recognition;
+        window.isVoiceTesting = false; 
+
         if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
             const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
             recognition = new SpeechRec();
             recognition.lang = 'ar-SA'; 
             recognition.continuous = true; 
-            recognition.interimResults = false;
+            recognition.interimResults = true; 
             recognition.maxAlternatives = 1;
             
             recognition.onstart = function() {
+                window.isVoiceTesting = true;
                 document.getElementById('micBtn').classList.add('recording');
                 document.getElementById('voiceResultText').innerText = "جاري الاستماع... تفضل بالقراءة";
                 document.getElementById('voiceFeedback').innerText = "";
             };
             
             recognition.onresult = function(event) {
-                const latestResult = event.results[event.results.length - 1];
-                const transcript = latestResult[0].transcript.trim();
+                let transcript = '';
+                for (let i = event.resultIndex; i < event.results.length; ++i) {
+                    transcript += event.results[i][0].transcript;
+                }
+                transcript = transcript.trim();
                 
                 const normalizeText = (text) => {
                     return text.replace(/[\u0610-\u061A\u064B-\u065F\u0670\u06D6-\u06ED\u06DF-\u06E8]/g, '')
                                .replace(/[أإآ]/g, 'ا') 
                                .replace(/ة/g, 'ه') 
-                               .replace(/ى/g, 'ي') 
+                               .replace(/ى/g, 'ي')
+                               .replace(/ؤ/g, 'و')
+                               .replace(/ئ/g, 'ي')
                                .replace(/[^ا-ي ]/g, '')
                                .trim(); 
                 };
 
                 const normSpoken = normalizeText(transcript);
-                
-                if (normSpoken.length < 5) return; 
+                if (normSpoken.length < 2) return; 
 
                 document.getElementById('voiceResultText').innerText = "سمعتك تقول: " + transcript;
                 
                 const surahNum = document.getElementById('voiceSurahSelect').value;
                 if(!surahNum || !window.cachedVoiceSurahAyahs || window.cachedVoiceSurahNum !== surahNum || !window.cachedVoiceSurahAyahs[window.currentVoiceAyahIndex]) {
-                    document.getElementById('voiceFeedback').innerHTML = "<span style='color:red;'>يرجى تحديد السورة وانتظار التجهيز أولاً!</span>";
-                    return;
-                }
-
-                if(window.currentVoiceAyahIndex >= window.cachedVoiceSurahAyahs.length) {
-                    document.getElementById('voiceFeedback').innerHTML = "<span style='color:var(--green); font-weight:bold; font-size:20px;'>ما شاء الله! أتممت السورة بنجاح 🎉</span>";
                     return;
                 }
 
@@ -1103,24 +1107,20 @@
                 }
 
                 let isCorrect = false;
+                let expectedWords = normExpected.split(' ');
+                let spokenWords = normSpoken.split(' ');
+                let matchCount = 0;
                 
-                if (normExpected.includes(normSpoken) && normSpoken.length > 8) {
+                expectedWords.forEach(w => { if (w.length >= 2 && spokenWords.includes(w)) matchCount++; });
+                
+                if (normSpoken.includes(normExpected) || normExpected.includes(normSpoken)) {
                     isCorrect = true;
-                } else if (normSpoken.includes(normExpected)) {
+                } else if (matchCount >= Math.max(1, Math.floor(expectedWords.length * 0.3)) || matchCount >= 2) {
                     isCorrect = true;
-                } else {
-                    let expectedWords = normExpected.split(' ');
-                    let spokenWords = normSpoken.split(' ');
-                    let matchCount = 0;
-                    expectedWords.forEach(w => { if (w.length > 2 && spokenWords.includes(w)) matchCount++; });
-                    
-                    if (matchCount >= Math.max(1, Math.floor(expectedWords.length * 0.5)) || matchCount >= 3) {
-                        isCorrect = true;
-                    }
                 }
 
                 if(isCorrect) {
-                    document.getElementById('voiceFeedback').innerHTML = "<span style='color:var(--green); font-weight:bold; font-size:20px;'>أحسنت! أكمل الآية التالية... ✔️</span>";
+                    document.getElementById('voiceFeedback').innerHTML = "<span style='color:var(--green); font-weight:bold; font-size:20px;'>أحسنت! أكمل... ✔️</span>";
                     
                     let displayText = expectedAyah.text;
                     if (expectedAyah.numberInSurah !== 1 && displayText.startsWith("بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ ")) { 
@@ -1134,23 +1134,38 @@
                     container.scrollTop = container.scrollHeight; 
                     
                     window.currentVoiceAyahIndex++;
+                    recognition.stop(); 
+                    
                     if(window.currentVoiceAyahIndex >= window.cachedVoiceSurahAyahs.length) {
                         document.getElementById('voiceFeedback').innerHTML = "<span style='color:var(--green); font-weight:bold; font-size:20px;'>ما شاء الله! أتممت السورة بنجاح 🎉</span>";
-                        recognition.stop();
+                        window.isVoiceTesting = false;
                     }
                 } else {
-                    document.getElementById('voiceFeedback').innerHTML = `<span style='color:red; font-weight:bold; font-size:18px;'>لم تتطابق الآية، أعد قراءتها بوضوح ❌</span>`;
+                    const isFinal = event.results[event.results.length - 1].isFinal;
+                    if (isFinal && normSpoken.length > 5) {
+                        document.getElementById('voiceFeedback').innerHTML = `<span style='color:red; font-weight:bold; font-size:18px;'>أعد قراءة الآية بوضوح ❌</span>`;
+                    } else {
+                        document.getElementById('voiceFeedback').innerHTML = `<span style='color:var(--gold); font-size:16px;'>أكمل القراءة... ⏳</span>`;
+                    }
                 }
             };
             
             recognition.onend = function() {
-                document.getElementById('micBtn').classList.remove('recording');
-                document.getElementById('voiceResultText').innerText = "توقف الاستماع.";
+                if(window.isVoiceTesting && window.currentVoiceAyahIndex < window.cachedVoiceSurahAyahs.length) {
+                    try { recognition.start(); } catch(e) {}
+                } else {
+                    document.getElementById('micBtn').classList.remove('recording');
+                    document.getElementById('voiceResultText').innerText = "توقف الاستماع.";
+                    window.isVoiceTesting = false;
+                }
             };
             
             recognition.onerror = function(event) {
-                document.getElementById('micBtn').classList.remove('recording');
-                document.getElementById('voiceResultText').innerText = "لم أتمكن من سماعك بوضوح، اضغط المايك وحاول مرة أخرى.";
+                if (event.error !== 'no-speech') {
+                    document.getElementById('micBtn').classList.remove('recording');
+                    document.getElementById('voiceResultText').innerText = "اضغط المايك وحاول مرة أخرى.";
+                    window.isVoiceTesting = false;
+                }
             };
         } else {
             document.getElementById('micBtn').style.display = 'none';
@@ -1158,7 +1173,15 @@
         }
 
         function startVoiceTest() {
-            if(recognition) recognition.start();
+            if(recognition) {
+                if(window.isVoiceTesting) {
+                    window.isVoiceTesting = false;
+                    recognition.stop();
+                } else {
+                    window.isVoiceTesting = true;
+                    try { recognition.start(); } catch(e) {}
+                }
+            }
         }
 
         const SURAH_API = "https://api.alquran.cloud/v1/surah";
@@ -1335,13 +1358,11 @@
 
         window.onscroll = function() { document.getElementById("topButton").style.display = (document.documentElement.scrollTop > 300) ? "block" : "none"; };
         
-        // منع الانهيار عند بدء التحميل
         window.onload = function() {
             adhkarState = JSON.parse(JSON.stringify(adhkarData['morning']));
             changeLanguage('ar');
-            loadSurahs();
+            loadSurahs(); 
         };
     </script>
 </body>
 </html>
-```
