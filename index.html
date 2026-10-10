@@ -2653,28 +2653,84 @@ placeholder_profile_name: "Votre Nom", placeholder_profile_goal: "Votre Objectif
 
 
 
-        function playSurah(number) {
+        async function playSurah(number) {
+            const surah = allSurahs.find(s => s.number === number);
+            if (!surah) return;
 
-            let surah = allSurahs.find(s => s.number === number);
+            currentSurah = number;
+            currentSurahName = surah.name;
 
-            if(!surah) return;
+            const reciterSelect = document.getElementById("reciterSelect");
+            const selectedOption = reciterSelect.options[reciterSelect.selectedIndex];
+            const selectedReciterName = selectedOption.textContent.trim();
+            const originalBase = reciterSelect.value;
+            const paddedNumber = String(number).padStart(3, "0");
+            const subtitle = document.getElementById("playerSubtitle");
 
-            currentSurah = number; currentSurahName = surah.name;
+            document.getElementById("playerTitle").innerText =
+                currentLang === "ar" ? fixSurahName(surah.name) : surah.englishName;
+            subtitle.innerText = "جاري تحميل التلاوة...";
+            document.getElementById("ayahPlayer").pause();
+            audioPlayer.onerror = async function () {
+                audioPlayer.onerror = null;
+                subtitle.innerText = "تعذر تشغيل هذا الرابط، جاري البحث عن رابط بديل للقارئ...";
 
-            const url = `${document.getElementById("reciterSelect").value}${String(number).padStart(3, '0')}.mp3`;
+                try {
+                    const response = await fetch("https://www.mp3quran.net/api/v3/reciters?language=ar");
+                    if (!response.ok) throw new Error("تعذر الوصول إلى خدمة القراء");
+                    const result = await response.json();
+                    const normalize = value => String(value || "")
+                        .replace(/الشيخ|الشيخ\s+/g, "")
+                        .replace(/[\u064B-\u065F\u0670]/g, "")
+                        .replace(/[أإآ]/g, "ا")
+                        .replace(/ى/g, "ي")
+                        .replace(/[^\u0621-\u064A]/g, "")
+                        .trim();
 
-            document.getElementById("playerSubtitle").innerText = "..."; audioPlayer.src = url; 
+                    const wantedName = normalize(selectedReciterName);
+                    const reciters = result.reciters || [];
+                    let reciter = reciters.find(r => normalize(r.name) === wantedName);
+                    if (!reciter) {
+                        reciter = reciters.find(r => {
+                            const apiName = normalize(r.name);
+                            return apiName && wantedName && (apiName.includes(wantedName) || wantedName.includes(apiName));
+                        });
+                    }
 
-            document.getElementById('playerTitle').innerText = currentLang === 'ar' ? fixSurahName(surah.name) : surah.englishName;
+                    const moshaf = reciter && (reciter.moshaf || []).find(m => {
+                        const list = String(m.surah_list || "");
+                        return list.split(",").includes(String(number));
+                    });
 
-            document.getElementById('ayahPlayer').pause();
+                    if (!moshaf || !moshaf.server) throw new Error("لم يتم العثور على رابط بديل لهذا القارئ");
+                    const base = moshaf.server.endsWith("/") ? moshaf.server : moshaf.server + "/";
+                    const fallbackUrl = base + paddedNumber + ".mp3";
+                    if (fallbackUrl === audioPlayer.src) throw new Error("الرابط البديل هو نفسه الرابط السابق");
 
-            const p = audioPlayer.play();
+                    audioPlayer.src = fallbackUrl;
+                    audioPlayer.load();
+                    try {
+                        await audioPlayer.play();
+                        subtitle.innerText = "▶";
+                    } catch (error) {
+                        subtitle.innerText = "تعذر التشغيل؛ جرّب قارئًا آخر أو تحقق من اتصال الإنترنت.";
+                    }
+                } catch (error) {
+                    subtitle.innerText = "تعذر تشغيل هذا القارئ حاليًا؛ جرّب قارئًا آخر أو تحقق من اتصال الإنترنت.";
+                }
+            };
 
-            if(p !== undefined) p.then(()=> document.getElementById("playerSubtitle").innerText = "▶").catch(e=>{});
+            audioPlayer.src = originalBase + paddedNumber + ".mp3";
+            audioPlayer.load();
+            try {
+                await audioPlayer.play();
+                subtitle.innerText = "▶";
+            } catch (error) {
+                if (audioPlayer.error) audioPlayer.onerror();
+                else subtitle.innerText = "اضغط تشغيل مرة أخرى أو تحقق من اتصال الإنترنت.";
+            }
 
-            document.getElementById('audio').scrollIntoView({ behavior: 'smooth' });
-
+            document.getElementById("audio").scrollIntoView({ behavior: "smooth" });
         }
 
         function changeReciter() { if (currentSurah !== 0) playSurah(currentSurah); }
