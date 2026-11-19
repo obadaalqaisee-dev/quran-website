@@ -1,0 +1,178 @@
+[
+ {
+  "slug": "basit",
+  "position": 1,
+  "name_ar": "الشيخ عبد الباسط عبد الصمد",
+  "name_en": "Abdul Basit Abdul Samad",
+  "i18n_key": null,
+  "base_url": "https://server7.mp3quran.net/basit/",
+  "rewaya": "حفص عن عاصم - مرتل",
+  "mp3quran_reciter_id": 51,
+  "mp3quran_moshaf_id": 53
+ },
+ {
+  "slug": "shuraim",
+  "position": 2,
+  "name_ar": "الشيخ سعود الشريم",
+  "name_en": "Saud Al-Shuraim",
+  "i18n_key": null,
+  "base_url": "https://server7.mp3quran.net/shur/",
+  "rewaya": "حفص عن عاصم - مرتل",
+  "mp3quran_reciter_id": 31,
+  "mp3quran_moshaf_id": 31
+ },
+ {
+  "slug": "husary",
+  "position": 3,
+  "name_ar": "الشيخ محمود خليل الحصري",
+  "name_en": "Mahmoud Khalil Al-Husary",
+  "i18n_key": null,
+  "base_url": "https://server13.mp3quran.net/husr/",
+  "rewaya": "حفص عن عاصم - مرتل",
+  "mp3quran_reciter_id": 118,
+  "mp3quran_moshaf_id": 118
+ },
+ {
+  "slug": "hudhaifi",
+  "position": 4,
+  "name_ar": "الشيخ علي الحذيفي",
+  "name_en": "Ali Al-Hudhaifi",
+  "i18n_key": null,
+  "base_url": "https://server9.mp3quran.net/hthfi/",
+  "rewaya": "حفص عن عاصم - مرتل",
+  "mp3quran_reciter_id": 74,
+  "mp3quran_moshaf_id": 74
+ },
+ {
+  "slug": "yamani",
+  "position": 5,
+  "name_ar": "الشيخ وديع اليمني",
+  "name_en": "Wadee Al-Yamani",
+  "i18n_key": null,
+  "base_url": "https://server6.mp3quran.net/wdee3/",
+  "rewaya": "حفص عن عاصم - مرتل",
+  "mp3quran_reciter_id": 219,
+  "mp3quran_moshaf_id": 219
+ },
+ {
+  "slug": "tunaiji",
+  "position": 6,
+  "name_ar": "الشيخ خليفة الطنيجي",
+  "name_en": "Khalifa Al-Tunaiji",
+  "i18n_key": null,
+  "base_url": "https://server12.mp3quran.net/tnjy/",
+  "rewaya": "حفص عن عاصم - مرتل",
+  "mp3quran_reciter_id": 24,
+  "mp3quran_moshaf_id": 24
+ },
+ {
+  "slug": "dosari",
+  "position": 7,
+  "name_ar": "الشيخ ياسر الدوسري",
+  "name_en": "Yasser Al-Dosari",
+  "i18n_key": "reciter_yasser",
+  "base_url": "https://server11.mp3quran.net/yasser/",
+  "rewaya": "حفص عن عاصم - مرتل",
+  "mp3quran_reciter_id": 92,
+  "mp3quran_moshaf_id": 92
+ },
+ {
+  "slug": "shatri",
+  "position": 8,
+  "name_ar": "الشيخ أبو بكر الشاطري",
+  "name_en": "Abu Bakr Al-Shatri",
+  "i18n_key": "reciter_shatri",
+  "base_url": "https://server11.mp3quran.net/shatri/",
+  "rewaya": "حفص عن عاصم - مرتل",
+  "mp3quran_reciter_id": 4,
+  "mp3quran_moshaf_id": 4
+ },
+ {
+  "slug": "afasy",
+  "position": 9,
+  "name_ar": "الشيخ مشاري العفاسي",
+  "name_en": "Mishary Al-Afasy",
+  "i18n_key": "reciter_afasy",
+  "base_url": "https://server8.mp3quran.net/afs/",
+  "rewaya": "حفص عن عاصم - مرتل",
+  "mp3quran_reciter_id": 123,
+  "mp3quran_moshaf_id": 123
+ },
+ {
+  "slug": "muaiqly",
+  "position": 10,
+  "name_ar": "الشيخ ماهر المعيقلي",
+  "name_en": "Maher Al-Muaiqly",
+  "i18n_key": "reciter_maher",
+  "base_url": "https://server12.mp3quran.net/maher/",
+  "rewaya": "حفص عن عاصم - مرتل",
+  "mp3quran_reciter_id": 102,
+  "mp3quran_moshaf_id": 102
+ },
+ {
+  "slug": "ajmi",
+  "position": 11,
+  "name_ar": "الشيخ أحمد العجمي",
+  "name_en": "Ahmed Al-Ajmi",
+  "i18n_key": "reciter_ajmi",
+  "base_url": "https://server10.mp3quran.net/ajm/",
+  "rewaya": "حفص عن عاصم - مرتل",
+  "mp3quran_reciter_id": 5,
+  "mp3quran_moshaf_id": 5
+ },
+ {
+  "slug": "abbad",
+  "position": 12,
+  "name_ar": "الشيخ فارس عباد",
+  "name_en": "Fares Abbad",
+  "i18n_key": "reciter_fares",
+  "base_url": "https://server8.mp3quran.net/frs_a/",
+  "rewaya": "حفص عن عاصم - مرتل",
+  "mp3quran_reciter_id": 81,
+  "mp3quran_moshaf_id": 81
+ },
+ {
+  "slug": "luhaidan",
+  "position": 13,
+  "name_ar": "الشيخ محمد اللحيدان",
+  "name_en": "Muhammad Al-Luhaidan",
+  "i18n_key": "reciter_luhaidan",
+  "base_url": "https://server8.mp3quran.net/lhdan/",
+  "rewaya": "حفص عن عاصم - مرتل",
+  "mp3quran_reciter_id": 107,
+  "mp3quran_moshaf_id": 107
+ },
+ {
+  "slug": "abkar",
+  "position": 14,
+  "name_ar": "الشيخ إدريس أبكر",
+  "name_en": "Idrees Abkar",
+  "i18n_key": "reciter_idrees",
+  "base_url": "https://server6.mp3quran.net/abkr/",
+  "rewaya": "حفص عن عاصم - مرتل",
+  "mp3quran_reciter_id": 12,
+  "mp3quran_moshaf_id": 12
+ },
+ {
+  "slug": "ghamdi",
+  "position": 15,
+  "name_ar": "الشيخ سعد الغامدي",
+  "name_en": "Saad Al-Ghamdi",
+  "i18n_key": "reciter_ghamdi",
+  "base_url": "https://server7.mp3quran.net/s_gmd/",
+  "rewaya": "حفص عن عاصم - مرتل",
+  "mp3quran_reciter_id": 30,
+  "mp3quran_moshaf_id": 30
+ },
+ {
+  "slug": "qatami",
+  "position": 16,
+  "name_ar": "الشيخ ناصر القطامي",
+  "name_en": "Nasser Al-Qatami",
+  "i18n_key": "reciter_qatami",
+  "base_url": "https://server6.mp3quran.net/qtm/",
+  "rewaya": "حفص عن عاصم - مرتل",
+  "mp3quran_reciter_id": 86,
+  "mp3quran_moshaf_id": 86
+ }
+]

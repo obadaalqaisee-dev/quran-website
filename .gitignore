@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+
+# Local databases (the schema and seed data are reproducible)
+*.sqlite
+*.sqlite3
+*.sqlite3-*
+*.db
+*.db-*
+
+# Node / test artefacts
+node_modules/
+test-results/
+playwright-report/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp

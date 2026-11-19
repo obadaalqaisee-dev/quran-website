@@ -1,0 +1,19 @@
+# Render Blueprint for the Python API (https://render.com/docs/blueprint-spec).
+# The website stays on GitHub Pages: https://obadaalqaisee-dev.github.io/quran-website/
+services:
+  - type: web
+    name: quran-website-api
+    runtime: docker
+    rootDir: backend
+    dockerfilePath: ./Dockerfile
+    plan: free
+    region: frankfurt
+    healthCheckPath: /api/v1/health
+    autoDeploy: true
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: CORS_ORIGINS
+        value: https://obadaalqaisee-dev.github.io
+      - key: WEB_CONCURRENCY
+        value: "2"
