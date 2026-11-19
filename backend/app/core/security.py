@@ -13,7 +13,8 @@ from starlette.types import ASGIApp, Message, Receive, Scope, Send
 # upstream APIs when no backend is configured (GitHub Pages fallback mode).
 CSP_SOURCES = {
     "default-src": ["'self'"],
-    "script-src": ["'self'", "https://www.googletagmanager.com"],
+    # The hash allows exactly one inline script: the theme initialiser in index.html (no 'unsafe-inline').
+    "script-src": ["'self'", "'sha256-ANrF7JP3nCCxPbHOeznx86QJisMdocwvh/00wruFO+g='", "https://www.googletagmanager.com"],
     "style-src": ["'self'"],
     "font-src": ["'self'"],  # fonts are self-hosted
     "img-src": [

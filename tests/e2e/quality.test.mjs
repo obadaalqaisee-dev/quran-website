@@ -2,7 +2,8 @@
 
 import assert from 'node:assert/strict';
 import { execFileSync, spawnSync } from 'node:child_process';
-import { mkdirSync, readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { mkdirSync, readFileSync, readdirSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { join } from 'node:path';
 import { after, before, describe, test } from 'node:test';
@@ -158,15 +159,32 @@ describe('static security and SEO checks', () => {
   const html = readFileSync(join(REPO, 'index.html'), 'utf8');
 
   test('no inline scripts, inline event handlers or style attributes (strict CSP is possible)', () => {
+    const csp = /http-equiv="Content-Security-Policy" content="([^"]+)"/.exec(html)[1];
     const scripts = [...html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/g)];
+    let inline = 0;
     for (const [, attrs, body] of scripts) {
       if (/type="application\/ld\+json"/.test(attrs)) continue;
-      assert.match(attrs, /\bsrc="/, 'scripts must be external');
-      assert.equal(body.trim(), '');
+      if (/\bsrc="/.test(attrs)) { assert.equal(body.trim(), ''); continue; }
+      // The single inline script (theme initialiser) must be allowed by its exact hash, not 'unsafe-inline'.
+      inline += 1;
+      const hash = `sha256-${createHash('sha256').update(body).digest('base64')}`;
+      assert.ok(csp.includes(`'${hash}'`), `inline script hash ${hash} missing from the CSP`);
     }
+    assert.equal(inline, 1);
+    assert.doesNotMatch(csp, /unsafe-inline|unsafe-eval/);
     assert.doesNotMatch(html, /\son[a-z]+="/i, 'inline event handler');
     assert.doesNotMatch(html, /\sstyle="/i, 'inline style attribute');
     assert.doesNotMatch(html, /javascript:/i);
+  });
+
+  test('every JS module is preloaded and precached by the service worker', () => {
+    const walk = (dir) => readdirSync(join(REPO, dir), { withFileTypes: true })
+      .flatMap((e) => (e.isDirectory() ? walk(`${dir}/${e.name}`) : [`${dir}/${e.name}`]));
+    const modules = walk('assets/js').filter((f) => f.endsWith('.js') && !f.endsWith('analytics.js')).sort();
+    const preloaded = [...html.matchAll(/<link rel="modulepreload" href="([^"]+)">/g)].map((m) => m[1]).sort();
+    assert.deepEqual(preloaded, modules);
+    const sw = readFileSync(join(REPO, 'sw.js'), 'utf8');
+    for (const f of [...modules, 'assets/js/analytics.js', 'assets/css/main.css', 'index.html']) assert.ok(sw.includes(`'${f}'`), `sw.js precaches ${f}`);
   });
 
   test('external links opened in a new tab use rel="noopener noreferrer"', () => {

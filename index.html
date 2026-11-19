@@ -8,7 +8,7 @@
     APIs (GitHub Pages works either way). Set a URL with: python3 scripts/set_api_url.py https://your-api
   -->
   <meta name="quran-api" content="auto">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://www.googletagmanager.com; style-src 'self'; font-src 'self'; img-src 'self' data: https://images.unsplash.com https://images.pexels.com https://i.ytimg.com https://www.googletagmanager.com https://*.google-analytics.com; media-src 'self' https://*.mp3quran.net https://cdn.islamic.network; connect-src 'self' https://api.alquran.cloud https://www.mp3quran.net https://api.aladhan.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-ANrF7JP3nCCxPbHOeznx86QJisMdocwvh/00wruFO+g=' https://www.googletagmanager.com; style-src 'self'; font-src 'self'; img-src 'self' data: https://images.unsplash.com https://images.pexels.com https://i.ytimg.com https://www.googletagmanager.com https://*.google-analytics.com; media-src 'self' https://*.mp3quran.net https://cdn.islamic.network; connect-src 'self' https://api.alquran.cloud https://www.mp3quran.net https://api.aladhan.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
   <meta name="referrer" content="strict-origin-when-cross-origin">
 
   <title>القرآن الكريم | تلاوة، قراءة، أذكار وتفسير - The Noble Quran</title>
@@ -58,13 +58,45 @@
   <link rel="icon" href="assets/icons/icon-192.png" sizes="192x192" type="image/png">
   <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 
-  <!-- Fonts: Amiri (Quran and headings) and Cairo (interface), as in the original design, now self-hosted -->
-  <link rel="preload" href="assets/fonts/amiri-arabic-400-normal.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="preload" href="assets/fonts/cairo-arabic-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <!-- Fonts (Amiri, Cairo) are self-hosted and declared in main.css with font-display: swap. -->
 
   <link rel="stylesheet" href="assets/css/main.css">
+  <!-- Applies the saved/system theme before first paint (allowed by its hash in the CSP). -->
+  <script>
+(function () {
+  var theme = null;
+  try { theme = localStorage.getItem('theme'); } catch (e) { /* storage unavailable */ }
+  var dark = theme ? theme === 'dark' : !!(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  if (dark) document.documentElement.classList.add('dark-mode');
+})();
+  </script>
+  <!-- Fetch the whole module graph in parallel instead of import by import. -->
+  <link rel="modulepreload" href="assets/js/core/api.js">
+  <link rel="modulepreload" href="assets/js/core/arabic.js">
+  <link rel="modulepreload" href="assets/js/core/dom.js">
+  <link rel="modulepreload" href="assets/js/core/i18n.js">
+  <link rel="modulepreload" href="assets/js/core/modal.js">
+  <link rel="modulepreload" href="assets/js/core/quran.js">
+  <link rel="modulepreload" href="assets/js/core/storage.js">
+  <link rel="modulepreload" href="assets/js/core/toast.js">
+  <link rel="modulepreload" href="assets/js/data/adhkar.js">
+  <link rel="modulepreload" href="assets/js/data/reciters.js">
+  <link rel="modulepreload" href="assets/js/data/surahs.js">
+  <link rel="modulepreload" href="assets/js/data/translations.js">
+  <link rel="modulepreload" href="assets/js/features/adhkar.js">
+  <link rel="modulepreload" href="assets/js/features/ayah-search.js">
+  <link rel="modulepreload" href="assets/js/features/favorites.js">
+  <link rel="modulepreload" href="assets/js/features/islamic-search.js">
+  <link rel="modulepreload" href="assets/js/features/player.js">
+  <link rel="modulepreload" href="assets/js/features/prayer.js">
+  <link rel="modulepreload" href="assets/js/features/profile.js">
+  <link rel="modulepreload" href="assets/js/features/reader.js">
+  <link rel="modulepreload" href="assets/js/features/rosary.js">
+  <link rel="modulepreload" href="assets/js/features/surahs.js">
+  <link rel="modulepreload" href="assets/js/features/theme.js">
+  <link rel="modulepreload" href="assets/js/features/voice-lab.js">
+  <link rel="modulepreload" href="assets/js/features/wird.js">
   <link rel="modulepreload" href="assets/js/main.js">
-  <script src="assets/js/theme-init.js"></script>
   <script src="assets/js/analytics.js" async></script>
   <script type="module" src="assets/js/main.js"></script>
 </head>

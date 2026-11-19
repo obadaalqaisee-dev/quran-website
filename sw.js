@@ -14,7 +14,7 @@ const DATA_LIMIT = 300;
 
 const SHELL_FILES = [
   './', 'index.html', 'manifest.json', 'assets/css/main.css',
-  'assets/js/main.js', 'assets/js/theme-init.js', 'assets/js/analytics.js',
+  'assets/js/main.js', 'assets/js/analytics.js',
   'assets/js/core/api.js', 'assets/js/core/arabic.js', 'assets/js/core/dom.js', 'assets/js/core/i18n.js',
   'assets/js/core/modal.js', 'assets/js/core/quran.js', 'assets/js/core/storage.js', 'assets/js/core/toast.js',
   'assets/js/data/adhkar.js', 'assets/js/data/reciters.js', 'assets/js/data/surahs.js', 'assets/js/data/translations.js',
