@@ -14,8 +14,8 @@ from starlette.types import ASGIApp, Message, Receive, Scope, Send
 CSP_SOURCES = {
     "default-src": ["'self'"],
     "script-src": ["'self'", "https://www.googletagmanager.com"],
-    "style-src": ["'self'", "https://fonts.googleapis.com"],
-    "font-src": ["'self'", "https://fonts.gstatic.com"],
+    "style-src": ["'self'"],
+    "font-src": ["'self'"],  # fonts are self-hosted
     "img-src": [
         "'self'",
         "data:",
