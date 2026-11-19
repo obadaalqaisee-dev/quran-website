@@ -92,7 +92,7 @@ An earlier measurement before the performance commit showed a slower first paint
 
 ## Known limitations of the test suite
 
-* **Speech recognition and notifications are faked in the browser tests.** They verify the app's logic (matching, revealing ayahs, scheduling and wording of notifications), not the browser's microphone or the operating system's notification centre.
+* **Speech recognition and notifications are faked in the browser tests.** They verify the app's logic (matching, revealing ayahs, scheduling and wording of notifications), not the browser's microphone or the operating system's notification centre. Notification timing is tested with Playwright's controllable clock, including a jump past prayer time without intermediate ticks, as happens in a throttled background tab.
 * **Only Chromium is automated.** Firefox and Safari were not tested. Safari's support for `<dialog>`, ES modules and the Media Session API is present in current versions, but has not been verified here.
 * **No real screen-reader testing** (VoiceOver, NVDA): axe and keyboard tests are not a substitute.
 * **The deployed backend was not tested**, because no hosting account was available. The container, the production configuration and the cross-origin topology were tested locally.

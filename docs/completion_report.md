@@ -20,7 +20,7 @@ Details are in [technical_audit.md](technical_audit.md). Main problems, all **co
 | 1 | Memorisation lab crashed on every speech result (`getSkeleton` undefined) | ✅ fixed |
 | 2 | **Basmala shown twice** for surahs 2–114 (except 9), presenting it as part of ayah 1 (Unicode-order mismatch) | ✅ fixed; tested on all 114 surahs |
 | 3 | Arabic surah filter returned nothing; English needed the exact transliteration | ✅ fixed |
-| 4 | Prayer notifications promised but never sent | ✅ fixed (sent while the site is open) |
+| 4 | Prayer notifications promised but never sent | ✅ fixed: a warning within the last 10 minutes (with the real minutes left) and one at prayer time, while the site is open. Robust to background-tab timer throttling; tested with a controlled clock. |
 | 5 | Daily wird reset at UTC midnight | ✅ fixed (local date) |
 | 6 | Prayer names and next-prayer highlight lost on language change; language not remembered; many untranslated strings; ES/FR labels left in English; truncated translations | ✅ fixed |
 | 7 | Service worker never registered; PWA icons the wrong size | ✅ fixed (offline reading tested) |

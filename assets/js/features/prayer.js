@@ -1,5 +1,5 @@
 // Prayer times (geolocation, falling back to Amman as before), Hijri date, next-prayer countdown,
-// and prayer notifications: 10 minutes before and at the time of each prayer while the site is open.
+// and prayer notifications: a warning within the last 10 minutes and one at prayer time, while the site is open.
 
 import { getPrayerTimes } from '../core/api.js';
 import { h, localDateKey, pad2 } from '../core/dom.js';
@@ -88,18 +88,27 @@ async function showNotification(body) {
   try { new Notification(title, options); } catch { /* ignore */ }
 }
 
+// Browsers throttle timers in background tabs (to about once a minute), so notifications must not
+// depend on a tick landing in a narrow window:
+//  * "before": sent once, at any moment within the last NOTIFY_BEFORE_MIN minutes, stating the
+//    real number of minutes left (e.g. when notifications are enabled 4 minutes before a prayer);
+//  * "now": sent when the upcoming prayer changes because the previous one's time has passed.
 function maybeNotify(next, secondsLeft) {
+  const previous = state.lastNext;
+  state.lastNext = next;
   if (!notificationsEnabled()) return;
-  const day = localDateKey(next.time);
-  const before = `${day}:${next.key}:before`;
-  const now = `${day}:${next.key}:now`;
-  if (secondsLeft <= NOTIFY_BEFORE_MIN * 60 && secondsLeft > NOTIFY_BEFORE_MIN * 60 - 90 && !state.notified.has(before)) {
-    state.notified.add(before);
-    showNotification(t('notify_before', { min: NOTIFY_BEFORE_MIN, prayer: prayerLabel(next.key) }));
+  if (previous && previous.time.getTime() !== next.time.getTime() && previous.time <= new Date()
+      && Date.now() - previous.time < 5 * 60 * 1000) {
+    const key = `${localDateKey(previous.time)}:${previous.key}:now`;
+    if (!state.notified.has(key)) {
+      state.notified.add(key);
+      showNotification(t('notify_now', { prayer: prayerLabel(previous.key) }));
+    }
   }
-  if (secondsLeft <= 1 && !state.notified.has(now)) {
-    state.notified.add(now);
-    showNotification(t('notify_now', { prayer: prayerLabel(next.key) }));
+  const before = `${localDateKey(next.time)}:${next.key}:before`;
+  if (secondsLeft > 0 && secondsLeft <= NOTIFY_BEFORE_MIN * 60 && !state.notified.has(before)) {
+    state.notified.add(before);
+    showNotification(t('notify_before', { min: Math.ceil(secondsLeft / 60), prayer: prayerLabel(next.key) }));
   }
 }
 

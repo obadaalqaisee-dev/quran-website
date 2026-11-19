@@ -394,21 +394,34 @@ describe('prayer times and dashboard', () => {
     await close(s);
   });
 
-  test('notifications: enabling grants permission and a notice fires before the next prayer', async () => {
-    const soon = new Date(Date.now() + 9 * 60 * 1000 + 30 * 1000);
-    const hhmm = `${String(soon.getHours()).padStart(2, '0')}:${String(soon.getMinutes()).padStart(2, '0')}`;
-    const timings = () => ({ Fajr: '00:00', Sunrise: '00:01', Dhuhr: hhmm, Asr: '23:57', Sunset: '23:58', Maghrib: '23:58', Isha: '23:59' });
-    const s = await open({ upstream: { timings }, init: [FAKE_NOTIFICATIONS] });
-    const { page } = s;
-    if (soon.getDate() !== new Date().getDate() || hhmm <= '00:01') { await close(s); return; } // too close to midnight to test
+  test('notifications: a warning with the real minutes left, then "it is time" — even with throttled timers', async () => {
+    // Deterministic clock: 12:18:30 local time, Dhuhr at 12:22 (3.5 minutes away).
+    const context = await browser.newContext({ viewport: { width: 1366, height: 900 }, locale: 'ar' });
+    await mockUpstream(context, { timings: () => ({ Fajr: '05:36', Sunrise: '07:08', Dhuhr: '12:22', Asr: '15:16', Sunset: '17:35', Maghrib: '17:35', Isha: '19:05' }) });
+    await context.addInitScript(FAKE_NOTIFICATIONS);
+    const page = await context.newPage();
+    if (!page.clock) { await context.close(); return; } // Playwright without clock control
+    await page.clock.install({ time: new Date(2026, 10, 19, 12, 18, 30) });
+    const errors = collectErrors(page);
+    await page.goto(site.url);
+    await page.waitForSelector('.prayer-card');
     await page.click('.tool-card[data-open="profileModal"]');
     await page.click('#notifyBtn');
     await page.waitForFunction(() => /✅/.test(document.getElementById('notifyBtn').textContent));
     assert.equal(await page.evaluate(() => localStorage.getItem('prayerNotify')), 'true');
-    await page.waitForFunction(() => window.__notifications.length > 0, null, { timeout: 5000 });
-    const [n] = await page.evaluate(() => window.__notifications);
-    assert.match(n.body, /بقي 10 دقائق على صلاة الظهر/);
-    await close(s);
+    await page.clock.runFor(2000);
+    await page.waitForFunction(() => window.__notifications.length === 1);
+    assert.equal((await page.evaluate(() => window.__notifications))[0].body, 'بقي 4 دقائق على صلاة الظهر');
+    // Jump past Dhuhr without running the intermediate one-second ticks, as a throttled background
+    // tab experiences it; then let a single tick run.
+    await page.clock.fastForward('04:00');
+    await page.clock.runFor(1100);
+    await page.waitForFunction(() => window.__notifications.length >= 2);
+    const bodies = (await page.evaluate(() => window.__notifications)).map((n) => n.body);
+    assert.ok(bodies.includes('حان الآن موعد صلاة الظهر'), JSON.stringify(bodies));
+    assert.equal(bodies.filter((b) => b.includes('الظهر')).length, 2, 'each notice is sent once');
+    assert.deepEqual(errors, []);
+    await context.close();
   });
 
   test('daily wird: four items, progress, persisted under today\'s local date', async () => {

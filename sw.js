@@ -7,7 +7,7 @@
  * - Audio is never intercepted (range requests must go straight to the media servers).
  * - Prayer times and audio look-ups are never cached here (they are time/location dependent).
  */
-const VERSION = 'v2.0.0';
+const VERSION = 'v2.0.1';
 const SHELL = `shell-${VERSION}`;
 const DATA = 'quran-data-v1';
 const DATA_LIMIT = 300;
