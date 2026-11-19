@@ -65,32 +65,34 @@ Both paths return the same normalised shapes, so feature modules do not know whi
 ├── index.html            semantic markup, no inline JS/CSS handlers
 ├── manifest.json, sw.js, robots.txt, sitemap.xml, Quran.mp3, icon.png
 ├── assets/
-│   ├── css/              tokens.css, base.css, layout.css, components.css, reader.css
-│   ├── icons/            icon-192.png, icon-512.png, maskable, apple-touch, og image
+│   ├── css/main.css      one stylesheet (one request), organised in numbered sections: tokens, base, layout, …
+│   ├── fonts/            self-hosted Amiri and Cairo (woff2, OFL), loaded per unicode-range
+│   ├── icons/            icon-192, icon-512, maskable-512, apple-touch-icon, favicon (from the original icon.png)
 │   └── js/
 │       ├── main.js       entry point: wires modules together
-│       ├── core/         api.js, dom.js, i18n.js, storage.js, state.js, modal.js, toast.js, arabic.js, analytics.js
+│       ├── analytics.js  Google Analytics loader (was an inline script)
+│       ├── core/         api.js, dom.js, i18n.js, storage.js, quran.js, modal.js, toast.js, arabic.js
 │       ├── data/         translations.js, adhkar.js, reciters.js, surah-meta.js
 │       └── features/     surahs.js, player.js, reader.js, prayer.js, dashboard.js, adhkar.js,
 │                         rosary.js, ayah-search.js, islamic-search.js, voice-lab.js,
-│                         favorites.js, profile.js, theme.js, notifications.js
+│                         favorites.js, profile.js, theme.js, wird.js
 ├── backend/
 │   ├── app/
 │   │   ├── main.py            application factory
 │   │   ├── core/              config.py, security.py (headers/CSP), rate_limit.py, logging.py, errors.py, cache.py
 │   │   ├── db/                base.py, session.py
-│   │   ├── models/            surah.py, ayah.py, edition.py, reciter.py, dhikr.py, data_import.py
+│   │   ├── models/            __init__.py: Surah, Ayah, Edition, AyahText, Reciter, Dhikr, DataImport
 │   │   ├── schemas/           Pydantic response and request models
 │   │   ├── repositories/      database queries (no SQL in routes)
-│   │   ├── services/          quran, search, audio, prayer, adhkar, upstream http client
-│   │   ├── api/v1/            routers: health, surahs, ayahs, search, reciters, prayer, adhkar
+│   │   ├── services/          arabic (normalisation), datasets (verify/seed), audio, prayer, upstream http client
+│   │   ├── api/v1/            quran.py (surahs, ayahs, editions, search), services.py (health, reciters/audio, prayer, adhkar)
 │   │   ├── static_site.py     allow-listed static file serving
 │   │   ├── cli.py             `python -m app.cli seed|verify`
 │   │   └── data/              verified datasets (.json.gz) + checksums.json
 │   ├── alembic/              migrations
 │   ├── tests/                pytest suite
 │   └── pyproject.toml, requirements*.txt, Dockerfile, .env.example
-├── tests/e2e/            Playwright end-to-end tests (Node built-in test runner)
+├── tests/unit, tests/e2e Node unit tests and Playwright end-to-end tests (Node built-in test runner)
 └── docs/                 audit, checklist, architecture, API, deployment, security, testing
 ```
 
@@ -140,7 +142,7 @@ Details are in [`security.md`](security.md).
 
 * **Headers** (backend): strict CSP with no `unsafe-inline` scripts, HSTS (production only), `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy` (microphone and geolocation for this site only), `frame-ancestors 'none'`, COOP.
 * **Static pages:** the same CSP is delivered as a `<meta>` tag on GitHub Pages, minus the directives `<meta>` cannot carry.
-* **No inline scripts or handlers.** All behaviour lives in modules, so CSP can forbid inline script.
+* **No inline handlers; one inline script allowed by hash.** All behaviour lives in modules. The tiny theme initialiser runs inline before first paint and is allowed by its SHA-256 hash, so the CSP still forbids `unsafe-inline`.
 * **Output encoding.** Remote text is inserted with `textContent` or through an escaping template helper. The only `innerHTML` sinks are static, trusted i18n strings that contain markup (`<strong>`, `<span>`).
 * **Input validation.** All path and query parameters have Pydantic constraints (ranges, lengths, enums). Edition identifiers and reciter slugs come from allow-lists.
 * **SSRF.** The server only calls a fixed allow-list of upstream hosts. User input never forms a hostname.
@@ -151,7 +153,8 @@ Details are in [`security.md`](security.md).
 ## 8. Performance architecture
 
 * No artificial start-up delay. Surah metadata (114 entries, ~10 KB) ships **inside** the frontend, so the list renders instantly without any network request; the backend or upstream is only needed for ayah text.
-* `fetch` responses are memoised in memory. The service worker uses cache-first for the app shell and fonts, stale-while-revalidate for Quran/tafsir JSON, and network-only for audio.
+* `fetch` responses are memoised in memory. The service worker precaches the app shell (HTML, CSS, every module, fonts, icons), uses stale-while-revalidate for it and for Quran/tafsir JSON, and never intercepts audio.
+* Fonts are self-hosted with `unicode-range` and `font-display: swap`. All ES modules are announced with `modulepreload`, so the import graph downloads in parallel. Measured results are in [testing.md](testing.md).
 * The backend sets long `Cache-Control` and an `ETag` on immutable Quran data, uses GZip compression, and keeps a TTL cache for prayer times and audio resolution.
 * Icons are resized (709 KB → a few KB). The hero image uses responsive sizes and a lower-resolution default.
 * Event delegation replaces hundreds of per-card listeners. The surah filter is debounced. The scroll handler uses `IntersectionObserver`.

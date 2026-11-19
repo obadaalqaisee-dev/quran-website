@@ -38,7 +38,7 @@ Git history consists mostly of "Add files via upload" and "Update index.html" co
 | F3 | Surah audio player, 16 reciters | `<select>` of server base URLs, `base + 001.mp3` | Works. All 16 links verified (surah 1 and 114 each, 32/32 HTTP 206 `audio/mpeg`). All now 301-redirect to `cdn.mp3quran.net`. |
 | F4 | Reciter fallback | `onerror`: downloads the **entire** mp3quran reciter list (167 KB) and fuzzy-matches the reciter name | Works but is wasteful and fragile (name matching). |
 | F5 | Previous / Next / Surah-loop, auto-advance on end | `audio.ended` → `nextSurah()` unless looping | Works. |
-| F6 | Reading view | `api.alquran.cloud/v1/surah/{n}/quran-uthmani`; strips the basmala from ayah 1 (except surah 1); hides the basmala header for 1 and 9 | Works. Ayah spans are clickable but **not keyboard-accessible**. |
+| F6 | Reading view | `api.alquran.cloud/v1/surah/{n}/quran-uthmani`; meant to strip the basmala from ayah 1 (except surah 1); hides the basmala header for 1 and 9 | **Bug (Verified on the live site, found during implementation):** the stripping compares against a literal whose combining marks are in a different Unicode order (fatha+shadda versus the source's shadda+fatha), so it never matches. The basmala is therefore shown **twice** for surahs 2–114 (except 9): once in the header and again as part of ayah 1 (e.g. «بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ الٓمٓ ﴿1﴾»), which wrongly presents it as part of 2:1. The same bug affects the memorisation lab. Ayah spans are clickable but **not keyboard-accessible**. |
 | F7 | Per-ayah audio (Mishary Alafasy) + ayah loop | `cdn.islamic.network/quran/audio/128/ar.alafasy/{global}.mp3` | Works (Verified 206). |
 | F8 | Tafsir al-Muyassar (Arabic UI only) + translation (en.sahih / es.cortes / fr.hamidullah) | Two fetches per ayah click | Works. Fetch errors are silently swallowed, leaving "Loading..." on screen forever. |
 | F9 | Bookmark ("last read") + resume banner | `localStorage.quranBookmark` | Works. `JSON.parse` has no try/catch, so corrupt storage breaks the page. |
@@ -128,6 +128,7 @@ Missing: `twitter:` card, structured data (JSON-LD `WebSite` / `SearchAction`), 
 ## 8. Summary of defects to fix
 
 1. Memorisation lab crashes (`getSkeleton` undefined).
+1. The basmala is displayed twice in the reading view (Unicode-order mismatch in the stripping code).
 2. Arabic surah filter returns nothing; English requires the exact transliteration.
 3. Prayer notifications are promised but never sent.
 4. Daily wird resets at UTC midnight instead of local midnight.

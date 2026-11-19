@@ -4,8 +4,8 @@ This is the permanent regression list. It was built from a line-by-line reading 
 
 Every row must still exist and work after the modernisation.
 
-* **Automated** names the test that checks the row (see [`testing.md`](testing.md)).
-* **Status** records the result of the final verification run.
+* **Status** records the result of the final verification run on 2026-11-19 (see [`testing.md`](testing.md)).
+* §H maps each section to the automated tests that check it.
 
 Legend: ✅ verified working · 🔧 was broken in the original and is now fixed · ⚠️ preserved, with a known limitation noted.
 
@@ -100,7 +100,7 @@ The redesign keeps **every** icon below, either as the original glyph or as an e
 |---|---|---|
 | Surahs | 114 (Arabic name, English name, English meaning, revelation type, ayah count) | ✅ |
 | Ayahs (Uthmani) | 6,236, same `quran-uthmani` text the site always displayed, verified against Tanzil | ✅ |
-| i18n strings | 124 keys × 4 languages (ar, en, es, fr), copied verbatim | ✅ |
+| i18n strings | 147 keys × 4 languages (ar, en, es, fr), copied verbatim; the 26 keys the Arabic table lacked are filled from the Arabic fallback strings that were hard-coded in the original code | ✅ |
 | Adhkar | 36 entries with their repeat counts | ✅ |
 | Learn-the-Prayer text | 5 steps × 4 languages | ✅ |
 | Message-of-Islam text | 3 sections × 4 languages | ✅ |
@@ -113,3 +113,30 @@ The redesign keeps **every** icon below, either as the original glyph or as an e
 The keys `theme`, `quranBookmark`, `islamicProfile`, `dailyWird`, and `favoriteSurahs` keep their names and formats, so existing visitors keep their data. `dailyWird` keeps its `YYYY-MM-DD` keys (now local date).
 
 The following behaviours are preserved: auto-advance to the next surah, surah loop, ayah loop, pausing the surah player when an ayah is played, marking the "Quran" wird done when a bookmark is saved, the welcome toast with the profile name, closing a dialog by clicking its backdrop, and vibration on rosary taps.
+
+## H. How each section is verified
+
+| Section | Automated tests (`tests/e2e/…` unless noted) |
+|---|---|
+| A. Reciters | `features`: all 16 in original order, each plays its original URL; fallback by mp3quran ID; `Quran.mp3` fallback for Al-Fatihah. `backend/tests/test_api.py::test_reciters_preserve_original_list`. `live`: real audio playback. |
+| B. Navigation | `features`: every nav item, all six side-menu items, Escape/button/backdrop closing, back-to-top. `quality`: keyboard flow and focus return. |
+| C. Sections | `features`: page structure, surah list, player, reading, prayer, dashboard, footer credits and links. |
+| D. Dialogs | `features`: each dialog opens and its content is present. `quality`: axe on 8 dialogs. |
+| E. Icons | Present in the markup and translation strings (`unit/logic.test.mjs` checks that every `data-i18n` key exists); visually checked in screenshots. |
+| F. Content and data | `backend/tests/test_data_integrity.py`; `unit/logic.test.mjs` (frontend data = backend data; 4 × 238 keys); `features` (displayed Quran text = verified source). |
+| G. Storage and behaviours | `features`: original storage formats read; corrupt storage tolerated; auto-advance, loop, ayah loop, pause-on-ayah, bookmark → wird, welcome toast. (Vibration on rosary/adhkar taps is present in the code but cannot be observed in an automated browser.) |
+
+## I. Deliberate presentation changes (nothing was removed)
+
+| Item | Before | Now | Why |
+|---|---|---|---|
+| Header layout | One row: 9 nav controls + language + theme | Row 1: ☰, logo, 🌐 language, 🌙 theme. Row 2: the 7 nav items (horizontally scrollable on phones). Item order: السور، مواقيت الصلاة، حصن المسلم، الإسلام، المسبحة، بحث آيات، التسميع. | On phones the old header stacked into a tall block that covered about 40 % of the screen. |
+| Language options | `🌐 العربية / Arabic`, … | 🌐 icon beside the picker; options `العربية`, `English`, `Español`, `Français` | The long bilingual labels were clipped on phones. Same four languages, same codes. |
+| Memorisation-lab nav label (Arabic) | Static HTML `🎙️ التسميع`, replaced at start-up by the original translation `🎙 التسميع` | Unchanged: the original translation string is shown | Kept verbatim. |
+| Spanish/French labels that were left in English | `📿 Rosary`, `🔍 Search Ayah`, `🎙️ Voice Test`; FR ayah-loop label in Spanish | `📿 Tasbih`, `🔍 Buscar Aleya` / `🔍 Chercher une Ayah`, `🎙️ Prueba de Recitación` / `🎙️ Test de Récitation`; French label fixed | Translation errors in the original. |
+| "Message of Islam" (EN/ES/FR) | First sentence followed by "..." | Full translation of the Arabic paragraphs | The original translations were truncated. The Arabic text is unchanged. |
+| Reading view | Basmala in the header **and** at the start of ayah 1 (surahs 2–114 except 9) | Basmala once, in the header | The original stripping code never matched (Unicode encoding mismatch). Al-Fatihah still shows it as ayah 1. |
+| Canonical URL | `…/quran-website/index.html` | `…/quran-website/` | Same page; the shorter URL is the one people share. Both keep working. |
+| Hero photo | CSS background, 1800 px wide | Responsive `<img>` (640/1200/1800 px) | Faster on phones. Same photo. |
+| Icons drawn by the browser | Emoji only | Same emoji, inside consistent round buttons. The mini player adds ⏮ ▶ ⏸ ⏭. | Consistency. No icon was replaced. |
+| Fonts | Google Fonts | The same Amiri and Cairo, self-hosted | Privacy, speed, offline use, stricter CSP. |
