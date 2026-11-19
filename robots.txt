@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /quran-website/
+Disallow: /quran-website/backend/
+Disallow: /quran-website/docs/
+Disallow: /quran-website/tests/
+
+Sitemap: https://obadaalqaisee-dev.github.io/quran-website/sitemap.xml
