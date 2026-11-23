@@ -17,13 +17,18 @@ from sqlalchemy import delete, func, select
 from sqlalchemy.orm import Session
 
 from app.core.config import DATA_DIR
-from app.models import Ayah, AyahText, DataImport, Dhikr, Edition, Reciter, Surah
+from app.models import Ayah, AyahText, DataImport, Dhikr, Edition, LearningResource, Reciter, Surah
 from app.services.arabic import normalize_arabic
 
 TOTAL_SURAHS = 114
 TOTAL_AYAHS = 6236
 EDITION_IDS = ("ar.muyassar", "en.sahih", "es.cortes", "fr.hamidullah")
 ADHKAR_CATEGORIES = ("morning", "evening", "sleep", "prayer", "daily")
+RESOURCE_STATUSES = ("existing", "official", "search")
+RESOURCE_FIELDS = (
+    "id", "position", "scholar", "scholar_name_ar", "scholar_name_en", "kind", "status",
+    "url", "title_ar", "title_en", "topic",
+)
 
 
 class DatasetError(RuntimeError):
@@ -38,6 +43,7 @@ class VerifiedData:
     reciters: list[dict]
     adhkar: dict[str, list[dict]]
     checksums: dict[str, str]
+    resources: list[dict]
 
 
 def _read(path: Path) -> bytes:
@@ -66,6 +72,7 @@ def load_verified(data_dir: Path = DATA_DIR) -> VerifiedData:
     editions = {e: loaded[f"edition-{e}.json.gz"] for e in EDITION_IDS}
     reciters = loaded["reciters.json"]
     adhkar = loaded["adhkar.json"]["adhkar"]
+    resources = loaded["learning_resources.json"]["resources"]
 
     # ---- structural invariants -------------------------------------------
     if len(surahs) != TOTAL_SURAHS or [s["number"] for s in surahs] != list(range(1, 115)):
@@ -89,14 +96,19 @@ def load_verified(data_dir: Path = DATA_DIR) -> VerifiedData:
         raise DatasetError("expected 16 unique reciters")
     if set(adhkar) != set(ADHKAR_CATEGORIES):
         raise DatasetError("unexpected adhkar categories")
-    return VerifiedData(surahs, ayahs, editions, reciters, adhkar, checksums)
+    ids = [r["id"] for r in resources]
+    if len(ids) != len(set(ids)) or any(r["status"] not in RESOURCE_STATUSES for r in resources):
+        raise DatasetError("learning resources must have unique ids and a known status")
+    if any(not r["url"].startswith("https://") for r in resources):
+        raise DatasetError("learning resource URLs must use https")
+    return VerifiedData(surahs, ayahs, editions, reciters, adhkar, checksums, resources)
 
 
 def seed(db: Session, data: VerifiedData | None = None) -> dict[str, int]:
     """Replace all reference data with the verified datasets (idempotent)."""
     data = data or load_verified()
     with db.begin():
-        for model in (AyahText, Ayah, Edition, Surah, Reciter, Dhikr):
+        for model in (AyahText, Ayah, Edition, Surah, Reciter, Dhikr, LearningResource):
             db.execute(delete(model))
         db.add_all(Surah(**s) for s in data.surahs)
         db.flush()
@@ -129,9 +141,13 @@ def seed(db: Session, data: VerifiedData | None = None) -> dict[str, int]:
             db.flush()
             db.execute(
                 AyahText.__table__.insert(),
-                [{"edition": ident, "ayah_id": i, "text": t} for i, t in enumerate(ed["texts"], start=1)],
+                [
+                    {"edition": ident, "ayah_id": i, "text": t, "text_search": normalize_arabic(t)}
+                    for i, t in enumerate(ed["texts"], start=1)
+                ],
             )
         db.add_all(Reciter(**r) for r in data.reciters)
+        db.add_all(LearningResource(**{k: r[k] for k in RESOURCE_FIELDS}) for r in data.resources)
         for category in ADHKAR_CATEGORIES:
             db.add_all(
                 Dhikr(category=category, position=i, text=d["text"], count=d["count"])
@@ -155,6 +171,8 @@ def _record_count(name: str, data: VerifiedData) -> int:
         return len(data.reciters)
     if name == "adhkar.json":
         return sum(len(v) for v in data.adhkar.values())
+    if name == "learning_resources.json":
+        return len(data.resources)
     return 0
 
 
@@ -189,4 +207,10 @@ def verify_database(db: Session, data: VerifiedData | None = None) -> list[str]:
             problems.append(f"ayah {src[1]}:{src[2]} differs from the verified source")
             if len(problems) > 20:
                 break
+    resources = db.scalar(select(func.count()).select_from(LearningResource)) or 0
+    if resources != len(data.resources):
+        problems.append(f"learning_resources: expected {len(data.resources)}, found {resources}")
+    missing_search = db.scalar(select(func.count()).select_from(AyahText).where(AyahText.text_search.is_(None))) or 0
+    if missing_search:
+        problems.append(f"ayah_texts: {missing_search} rows without search text (run `python -m app.cli seed`)")
     return problems

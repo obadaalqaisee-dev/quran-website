@@ -5,7 +5,7 @@ from __future__ import annotations
 from sqlalchemy import func, or_, select
 from sqlalchemy.orm import Session
 
-from app.models import Ayah, AyahText, Dhikr, Edition, Reciter, Surah
+from app.models import Ayah, AyahText, Dhikr, Edition, LearningResource, Reciter, Surah
 
 
 def list_surahs(db: Session) -> list[Surah]:
@@ -74,3 +74,44 @@ def list_adhkar(db: Session, category: str | None = None) -> list[Dhikr]:
     if category:
         stmt = stmt.where(Dhikr.category == category)
     return list(db.scalars(stmt))
+
+
+def search_edition(
+    db: Session, edition: str, normalized_query: str, limit: int, offset: int
+) -> tuple[int, list[tuple[AyahText, Ayah]]]:
+    """Substring search in one tafsir/translation edition (parameterised LIKE, escaped wildcards)."""
+    condition = (AyahText.edition == edition) & AyahText.text_search.like(
+        f"%{_escape_like(normalized_query)}%", escape="\\"
+    )
+    total = db.scalar(select(func.count()).select_from(AyahText).where(condition)) or 0
+    rows = db.execute(
+        select(AyahText, Ayah)
+        .join(Ayah, Ayah.id == AyahText.ayah_id)
+        .where(condition)
+        .order_by(AyahText.ayah_id)
+        .limit(limit)
+        .offset(offset)
+    ).all()
+    return total, [(r[0], r[1]) for r in rows]
+
+
+def quran_index(db: Session) -> dict[str, list[list[int]]]:
+    """First ayah of every juz and page, and the sajda ayahs, as [surah, ayah] pairs."""
+    juz: dict[int, list[int]] = {}
+    pages: dict[int, list[int]] = {}
+    sajda: list[list[int]] = []
+    columns = (Ayah.surah_number, Ayah.number_in_surah, Ayah.juz, Ayah.page, Ayah.sajda)
+    rows = db.execute(select(*columns).order_by(Ayah.id))
+    for surah, ayah, j, page, is_sajda in rows:
+        juz.setdefault(j, [surah, ayah])
+        pages.setdefault(page, [surah, ayah])
+        if is_sajda:
+            sajda.append([surah, ayah])
+    return {"juz": [juz[k] for k in sorted(juz)], "pages": [pages[k] for k in sorted(pages)], "sajda": sajda}
+
+
+def list_learning_resources(db: Session, topic: str | None = None) -> list[LearningResource]:
+    query = select(LearningResource).order_by(LearningResource.position)
+    if topic:
+        query = query.where((LearningResource.topic == topic) | (LearningResource.topic == "all"))
+    return list(db.scalars(query))

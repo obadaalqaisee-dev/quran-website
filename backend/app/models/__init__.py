@@ -71,6 +71,8 @@ class AyahText(Base):
     edition: Mapped[str] = mapped_column(ForeignKey("editions.identifier", ondelete="CASCADE"), primary_key=True)
     ayah_id: Mapped[int] = mapped_column(ForeignKey("ayahs.id", ondelete="CASCADE"), primary_key=True)
     text: Mapped[str] = mapped_column(Text)
+    # Normalised form used by /tafsir/search (migration 0002). NULL until `python -m app.cli seed` runs.
+    text_search: Mapped[str | None] = mapped_column(Text, nullable=True)
 
 
 class Reciter(Base):
@@ -99,6 +101,30 @@ class Dhikr(Base):
     position: Mapped[int] = mapped_column(Integer)
     text: Mapped[str] = mapped_column(Text)
     count: Mapped[int] = mapped_column(Integer)
+
+
+class LearningResource(Base):
+    """A scholar resource or verification tool shown in the learning section, with its link status.
+
+    status: 'existing' (link already published on the site), 'official' (official website, home page),
+    'search' (a search on a public platform). `checked_at` is set only by a live link check.
+    """
+
+    __tablename__ = "learning_resources"
+    __table_args__ = (CheckConstraint("status IN ('existing', 'official', 'search')", name="ck_resource_status"),)
+
+    id: Mapped[str] = mapped_column(String(32), primary_key=True)
+    position: Mapped[int] = mapped_column(Integer, unique=True)
+    scholar: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    scholar_name_ar: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    scholar_name_en: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    kind: Mapped[str] = mapped_column(String(16))
+    status: Mapped[str] = mapped_column(String(16))
+    url: Mapped[str] = mapped_column(String(512))
+    title_ar: Mapped[str] = mapped_column(String(255))
+    title_en: Mapped[str] = mapped_column(String(255))
+    topic: Mapped[str] = mapped_column(String(32))
+    checked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
 
 class DataImport(Base):
