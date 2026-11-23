@@ -50,12 +50,13 @@ describe('navigation', () => {
     const s = await open();
     const { page } = s;
     const nav = (await page.locator('.nav-links > li').allTextContents()).map((t) => t.replace(/️/g, '').trim());
-    for (const label of ['السور', 'مواقيت الصلاة', '📿 حصن المسلم', '🕌 الإسلام', '📿 المسبحة', '🔍 بحث آيات', '🎙 التسميع', '🕋 تعلم الصلاة الصحيحة', '🎓 الأكاديمية']) {
+    for (const label of ['السور', 'مواقيت الصلاة', '📿 حصن المسلم', '🕌 الإسلام', '🔍 بحث آيات', '🎙 التسميع', '🕋 تعلم الصلاة الصحيحة', '🎓 الأكاديمية', '🕊 من أنا']) {
       assert.ok(nav.includes(label), label);
     }
     await page.click('.nav-links a[href="#learnSection"]');
     await page.waitForFunction(() => Math.abs(document.getElementById('learnSection').getBoundingClientRect().top) < 200);
-    assert.equal(await page.locator('#sideMenu .drawer-links li').count(), 7, 'six original side-menu items + settings');
+    // Original six items − «تعلم الصلاة» (moved to the academy) + settings + «من أنا».
+    assert.equal(await page.locator('#sideMenu .drawer-links li').count(), 7);
     await page.click('.menu-btn');
     await page.locator('#sideMenu').getByText('الإعدادات', { exact: true }).click();
     assert.ok(await page.locator('#settingsModal').evaluate((d) => d.open));

@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-ANrF7JP3nCCxPbHOeznx86QJisMdocwvh/00wruFO+g=' https://www.googletagmanager.com; style-src 'self'; font-src 'self'; img-src 'self' data: https://images.unsplash.com https://images.pexels.com https://i.ytimg.com https://www.googletagmanager.com https://*.google-analytics.com; media-src 'self' https://*.mp3quran.net https://cdn.islamic.network; connect-src 'self' https://api.alquran.cloud https://www.mp3quran.net https://api.aladhan.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>من أنا | القرآن الكريم - The Noble Quran</title>
+  <meta name="description" content="من أنا: تعريف بمطوري موقع القرآن الكريم، عبادة أبو فردة ويونس أبو صعيلك، والغاية من الموقع: خدمة كتاب الله وسنة نبيه ﷺ ابتغاء الأجر والثواب.">
+  <meta name="author" content="Obada najeeb AL-Qaisee">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://obadaalqaisee-dev.github.io/quran-website/about.html">
+  <meta name="theme-color" content="#0b3a2e" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#061510" media="(prefers-color-scheme: dark)">
+  <meta name="color-scheme" content="light dark">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="من أنا | القرآن الكريم">
+  <meta property="og:url" content="https://obadaalqaisee-dev.github.io/quran-website/about.html">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="assets/icons/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="assets/css/main.css">
+  <!-- Applies the saved/system theme before first paint (same script, and hash, as index.html). -->
+  <script>
+(function () {
+  var theme = null;
+  try { theme = localStorage.getItem('theme'); } catch (e) { /* storage unavailable */ }
+  var dark = theme ? theme === 'dark' : !!(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  if (dark) document.documentElement.classList.add('dark-mode');
+})();
+  </script>
+  <link rel="modulepreload" href="assets/js/about.js">
+  <link rel="modulepreload" href="assets/js/data/about-media.js">
+  <link rel="modulepreload" href="assets/js/core/api.js">
+  <link rel="modulepreload" href="assets/js/core/arabic.js">
+  <link rel="modulepreload" href="assets/js/core/i18n.js">
+  <link rel="modulepreload" href="assets/js/core/dom.js">
+  <link rel="modulepreload" href="assets/js/core/storage.js">
+  <link rel="modulepreload" href="assets/js/features/theme.js">
+  <link rel="modulepreload" href="assets/js/data/translations.js">
+  <link rel="modulepreload" href="assets/js/data/translations-ext.js">
+  <script src="assets/js/analytics.js" async></script>
+  <script type="module" src="assets/js/about.js"></script>
+</head>
+
+<body class="about-page">
+  <a class="skip-link" href="#aboutMain" data-i18n="skip_to_content">تخطَّ إلى المحتوى</a>
+
+  <header class="site-header">
+    <div class="container header-bar">
+      <a href="index.html" class="icon-btn about-back" data-i18n-aria-label="about_back" aria-label="العودة إلى الصفحة الرئيسية"><span aria-hidden="true">→</span></a>
+      <a href="index.html" class="logo" data-i18n="logo_text">القرآن <span>الكريم</span></a>
+      <div class="header-tools">
+        <label class="lang-wrap">
+          <span class="lang-icon" aria-hidden="true">🌐</span>
+          <span class="visually-hidden" data-i18n="lang_label">اللغة</span>
+          <select id="langSelect" class="lang-select">
+            <option value="ar" lang="ar">العربية</option>
+            <option value="en" lang="en">English</option>
+            <option value="es" lang="es">Español</option>
+            <option value="fr" lang="fr">Français</option>
+          </select>
+        </label>
+        <button id="themeToggle" class="icon-btn theme-toggle" type="button" aria-pressed="false" data-i18n-aria-label="theme_toggle" aria-label="تبديل الوضع الليلي" data-i18n-title="theme_toggle" title="تبديل الوضع الليلي">
+          <span aria-hidden="true" class="theme-icon">🌙</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main id="aboutMain" tabindex="-1">
+    <!-- Main visual: Al-Aqsa Mosque (local, licensed photograph configured in assets/js/data/about-media.js) -->
+    <section class="about-hero" aria-labelledby="aboutTitle">
+      <figure class="about-photo" id="aqsaFigure" hidden>
+        <img id="aqsaImage" alt="المسجد الأقصى المبارك" decoding="async" fetchpriority="high">
+        <figcaption class="about-photo-credit" id="aqsaCredit"></figcaption>
+      </figure>
+      <div class="about-hero-text container">
+        <p class="eyebrow eyebrow--dark about-photo-label" lang="ar">المسجد الأقصى المبارك</p>
+        <h1 id="aboutTitle" data-i18n="about_title">من أنا</h1>
+        <!-- Al-Isra 17:1, loaded from the verified Quran text (never typed by hand) -->
+        <p class="about-lead" id="aqsaVerse" lang="ar" dir="rtl" hidden></p>
+      </div>
+    </section>
+
+    <div class="container about-body">
+      <!-- Nasheed: autoplay on entering the page, with a graceful fallback when the browser blocks it -->
+      <section class="nasheed-card" aria-labelledby="nasheedTitle">
+        <div class="nasheed-head">
+          <span class="nasheed-icon" aria-hidden="true">🎵</span>
+          <div>
+            <h2 id="nasheedTitle" data-i18n="nasheed_heading">نشيد</h2>
+            <p class="nasheed-line" id="nasheedLine" lang="ar" dir="rtl"></p>
+            <p class="small muted" id="nasheedMeta"></p>
+          </div>
+        </div>
+        <button type="button" class="nasheed-start" id="nasheedStart" hidden data-i18n="nasheed_tap_to_play">▶ اضغط لتشغيل النشيد</button>
+        <div class="nasheed-player" id="nasheedPlayer">
+          <button type="button" class="nasheed-play" id="nasheedPlay" aria-pressed="false" data-i18n-aria-label="nasheed_play" aria-label="تشغيل"><span aria-hidden="true">▶</span></button>
+          <div class="nasheed-timeline">
+            <label class="visually-hidden" for="nasheedSeek" data-i18n="nasheed_seek">موضع التشغيل</label>
+            <input type="range" id="nasheedSeek" min="0" max="1000" value="0" step="1">
+            <p class="nasheed-time small" dir="ltr"><span id="nasheedCurrent">0:00</span> / <span id="nasheedDuration">0:00</span></p>
+          </div>
+          <label class="nasheed-volume">
+            <span aria-hidden="true">🔊</span>
+            <span class="visually-hidden" data-i18n="nasheed_volume">مستوى الصوت</span>
+            <input type="range" id="nasheedVolume" min="0" max="1" step="0.05" value="0.8">
+          </label>
+        </div>
+        <p class="nasheed-status small" id="nasheedStatus" role="status" aria-live="polite"></p>
+        <audio id="nasheedAudio" preload="auto"></audio>
+      </section>
+
+      <!-- The developers -->
+      <section class="developers" aria-labelledby="devTitle">
+        <h2 class="about-section-title" id="devTitle" data-i18n="about_developers">مطوّرا الموقع</h2>
+        <div class="dev-grid" lang="ar" dir="rtl">
+          <article class="dev-card">
+            <span class="dev-mark" aria-hidden="true">۞</span>
+            <h3>عبادة أبو فردة</h3>
+            <p>طالب في جامعة الزيتونة الأردنية</p>
+            <p><span class="dev-label">التخصص:</span> الذكاء الاصطناعي</p>
+          </article>
+          <article class="dev-card">
+            <span class="dev-mark" aria-hidden="true">۞</span>
+            <h3>يونس أبو صعيلك</h3>
+            <p>طالب في الجامعة الهاشمية</p>
+          </article>
+        </div>
+      </section>
+
+      <!-- Purpose and dedication -->
+      <section class="dedication" aria-labelledby="dedicationTitle" lang="ar" dir="rtl">
+        <h2 class="visually-hidden" id="dedicationTitle">الغاية من الموقع</h2>
+        <span class="dedication-ornament" aria-hidden="true"></span>
+        <p class="dedication-text">تم تطوير هذا الموقع لوجه الله تعالى، ابتغاء الأجر والثواب، وخدمةً لكتاب الله وسنة نبيه ﷺ.</p>
+        <p class="dedication-by">بواسطة:</p>
+        <p class="dedication-names">عبادة أبو فردة ويونس أبو صعيلك.</p>
+        <span class="dedication-ornament" aria-hidden="true"></span>
+      </section>
+
+      <p class="center"><a class="btn btn-primary" href="index.html" data-i18n="about_back_home">العودة إلى الصفحة الرئيسية</a></p>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <h2 data-i18n="footer_title">القرآن الكريم</h2>
+      <p data-i18n="footer_desc">موقع تعليمي وتجريبي لخدمة كتاب الله</p>
+      <div class="developer">
+        <a href="https://www.instagram.com/obaalqaisee/" target="_blank" rel="noopener noreferrer" class="social-link" title="Instagram" aria-label="Instagram">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+        </a>
+        <a href="https://web.facebook.com/obada.alqaisse" target="_blank" rel="noopener noreferrer" class="social-link" title="Facebook" aria-label="Facebook">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M22.675 0h-21.35c-.732 0-1.325.593-1.325 1.325v21.351c0 .731.593 1.324 1.325 1.324h11.495v-9.294h-3.128v-3.622h3.128v-2.671c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.795.715-1.795 1.763v2.312h3.587l-.467 3.622h-3.12v9.293h6.116c.73 0 1.323-.593 1.323-1.325v-21.35c0-.732-.593-1.325-1.325-1.325z"/></svg>
+        </a>
+      </div>
+      <p>© 2026 جميع الحقوق محفوظة</p>
+    </div>
+  </footer>
+
+  <noscript>
+    <div class="noscript"><p>يحتاج مشغل النشيد إلى تفعيل JavaScript. · The nasheed player needs JavaScript.</p></div>
+  </noscript>
+</body>
+</html>

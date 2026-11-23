@@ -16,6 +16,7 @@ from fastapi.staticfiles import StaticFiles
 
 ROOT_FILES = {
     "index.html": "text/html; charset=utf-8",
+    "about.html": "text/html; charset=utf-8",
     "404.html": "text/html; charset=utf-8",
     "manifest.json": "application/manifest+json",
     "sw.js": "text/javascript; charset=utf-8",
@@ -33,7 +34,7 @@ def mount_static_site(app: FastAPI, root: Path) -> None:
         app.mount("/assets", StaticFiles(directory=assets), name="assets")
 
     def _file(name: str) -> FileResponse:
-        headers = {"Cache-Control": "no-cache"} if name in {"index.html", "sw.js"} else None
+        headers = {"Cache-Control": "no-cache"} if name in {"index.html", "about.html", "sw.js"} else None
         return FileResponse(root / name, media_type=ROOT_FILES[name], headers=headers)
 
     @app.get("/", include_in_schema=False)

@@ -10,8 +10,16 @@ export function onDialogOpen(id, fn) {
   openHooks.set(id, fn);
 }
 
+// Dialogs that were merged into another one keep working under their old id (e.g. "rosaryModal",
+// now the «المسبحة» tab of Hisn al-Muslim): openDialog(oldId) runs the alias instead.
+const aliases = new Map();
+export function registerDialogAlias(id, fn) {
+  aliases.set(id, fn);
+}
+
 export function openDialog(id) {
   const dialog = document.getElementById(id);
+  if (!dialog && aliases.has(id)) return aliases.get(id)();
   if (!dialog || dialog.open) return dialog;
   // Only one dialog at a time (e.g. "Login" → "My profile" swaps dialogs).
   for (const other of $$('dialog[open]')) if (other !== dialog) other.close();

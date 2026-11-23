@@ -3,6 +3,30 @@
 // licence (ijazah) and does not qualify anyone to teach; the interface says so.
 
 import { LESSONS } from './prayer-lessons.js';
+import { LANGUAGES, translations } from './translations.js';
+
+// «صفة صلاة النبي ﷺ» — migrated from the former «تعلم الصلاة» dialog of the side menu, which was retired
+// so that prayer learning lives in one place. Its text is the original, already translated into the four
+// languages (same translation keys: modal_learn_*, step1–5_*, video_*), so it is rendered through the i18n
+// system. Each step is illustrated with the matching original diagram instead of the stock photographs the
+// dialog used; the Sheikh Othman Al-Khamees video card is kept with the same link.
+const fromKey = (key) => Object.fromEntries(LANGUAGES.map((l) => [l, translations[l][key] ?? translations.ar[key]]));
+const PROPHET_PRAYER = {
+  id: 'prophet-prayer', icon: '🕌', multilingual: true,
+  title: fromKey('modal_learn_title'),
+  blocks: [
+    { type: 'i18n', key: 'modal_learn_desc' },
+    { type: 'i18nStep', title: 'step1_title', desc: 'step1_desc', img: 'assets/img/prayer/takbir.svg' },
+    { type: 'i18nStep', title: 'step2_title', desc: 'step2_desc', img: 'assets/img/prayer/qiyam.svg' },
+    { type: 'i18nStep', title: 'step3_title', desc: 'step3_desc', img: 'assets/img/prayer/ruku.svg' },
+    { type: 'i18nStep', title: 'step4_title', desc: 'step4_desc', img: 'assets/img/prayer/sujud.svg' },
+    { type: 'i18nStep', title: 'step5_title', desc: 'step5_desc', img: 'assets/img/prayer/tashahhud.svg' },
+    {
+      type: 'video', url: 'https://www.youtube.com/watch?v=W-jX2kY0vR8', thumb: 'https://i.ytimg.com/vi/W-jX2kY0vR8/hqdefault.jpg',
+      titleKey: 'video_title', descKey: 'video_desc', hintKey: 'video_hint',
+    },
+  ],
+};
 
 const q = (ref, expect, note) => ({ type: 'quran', ref, expect, note });
 const hadith = (text, source, search, note) => ({ type: 'hadith', text, source, search, note });
@@ -15,6 +39,7 @@ const TAJWEED_NOTE = 'التجويد علم يؤخذ بالتلقي والمشا
 
 /** Lessons written for the academy (prayer lessons are reused by id). */
 export const ACADEMY_LESSONS = [
+  PROPHET_PRAYER,
   // ---------------------------------------------------------------- memorisation
   {
     id: 'memo-method', icon: '🧠',
@@ -149,7 +174,7 @@ export const COURSES = [
     id: 'prayer', icon: '🕌',
     title: { ar: 'تعليم الصلاة', en: 'Prayer education', es: 'Educación de la oración', fr: 'Apprendre la prière' },
     objectives: { ar: 'أن تعرف شروط الصلاة وأركانها وواجباتها وسننها، وتؤدي الصلوات الخمس على الصفة الصحيحة، وتعرف أحكام السهو والسفر والجماعة.', en: 'Know the conditions, pillars, obligations and sunnahs of prayer; perform the five prayers correctly; know the rulings of forgetfulness, travel and congregation.' },
-    lessons: prayerIds,
+    lessons: ['prophet-prayer', ...prayerIds],
   },
   {
     id: 'memorization', icon: '🧠',

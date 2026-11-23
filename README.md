@@ -9,11 +9,12 @@ A bilingual (Arabic-first, also English, Spanish and French) Quran platform:
   memorisation plans, spaced revision and a mistake history;
 - **learn the correct prayer (تعلم الصلاة الصحيحة)**: 18 lessons, an illustrated step-by-step tutorial, quizzes,
   scholarly differences explained, and scholars' resources with honest link status;
-- a **Quran Academy** of short courses (prayer, memorisation, tajweed fundamentals, basics, daily practice);
+- an **Islamic Learning Academy** (الأكاديمية التعليمية الإسلامية) of short courses (prayer, memorisation, tajweed fundamentals, basics, daily practice);
 - a personal dashboard (daily goal, khatma progress, revisions due, recently played) and a daily companion;
 - juz/page navigation, reading themes, ayah-range repeat, a sleep timer and a play queue;
 - prayer times with a live countdown and notifications;
-- Hisn al-Muslim adhkar, an electronic rosary, the daily wird, favourites, settings and a local profile.
+- Hisn al-Muslim adhkar with the electronic rosary (its own tab), the daily wird, favourites, settings and a local profile;
+- a «من أنا» page (`about.html`) introducing the developers and the site's dedication, with an autoplaying nasheed player.
 
 The site is a static frontend served by **GitHub Pages**. An optional **Python (FastAPI) backend** serves verified Quran data and privacy-preserving proxies. The site works fully without it.
 
@@ -28,6 +29,7 @@ The site is a static frontend served by **GitHub Pages**. An optional **Python (
 
 | Document | Contents |
 |---|---|
+| [docs/about_page.md](docs/about_page.md) | The «من أنا» page, its media (Al-Aqsa photo, nasheed) and autoplay behaviour; the rosary and prayer-learning reorganisation |
 | [docs/evolution_audit.md](docs/evolution_audit.md) | Audit before the platform evolution: test baseline, findings and resolutions, content policy |
 | [docs/technical_audit.md](docs/technical_audit.md) | Audit of the original site: features, defects, security, performance, SEO |
 | [docs/feature_preservation_checklist.md](docs/feature_preservation_checklist.md) | Every reciter, page, dialog, icon and behaviour that must be preserved, with verification status |
@@ -42,8 +44,8 @@ The site is a static frontend served by **GitHub Pages**. An optional **Python (
 ## Repository layout
 
 ```
-index.html, 404.html, manifest.json, sw.js,      ← the website (GitHub Pages serves the repo root)
-robots.txt, sitemap.xml, Quran.mp3, icon.png
+index.html, about.html, 404.html, manifest.json,  ← the website (GitHub Pages serves the repo root);
+sw.js, robots.txt, sitemap.xml, Quran.mp3, icon.png  about.html is the «من أنا» page
 assets/css/main.css                              ← design tokens, light/dark themes, responsive layout
 assets/js/main.js                                ← entry point
 assets/js/core/                                  ← api (backend + public-API fallback), i18n, dialogs, storage, Arabic text…

@@ -71,6 +71,7 @@
 })();
   </script>
   <!-- Fetch the whole module graph in parallel instead of import by import. -->
+  <link rel="modulepreload" href="assets/js/about.js">
   <link rel="modulepreload" href="assets/js/core/api.js">
   <link rel="modulepreload" href="assets/js/core/arabic.js">
   <link rel="modulepreload" href="assets/js/core/dom.js">
@@ -86,6 +87,7 @@
   <link rel="modulepreload" href="assets/js/core/speech.js">
   <link rel="modulepreload" href="assets/js/core/storage.js">
   <link rel="modulepreload" href="assets/js/core/toast.js">
+  <link rel="modulepreload" href="assets/js/data/about-media.js">
   <link rel="modulepreload" href="assets/js/data/academy.js">
   <link rel="modulepreload" href="assets/js/data/adhkar.js">
   <link rel="modulepreload" href="assets/js/data/prayer-lessons.js">
@@ -157,11 +159,11 @@
         <li><a href="#prayerSection" data-i18n="nav_prayer">مواقيت الصلاة</a></li>
         <li><button type="button" class="nav-btn" data-open="adhkarModal" data-i18n="nav_adhkar">📿 حصن المسلم</button></li>
         <li><button type="button" class="nav-btn" data-open="islamModal" data-i18n="nav_islam">🕌 الإسلام</button></li>
-        <li><button type="button" class="nav-btn" data-open="rosaryModal" data-i18n="nav_rosary">📿 المسبحة</button></li>
         <li><button type="button" class="nav-btn" data-open="ayahSearchModal" data-i18n="nav_ayah_search">🔍 بحث آيات</button></li>
         <li><button type="button" class="nav-btn nav-btn--accent" data-open="voiceTestModal" data-i18n="nav_voice_test">🎙️ التسميع</button></li>
         <li><a href="#learnSection" class="nav-link--accent" data-i18n="nav_learn_prayer">🕋 تعلم الصلاة الصحيحة</a></li>
         <li><a href="#academySection" data-i18n="nav_academy">🎓 الأكاديمية</a></li>
+        <li><a href="about.html" class="nav-link--about" data-i18n="nav_about">🕊️ من أنا</a></li>
       </ul>
     </nav>
   </header>
@@ -173,13 +175,13 @@
       <button class="icon-btn close-btn" type="button" data-close data-i18n-aria-label="close" aria-label="إغلاق"><span aria-hidden="true">✖</span></button>
     </div>
     <ul class="drawer-links">
-      <li><button type="button" data-open="learnPrayerModal"><span class="ico" aria-hidden="true">🕌</span> <span data-i18n="side_learn">تعلم الصلاة</span></button></li>
       <li><button type="button" data-open="favoritesModal"><span class="ico" aria-hidden="true">⭐</span> <span data-i18n="side_favorites">المفضلة</span></button></li>
       <li><button type="button" data-open="profileModal"><span class="ico" aria-hidden="true">👤</span> <span data-i18n="side_profile">حسابي</span></button></li>
       <li><button type="button" data-open="loginModal"><span class="ico" aria-hidden="true">👤</span> <span data-i18n="side_login">تسجيل دخول</span></button></li>
       <li><button type="button" data-open="donateModal"><span class="ico" aria-hidden="true">💖</span> <span data-i18n="side_donate">تبرع</span></button></li>
       <li><button type="button" data-open="contactModal"><span class="ico" aria-hidden="true">✉️</span> <span data-i18n="side_contact">تواصل معنا</span></button></li>
       <li><button type="button" data-open="settingsModal"><span class="ico" aria-hidden="true">⚙️</span> <span data-i18n="side_settings">الإعدادات</span></button></li>
+      <li><a href="about.html" class="drawer-link"><span class="ico" aria-hidden="true">🕊️</span> <span data-i18n="side_about">من أنا</span></a></li>
     </ul>
   </dialog>
 
@@ -263,12 +265,23 @@
       </div>
     </section>
 
-    <!-- ================= Learn the correct prayer ================= -->
-    <section class="section section--learn" id="learnSection" aria-labelledby="learnSectionTitle">
+
+    <!-- ================= Learning academy ================= -->
+    <section class="section section--academy" id="academySection" aria-labelledby="academyTitle">
       <div class="container">
         <header class="section-title">
+          <span class="eyebrow" data-i18n="academy_eyebrow">تعلّم بخطوات منظمة</span>
+          <h2 id="academyTitle" data-i18n="academy_title">🎓 الأكاديمية التعليمية الإسلامية</h2>
+          <p data-i18n="academy_subtitle">دورات قصيرة لها أهداف واضحة ودروس مرتبة واختبارات، ويُحفظ تقدمك على هذا الجهاز.</p>
+        </header>
+        <div id="courseGrid" class="course-grid"></div>
+
+        <!-- Learn the correct prayer: the prayer track of the academy (moved here; ids unchanged) -->
+    <section class="academy-track" id="learnSection" aria-labelledby="learnSectionTitle">
+      <div class="track-body">
+        <header class="track-header">
           <span class="eyebrow" data-i18n="learn_eyebrow">منهج تعليمي متدرج</span>
-          <h2 id="learnSectionTitle" data-i18n="learn_title">🕋 تعلم الصلاة الصحيحة</h2>
+          <h3 class="track-title" id="learnSectionTitle" data-i18n="learn_title">🕋 تعلم الصلاة الصحيحة</h3>
           <p data-i18n="learn_subtitle">ثمانية عشر درسًا من الطهارة إلى سجود السهو، برسوم توضيحية لكل خطوة، واختبارات قصيرة لتقييم الفهم.</p>
         </header>
         <div class="learn-progress card">
@@ -276,20 +289,25 @@
           <div class="progress" id="learnProgress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-labelledby="learnProgressText"><span id="learnProgressBar"></span></div>
         </div>
 
-        <h3 class="sub-title" data-i18n="learn_tutorial_title">صفة الصلاة بالرسم خطوة بخطوة</h3>
+        <p class="center learn-start"><button type="button" class="btn btn-primary" data-action="lesson" data-id="prophet-prayer" data-i18n="learn_start_prophet">🕌 ابدأ هنا: صفة صلاة النبي ﷺ (بأربع لغات)</button></p>
+
+        <h4 class="sub-title" data-i18n="learn_tutorial_title">صفة الصلاة بالرسم خطوة بخطوة</h4>
         <div id="postureTutorial" class="posture-tutorial"></div>
 
-        <h3 class="sub-title" data-i18n="learn_modules_title">دروس المنهج</h3>
+        <h4 class="sub-title" data-i18n="learn_modules_title">دروس المنهج</h4>
         <div id="lessonGrid" class="lesson-grid"></div>
 
-        <h3 class="sub-title" data-i18n="learn_scholars_title">العلماء والمصادر</h3>
+        <h4 class="sub-title" data-i18n="learn_scholars_title">العلماء والمصادر</h4>
         <p class="muted" data-i18n="learn_scholars_desc">روابط إلى المواقع الرسمية ودروس العلماء. حالة كل رابط مبيّنة بجانبه، ولا يعني ذكر عالم هنا أنه يزكّي هذا الموقع.</p>
         <div id="scholarGrid" class="scholar-grid"></div>
         <div class="card verify-card">
-          <h3 class="card-title" data-i18n="learn_verify_title">🔍 للتحقق من الأحاديث ودرجتها</h3>
+          <h5 class="card-title" data-i18n="learn_verify_title">🔍 للتحقق من الأحاديث ودرجتها</h5>
           <ul id="verifyTools" class="resource-list resource-list--inline"></ul>
         </div>
         <p class="note" data-i18n="learn_disclaimer">هذا المحتوى تعليمي مُلخّص، ويبيّن مواضع الخلاف المشهورة بين المذاهب. لا يصدر الموقع فتاوى، ولا يغني عن سؤال أهل العلم والتعلم على يد معلم.</p>
+      </div>
+    </section>
+        <p class="note" data-i18n="academy_disclaimer">إتمام الدورات تقدّم شخصي للمراجعة الذاتية، وليس إجازة أو شهادة شرعية، ولا يؤهل للتدريس.</p>
       </div>
     </section>
 
@@ -460,18 +478,6 @@
       </div>
     </section>
 
-    <!-- ================= Learning academy ================= -->
-    <section class="section section--academy" id="academySection" aria-labelledby="academyTitle">
-      <div class="container">
-        <header class="section-title">
-          <span class="eyebrow" data-i18n="academy_eyebrow">تعلّم بخطوات منظمة</span>
-          <h2 id="academyTitle" data-i18n="academy_title">🎓 أكاديمية القرآن</h2>
-          <p data-i18n="academy_subtitle">دورات قصيرة لها أهداف واضحة ودروس مرتبة واختبارات، ويُحفظ تقدمك على هذا الجهاز.</p>
-        </header>
-        <div id="courseGrid" class="course-grid"></div>
-        <p class="note" data-i18n="academy_disclaimer">إتمام الدورات تقدّم شخصي للمراجعة الذاتية، وليس إجازة أو شهادة شرعية، ولا يؤهل للتدريس.</p>
-      </div>
-    </section>
   </main>
 
   <!-- ================= Footer ================= -->
@@ -543,49 +549,6 @@
     </div>
   </dialog>
 
-  <!-- Learn the prayer -->
-  <dialog id="learnPrayerModal" class="modal modal--wide" aria-labelledby="learnTitle">
-    <button class="icon-btn close-btn" type="button" data-close data-i18n-aria-label="close" aria-label="إغلاق"><span aria-hidden="true">✖</span></button>
-    <h2 class="modal-title" id="learnTitle" data-i18n="modal_learn_title">صفة صلاة النبي ﷺ</h2>
-    <p class="modal-lead" data-i18n="modal_learn_desc">شرح تفصيلي دقيق لخطوات الصلاة الصحيحة وفق منهج أهل السنة والجماعة، كما ثبت عن النبي ﷺ بأنه قال: "صلوا كما رأيتموني أصلي".</p>
-    <ol class="prayer-steps">
-      <li class="prayer-step">
-        <img loading="lazy" decoding="async" width="130" height="130" src="https://images.pexels.com/photos/8164382/pexels-photo-8164382.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=300" alt="القيام وتكبيرة الإحرام">
-        <div><h3 data-i18n="step1_title">1. الوضوء، النية، وتكبيرة الإحرام (القيام)</h3>
-          <p data-i18n="step1_desc">بعد إسباغ الوضوء واستقبال القبلة، ينوي المسلم الصلاة بقلبه (فالتلفظ بالنية بدعة). ثم يكبر تكبيرة الإحرام قائلاً: <strong>(الله أكبر)</strong> ويرفع يديه ممدودة الأصابع حذو منكبيه (أكتافه) أو حذو فروع أذنيه. ثم يضع يده اليمنى على ظهر كفه اليسرى أو يرسغهما ويضعهما على صدره. ويكون نظره في هذه الأثناء وأثناء القيام إلى موضع سجوده خضوعاً وتذللاً لله.</p></div>
-      </li>
-      <li class="prayer-step">
-        <img loading="lazy" decoding="async" width="130" height="130" src="https://images.pexels.com/photos/8164373/pexels-photo-8164373.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=300" alt="القراءة">
-        <div><h3 data-i18n="step2_title">2. دعاء الاستفتاح وقراءة الفاتحة</h3>
-          <p data-i18n="step2_desc">يستحب أن يقرأ دعاء الاستفتاح سراً، وأشهره: <strong>(سبحانك اللهم وبحمدك وتبارك اسمك وتعالى جدك ولا إله غيرك)</strong>. ثم يستعيذ بالله من الشيطان الرجيم ويبسمل سراً. ثم يقرأ <strong>سورة الفاتحة</strong> وهي ركن لا تصح الصلاة بدونها في كل ركعة للمنفرد والإمام. وبعد الفاتحة يقرأ ما تيسر من القرآن الكريم في الركعتين الأولى والثانية من كل صلاة.</p></div>
-      </li>
-      <li class="prayer-step">
-        <img loading="lazy" decoding="async" width="130" height="130" src="https://images.pexels.com/photos/8164378/pexels-photo-8164378.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=300" alt="الركوع والرفع منه">
-        <div><h3 data-i18n="step3_title">3. الركوع والاعتدال منه</h3>
-          <p data-i18n="step3_desc">يكبر ويرفع يديه كما فعل في تكبيرة الإحرام، ثم يركع بحيث يستوي ظهره (يصبح كالمائدة) ويقبض بيديه على ركبتيه ويفرق أصابعه. ويقول في ركوعه: <strong>(سبحان ربي العظيم)</strong> ثلاث مرات أو أكثر. ثم يرفع رأسه من الركوع رافعاً يديه ويقول للإمام والمنفرد: <strong>(سمع الله لمن حمده)</strong>، فإذا استوى قائماً قال: <strong>(ربنا ولك الحمد حمداً كثيراً طيباً مباركاً فيه)</strong>.</p></div>
-      </li>
-      <li class="prayer-step">
-        <img loading="lazy" decoding="async" width="130" height="130" src="https://images.pexels.com/photos/8164434/pexels-photo-8164434.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=300" alt="السجود">
-        <div><h3 data-i18n="step4_title">4. السجود والجلوس بين السجدتين</h3>
-          <p data-i18n="step4_desc">يكبر ويهوي للسجود (بدون رفع اليدين)، ويسجد على الأعضاء السبعة: (الجبهة والأنف، باطن الكفين، الركبتين، وأطراف أصابع القدمين متجهة للقبلة)، ويجافي عضديه عن جنبيه. ويقول: <strong>(سبحان ربي الأعلى)</strong> ثلاث مرات، ويكثر من الدعاء. ثم يرفع رأسه مكبراً ويجلس مفترشاً (ينصب رجله اليمنى ويجلس على اليسرى) ويقول: <strong>(رب اغفر لي وارحمني واهدني وعافني وارزقني)</strong>، ثم يسجد السجدة الثانية كالأولى.</p></div>
-      </li>
-      <li class="prayer-step">
-        <img loading="lazy" decoding="async" width="130" height="130" src="https://images.pexels.com/photos/8164448/pexels-photo-8164448.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=300" alt="التشهد">
-        <div><h3 data-i18n="step5_title">5. التشهد الأخير والتسليم</h3>
-          <p data-i18n="step5_desc">يجلس للتشهد ويضع يديه على فخذيه، ويقبض أصابع يده اليمنى ويشير بالسبابة عند الدعاء، ويقرأ التشهد: <strong>(التحيات لله والصلوات والطيبات، السلام عليك أيها النبي ورحمة الله وبركاته، السلام علينا وعلى عباد الله الصالحين، أشهد أن لا إله إلا الله وأشهد أن محمداً عبده ورسوله)</strong>. ثم يقرأ الصلاة الإبراهيمية (اللهم صل على محمد...). وبعدها يلتفت بوجهه لليمين قائلاً: <strong>(السلام عليكم ورحمة الله)</strong>، ثم لليسار بنفس العبارة.</p></div>
-      </li>
-    </ol>
-    <div class="video-card">
-      <h3 data-i18n="video_title">شرح مرئي عملي لصفة صلاة النبي ﷺ</h3>
-      <p class="muted" data-i18n="video_desc">لصاحب الفضيلة الشيخ أ.د عثمان الخميس حفظه الله</p>
-      <a class="video-link" href="https://www.youtube.com/watch?v=W-jX2kY0vR8" target="_blank" rel="noopener noreferrer">
-        <img loading="lazy" decoding="async" width="480" height="360" src="https://i.ytimg.com/vi/W-jX2kY0vR8/hqdefault.jpg" alt="فيديو شرح صلاة النبي عثمان الخميس">
-        <span class="video-play" aria-hidden="true"></span>
-      </a>
-      <p class="video-hint" data-i18n="video_hint">اضغط على الصورة لمشاهدة التفاصيل المباشرة على يوتيوب</p>
-    </div>
-    <p class="center learn-more"><a class="btn btn-primary" href="#learnSection" data-close data-i18n="learn_open_full">📚 افتح المنهج الكامل «تعلم الصلاة الصحيحة»</a></p>
-  </dialog>
 
   <!-- Hisn al-Muslim -->
   <dialog id="adhkarModal" class="modal modal--wide" aria-labelledby="adhkarTitle">
@@ -597,9 +560,31 @@
       <button class="tab-btn" role="tab" type="button" id="tab_sleep" data-adhkar="sleep" aria-selected="false" data-i18n="tab_sleep">النوم 🛏️</button>
       <button class="tab-btn" role="tab" type="button" id="tab_prayer" data-adhkar="prayer" aria-selected="false" data-i18n="tab_prayer">بعد الصلاة 🕌</button>
       <button class="tab-btn" role="tab" type="button" id="tab_daily" data-adhkar="daily" aria-selected="false" data-i18n="tab_daily">متنوعة 🤲</button>
+      <button class="tab-btn" role="tab" type="button" id="tab_tasbeeh" data-adhkar="tasbeeh" aria-selected="false" aria-controls="tasbeehPanel" data-i18n="nav_rosary">📿 المسبحة</button>
     </div>
     <div class="adhkar-grid" id="adhkarGrid" role="tabpanel" aria-live="polite"></div>
-    <p class="center"><button type="button" class="btn btn-soft btn-small" id="adhkarReset" data-i18n="adhkar_reset">إعادة العد 🔄</button></p>
+    <p class="center" id="adhkarResetRow"><button type="button" class="btn btn-soft btn-small" id="adhkarReset" data-i18n="adhkar_reset">إعادة العد 🔄</button></p>
+
+    <!-- Electronic rosary (moved here from its own dialog; same controls, ids and saved count) -->
+    <div id="tasbeehPanel" class="tasbeeh-panel center" role="tabpanel" aria-labelledby="tab_tasbeeh" hidden>
+      <h3 class="tasbeeh-title" data-i18n="tasbeeh_title">📿 المسبحة الإلكترونية</h3>
+      <p class="muted" data-i18n="rosary_hint">اضغط على الدائرة للتسبيح</p>
+      <div class="tasbeeh-options">
+        <div class="chips tasbeeh-phrases" id="tasbeehPhrases" role="group" data-i18n-aria-label="tasbeeh_phrase_label" aria-label="الذكر"></div>
+        <label class="field field--inline">
+          <span class="field-label" data-i18n="tasbeeh_target_label">الهدف</span>
+          <select id="tasbeehTarget" class="reciter-select reciter-select--compact">
+            <option value="0" data-i18n="tasbeeh_target_free">بدون هدف</option>
+            <option value="33">33</option>
+            <option value="100">100</option>
+          </select>
+        </label>
+      </div>
+      <p class="tasbeeh-phrase" id="tasbeehPhrase" lang="ar" dir="rtl" aria-live="polite"></p>
+      <button type="button" class="rosary-circle" id="rosaryCounter" data-i18n-aria-label="rosary_count_label" aria-label="عدد التسبيحات" aria-live="polite">0</button>
+      <p class="small muted" id="tasbeehProgress" aria-live="polite"></p>
+      <button type="button" class="btn btn-soft" id="rosaryReset" data-i18n="rosary_reset">تصفير العداد 🔄</button>
+    </div>
   </dialog>
 
   <!-- Message of Islam -->
@@ -616,14 +601,6 @@
     </div>
   </dialog>
 
-  <!-- Rosary -->
-  <dialog id="rosaryModal" class="modal modal--narrow center" aria-labelledby="rosaryTitle">
-    <button class="icon-btn close-btn" type="button" data-close data-i18n-aria-label="close" aria-label="إغلاق"><span aria-hidden="true">✖</span></button>
-    <h2 class="modal-title" id="rosaryTitle" data-i18n="nav_rosary">المسبحة الإلكترونية</h2>
-    <p class="muted" data-i18n="rosary_hint">اضغط على الدائرة للتسبيح</p>
-    <button type="button" class="rosary-circle" id="rosaryCounter" data-i18n-aria-label="rosary_count_label" aria-label="عدد التسبيحات" aria-live="polite">0</button>
-    <button type="button" class="btn btn-soft" id="rosaryReset" data-i18n="rosary_reset">تصفير العداد 🔄</button>
-  </dialog>
 
   <!-- Ayah search -->
   <dialog id="ayahSearchModal" class="modal" aria-labelledby="ayahSearchTitle">
