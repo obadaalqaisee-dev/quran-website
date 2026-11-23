@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from datetime import datetime
 from typing import Generic, Literal, TypeVar
 
 from pydantic import BaseModel, ConfigDict
@@ -125,3 +126,31 @@ class HealthOut(BaseModel):
     status: Literal["ok", "degraded"]
     database: Literal["ok", "unavailable"]
     version: str
+
+
+class TafsirHit(BaseModel):
+    id: int
+    surah: int
+    number_in_surah: int
+    edition: str
+    text: str
+
+
+class QuranIndexOut(BaseModel):
+    juz: list[list[int]]
+    pages: list[list[int]]
+    sajda: list[list[int]]
+
+
+class LearningResourceOut(ORM):
+    id: str
+    scholar: str | None
+    scholar_name_ar: str | None
+    scholar_name_en: str | None
+    kind: str
+    status: Literal["existing", "official", "search"]
+    url: str
+    title_ar: str
+    title_en: str
+    topic: str
+    checked_at: datetime | None

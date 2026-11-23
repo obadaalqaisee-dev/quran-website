@@ -1,17 +1,18 @@
 // Surah audio player: 16 reciters (original URLs), previous/next, surah loop, auto-advance,
 // fallback links, playback speed, lock-screen (Media Session) controls and a persistent mini player.
+// Added: sleep timer, play queue, recently played, retry after a failure, open/download the recitation.
 
 import { resolveAudio } from '../core/api.js';
 import { h, scrollIntoViewSmart } from '../core/dom.js';
 import { isArabic, onLanguageChange, t } from '../core/i18n.js';
-import { surahName } from '../core/quran.js';
-import { KEYS, getString, setString } from '../core/storage.js';
+import { getSurahMeta, surahName } from '../core/quran.js';
+import { KEYS, getJSON, getString, setJSON, setString } from '../core/storage.js';
 import { RECITERS } from '../data/reciters.js';
 
 const LOCAL_FATIHA = 'Quran.mp3'; // Al-Fatihah, Abu Bakr Al-Shatri (shipped with the original site)
 
 const el = {};
-const state = { surah: 0, loop: false, status: null, attempt: 0, urls: [], token: 0 };
+const state = { surah: 0, loop: false, status: null, attempt: 0, urls: [], token: 0, queue: [], sleepTimer: 0, sleepEnd: 0, sleepAtEnd: false };
 
 export const reciterLabel = (r) => (isArabic() ? r.name_ar : t(r.i18n_key || `reciter_${r.slug}`));
 const currentReciter = () => RECITERS.find((r) => r.slug === el.reciter.value) ?? RECITERS[0];
@@ -26,6 +27,10 @@ function renderStatus() {
   const vars = { ...state.status.vars };
   if (state.status.key === 'player_now') vars.reciter = reciterLabel(currentReciter());
   el.subtitle.textContent = t(state.status.key, vars);
+  el.retry.hidden = state.status.key !== 'player_failed';
+  const playable = /^https:\/\//.test(el.audio.currentSrc || el.audio.src) && state.status.key === 'player_now';
+  el.download.hidden = !playable;
+  if (playable) el.download.href = el.audio.currentSrc || el.audio.src;
 }
 
 function renderReciterOptions() {
@@ -99,6 +104,7 @@ export async function playSurah(number, { scroll = true } = {}) {
   if (!(n >= 1 && n <= 114)) return;
   const token = ++state.token;
   state.surah = n;
+  rememberRecent(n);
   state.attempt = 0;
   document.getElementById('ayahPlayer')?.pause();
   renderTitles();
@@ -117,6 +123,69 @@ export async function playSurah(number, { scroll = true } = {}) {
   state.urls = await resolveAudio(reciter, n);
   if (state.urls[0] !== primary) state.urls.unshift(primary);
   await playNextCandidate(token);
+}
+
+// ---------------------------------------------------------------- recently played
+export function recentlyPlayed() {
+  const list = getJSON(KEYS.recentAudio, []);
+  return Array.isArray(list) ? list.filter((r) => r && r.surah >= 1 && r.surah <= 114).slice(0, 5) : [];
+}
+function rememberRecent(n) {
+  const reciter = el.reciter.value;
+  const list = recentlyPlayed().filter((r) => r.surah !== n);
+  setJSON(KEYS.recentAudio, [{ surah: n, reciter, at: Date.now() }, ...list].slice(0, 5));
+  for (const fn of recentListeners) fn();
+}
+const recentListeners = new Set();
+export const onRecentChange = (fn) => recentListeners.add(fn);
+export const reciterBySlug = (slug) => RECITERS.find((r) => r.slug === slug) ?? null;
+/** Play a surah with a given reciter (used by "recently played"). */
+export function playWith(n, slug) {
+  if (slug && RECITERS.some((r) => r.slug === slug)) { el.reciter.value = slug; setString(KEYS.reciter, slug); }
+  playSurah(n);
+}
+
+// ---------------------------------------------------------------- sleep timer
+function cancelSleep() {
+  clearInterval(state.sleepTimer);
+  state.sleepTimer = 0;
+  state.sleepEnd = 0;
+  state.sleepAtEnd = false;
+  el.sleepStatus.textContent = '';
+  el.sleep.value = 'off';
+}
+function setSleep(value) {
+  clearInterval(state.sleepTimer);
+  state.sleepTimer = 0;
+  state.sleepAtEnd = value === 'end';
+  state.sleepEnd = 0;
+  el.sleepStatus.textContent = '';
+  if (value === 'off') return;
+  if (value === 'end') { el.sleepStatus.textContent = t('player_sleep_end_on'); return; }
+  state.sleepEnd = Date.now() + Number(value) * 60000;
+  const tick = () => {
+    const left = Math.max(0, state.sleepEnd - Date.now());
+    el.sleepStatus.textContent = t('player_sleep_left', { min: Math.ceil(left / 60000) });
+    if (left === 0) { el.audio.pause(); document.getElementById('ayahPlayer')?.pause(); cancelSleep(); setStatus('player_sleep_done'); }
+  };
+  tick();
+  state.sleepTimer = setInterval(tick, 1000);
+}
+
+// ---------------------------------------------------------------- queue
+function renderQueue() {
+  el.queueList.replaceChildren(...state.queue.map((n, i) => h('li', { class: 'chip' }, `${n}. ${surahName(n)} `,
+    h('button', { type: 'button', class: 'chip-x', text: '✖', attrs: { 'aria-label': `${t('player_queue_remove')}: ${surahName(n)}` }, on: { click: () => { state.queue.splice(i, 1); renderQueue(); } } }))));
+  el.queueEmpty.hidden = state.queue.length > 0;
+}
+function populateQueueSelect() {
+  el.queueSelect.replaceChildren(h('option', { value: '', text: t('player_queue_choose') }),
+    ...Array.from({ length: 114 }, (_, i) => h('option', { value: String(i + 1), text: `${i + 1}. ${surahName(i + 1)}` })));
+}
+export function enqueue(n) {
+  if (!getSurahMeta(n)) return;
+  state.queue.push(Number(n));
+  renderQueue();
 }
 
 export const pauseSurah = () => el.audio && !el.audio.paused && el.audio.pause();
@@ -156,7 +225,19 @@ export function initPlayer() {
     miniTitle: document.getElementById('miniTitle'),
     miniReciter: document.getElementById('miniReciter'),
     miniProgress: document.getElementById('miniProgress'),
+    retry: document.getElementById('playerRetry'),
+    download: document.getElementById('playerDownload'),
+    sleep: document.getElementById('sleepTimer'),
+    sleepStatus: document.getElementById('sleepStatus'),
+    queueSelect: document.getElementById('queueSelect'),
+    queueList: document.getElementById('queueList'),
+    queueEmpty: document.getElementById('queueEmpty'),
   });
+  el.retry.addEventListener('click', () => { if (state.surah) playSurah(state.surah, { scroll: false }); });
+  el.sleep.addEventListener('change', () => setSleep(el.sleep.value));
+  document.getElementById('queueAdd').addEventListener('click', () => { enqueue(Number(el.queueSelect.value)); el.queueSelect.value = ''; });
+  populateQueueSelect();
+  renderQueue();
 
   renderReciterOptions();
   const savedSpeed = getString(KEYS.speed);
@@ -178,7 +259,12 @@ export function initPlayer() {
   document.getElementById('miniNext').addEventListener('click', nextSurah);
   el.miniPlay.addEventListener('click', () => (el.audio.paused ? el.audio.play().catch(() => {}) : el.audio.pause()));
 
-  el.audio.addEventListener('ended', () => { if (!state.loop) nextSurah(); });
+  el.audio.addEventListener('ended', () => {
+    if (state.loop) return;
+    if (state.sleepAtEnd) { cancelSleep(); setStatus('player_sleep_done'); return; } // sleep timer: "end of this surah"
+    if (state.queue.length) { playSurah(state.queue.shift(), { scroll: false }); renderQueue(); return; }
+    nextSurah();
+  });
   el.audio.addEventListener('play', () => { document.getElementById('ayahPlayer')?.pause(); renderMiniState(); });
   el.audio.addEventListener('pause', renderMiniState);
   el.audio.addEventListener('playing', () => { if (state.status?.key === 'player_tap_play') setStatus('player_now'); });
@@ -206,6 +292,9 @@ export function initPlayer() {
   }
 
   onLanguageChange(() => {
+    populateQueueSelect();
+    renderQueue();
+    if (state.sleepEnd || state.sleepAtEnd) el.sleepStatus.textContent = state.sleepAtEnd ? t('player_sleep_end_on') : el.sleepStatus.textContent;
     renderReciterOptions();
     renderLoopButton();
     renderTitles();

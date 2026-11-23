@@ -1,0 +1,26 @@
+name: Link check
+
+# External links, reciter audio and public APIs (scripts/check_links.py). Separate from CI so that a
+# third-party outage never blocks a merge; failures are reported, and links are repaired by hand.
+on:
+  schedule:
+    - cron: "17 4 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  links:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python3 scripts/check_links.py --json link-report.json
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: link-report
+          path: link-report.json

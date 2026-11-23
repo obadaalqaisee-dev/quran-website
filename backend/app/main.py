@@ -14,7 +14,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 
 from app import __version__
-from app.api.v1 import quran, services
+from app.api.v1 import learning, quran, services
 from app.core.config import Settings, get_settings
 from app.core.errors import install_error_handlers
 from app.core.logging import configure_logging
@@ -52,6 +52,7 @@ def create_app(
 
     app.include_router(quran.router, prefix="/api/v1")
     app.include_router(services.router, prefix="/api/v1")
+    app.include_router(learning.router, prefix="/api/v1")
 
     if settings.static_enabled:
         from app.static_site import mount_static_site

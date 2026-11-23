@@ -2,8 +2,9 @@
 // so the Content Security Policy can forbid inline scripts.
 
 import { initialLanguage, setLanguage } from './core/i18n.js';
-import { initDialogs } from './core/modal.js';
+import { initDialogs, openDialog } from './core/modal.js';
 import { initAdhkar } from './features/adhkar.js';
+import { initDashboard, refreshDashboard } from './features/dashboard.js';
 import { initAyahSearch } from './features/ayah-search.js';
 import { initFavorites, refreshFavorites } from './features/favorites.js';
 import { initIslamicSearch } from './features/islamic-search.js';
@@ -12,8 +13,11 @@ import { initPrayer } from './features/prayer.js';
 import { initProfile, welcome } from './features/profile.js';
 import { initReader, readSurah } from './features/reader.js';
 import { initRosary } from './features/rosary.js';
+import { initSettingsPanel } from './features/settings-panel.js';
 import { initSurahList, renderBookmarkBanner } from './features/surahs.js';
 import { initTheme } from './features/theme.js';
+import { initLearn } from './features/learn.js';
+import { initMemorization, notifyMemoChange, onMemoChange } from './features/memorization.js';
 import { initVoiceLab } from './features/voice-lab.js';
 import { initWird, setWird } from './features/wird.js';
 
@@ -77,7 +81,17 @@ function boot() {
   initRosary();
   initAyahSearch({ readSurah: openReader });
   initIslamicSearch({ readSurah: openReader });
-  initVoiceLab();
+  initVoiceLab({ onMemoChange: notifyMemoChange });
+  initMemorization();
+
+  // Added by the platform evolution: learning, dashboard and settings.
+  const openLab = () => openDialog('voiceTestModal');
+  const openPlan = () => { openLab(); document.getElementById('labTabPlan').click(); };
+  const openSettings = () => openDialog('settingsModal');
+  initLearn({ readSurah: openReader, openLab, openPlan, openSettings });
+  initSettingsPanel({ onMemoGoalChange: notifyMemoChange });
+  initDashboard({ readSurah: openReader, openLab, openSettings });
+  onMemoChange(refreshDashboard);
   initProfile({ onReset: refreshFavorites });
   welcome();
   registerServiceWorker();

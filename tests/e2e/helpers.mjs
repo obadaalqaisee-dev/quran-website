@@ -132,6 +132,14 @@ export async function mockUpstream(context, options = {}) {
       }));
       return matches.length ? json(route, { code: 200, data: { count: matches.length, matches } }) : json(route, { code: 404, data: 'Nothing found' }, 404);
     }
+    // Search in a tafsir/translation edition (used by the Islamic search's tafsir option).
+    m = /^\/v1\/search\/(.+)\/all\/([\w.]+)$/.exec(url.pathname);
+    if (m && EDITIONS[m[2]]) {
+      const q = strip(decodeURIComponent(m[1]));
+      const matches = EDITIONS[m[2]].map((text, i) => ({ text, a: AYAHS[i] })).filter((x) => strip(x.text).includes(q))
+        .map(({ text, a }) => ({ number: a.id, text, numberInSurah: a.numberInSurah, surah: { number: a.surah, name: SURAHS[a.surah - 1].name_ar } }));
+      return matches.length ? json(route, { code: 200, data: { count: matches.length, matches } }) : json(route, { code: 404, data: 'Nothing found' }, 404);
+    }
     return json(route, { code: 404 }, 404);
   });
 
@@ -213,3 +221,46 @@ export function collectErrors(page) {
 }
 
 export const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+/**
+ * Fake microphone for the memorisation lab. options: { permission: 'granted'|'denied'|'prompt',
+ * gum: 'ok'|'NotAllowedError'|'NotFoundError' }. Records constraints in window.__gumConstraints and
+ * whether tracks were stopped in window.__tracksStopped.
+ */
+export const fakeMedia = ({ permission = 'prompt', gum = 'ok' } = {}) => `
+  (() => {
+    window.__tracksStopped = 0;
+    const permissions = navigator.permissions;
+    const query = permissions && permissions.query.bind(permissions);
+    if (permissions) permissions.query = (desc) => desc && desc.name === 'microphone'
+      ? Promise.resolve({ state: ${JSON.stringify(permission)}, addEventListener() {} }) : query(desc);
+    const md = navigator.mediaDevices || {};
+    Object.defineProperty(navigator, 'mediaDevices', { configurable: true, value: md });
+    md.getSupportedConstraints = () => ({ echoCancellation: true, noiseSuppression: true, autoGainControl: true, channelCount: true, deviceId: true });
+    md.enumerateDevices = async () => [
+      { kind: 'audioinput', deviceId: 'default', label: 'Default' },
+      { kind: 'audioinput', deviceId: 'mic-usb', label: 'USB Microphone' },
+    ];
+    md.getUserMedia = async (constraints) => {
+      window.__gumConstraints = constraints;
+      if (${JSON.stringify(gum)} !== 'ok') { const e = new Error('x'); e.name = ${JSON.stringify(gum)}; throw e; }
+      const ctx = new AudioContext();
+      const osc = ctx.createOscillator();
+      const dest = ctx.createMediaStreamDestination();
+      osc.connect(dest); osc.start();
+      const stream = dest.stream;
+      const [track] = stream.getAudioTracks();
+      const stop = track.stop.bind(track);
+      track.stop = () => { window.__tracksStopped += 1; stop(); };
+      track.getSettings = () => ({ echoCancellation: true, noiseSuppression: true, autoGainControl: true });
+      return stream;
+    };
+  })();`;
+
+/** Make the fake recogniser report an error, as Chrome does (onerror then onend). */
+export const speechError = (page, code) => page.evaluate((c) => {
+  const rec = window.__recognition;
+  rec.onerror?.({ error: c });
+  rec.running = false;
+  rec.onend?.();
+}, code);

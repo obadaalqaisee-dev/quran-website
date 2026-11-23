@@ -42,6 +42,7 @@ export function renderWird() {
   document.getElementById('wirdProgress').setAttribute('aria-valuenow', String(done * 25));
   const stat = document.getElementById('profileWirdStat');
   if (stat) stat.textContent = `${done * 25}%`;
+  document.dispatchEvent(new CustomEvent('wirdchange')); // lets the dashboard refresh
 }
 
 export function initWird() {

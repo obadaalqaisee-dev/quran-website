@@ -1,6 +1,8 @@
 // Interface strings for the four supported languages.
 // The original strings are kept verbatim; see docs/feature_preservation_checklist.md.
 // Values may contain trusted, static markup (<strong>, <span>); never put remote data here.
+import { EXTRA } from './translations-ext.js';
+
 export const translations = {
   "ar": {
     "logo_text": "القرآن <span>الكريم</span>",
@@ -965,3 +967,10 @@ export const translations = {
 };
 
 export const LANGUAGES = ['ar', 'en', 'es', 'fr'];
+
+// Strings added by the platform evolution (translations-ext.js). Existing keys are never overwritten.
+for (const lang of LANGUAGES) {
+  for (const [key, value] of Object.entries(EXTRA[lang] || {})) {
+    if (!(key in translations[lang])) translations[lang][key] = value;
+  }
+}

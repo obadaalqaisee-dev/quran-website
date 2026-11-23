@@ -1,24 +1,66 @@
 {
   "name": "القرآن الكريم | The Noble Quran",
   "short_name": "القرآن الكريم",
-  "description": "منصة إسلامية شاملة لقراءة واستماع القرآن الكريم، أذكار حصن المسلم، ومواقيت الصلاة.",
+  "description": "منصة إسلامية شاملة لقراءة واستماع القرآن الكريم، مختبر الحفظ والتسميع، تعلم الصلاة الصحيحة، أذكار حصن المسلم، ومواقيت الصلاة.",
   "id": "./",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "dir": "rtl",
   "lang": "ar",
-  "background_color": "#f5f2e8",
-  "theme_color": "#0b3d2e",
-  "categories": ["education", "books", "lifestyle"],
+  "background_color": "#0b3a2e",
+  "theme_color": "#0b3a2e",
+  "categories": [
+    "education",
+    "books",
+    "lifestyle"
+  ],
   "icons": [
-    { "src": "assets/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "assets/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
-    { "src": "assets/icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    {
+      "src": "assets/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icons/maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
   ],
   "shortcuts": [
-    { "name": "السور", "short_name": "السور", "url": "./index.html#surahs" },
-    { "name": "مواقيت الصلاة", "short_name": "الصلاة", "url": "./index.html#prayerSection" },
-    { "name": "استمع للقرآن", "short_name": "استماع", "url": "./index.html#audio" }
-  ]
+    {
+      "name": "السور",
+      "short_name": "السور",
+      "url": "./index.html#surahs"
+    },
+    {
+      "name": "مواقيت الصلاة",
+      "short_name": "الصلاة",
+      "url": "./index.html#prayerSection"
+    },
+    {
+      "name": "استمع للقرآن",
+      "short_name": "استماع",
+      "url": "./index.html#audio"
+    },
+    {
+      "name": "تعلم الصلاة الصحيحة",
+      "short_name": "تعلم الصلاة",
+      "url": "./index.html#learnSection"
+    },
+    {
+      "name": "أكاديمية القرآن",
+      "short_name": "الأكاديمية",
+      "url": "./index.html#academySection"
+    }
+  ],
+  "orientation": "any"
 }
