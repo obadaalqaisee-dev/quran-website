@@ -75,3 +75,18 @@ Not applicable. The API is read-only (`GET`), has no cookies and no authenticati
 3. **Third-party content.** Audio, Pexels and Unsplash images, and the public APIs in fallback mode are loaded from third parties. Their availability and integrity are outside this project's control. Quran *text* is protected by the backend's verified copy whenever the backend is configured.
 4. **GitHub Pages limits.** No custom headers: there is no `frame-ancestors` (the page can be framed) and no `Permissions-Policy` there.
 5. **Service worker cache.** Cached Quran data is refreshed in the background (stale-while-revalidate). After a dataset correction, bump `VERSION` in `sw.js`.
+
+## Platform evolution (2026-11-23)
+
+No existing control was relaxed. The CSP is unchanged (the new artwork is same-origin; scholar links are plain
+navigation, not loaded resources), and the static test still forbids inline scripts, inline handlers and style
+attributes. New surfaces and how they are handled:
+
+| Surface | Control |
+|---|---|
+| Lesson content, scholar resources, dashboard | Static data and on-device values only; rendered with `textContent` (the static test forbids `innerHTML` in feature modules). Progress bars use CSSOM `style.width`, which the CSP allows, not `style` attributes. |
+| External links (dorar.net, sunnah.com, YouTube searches, official sites) | `target="_blank"` with `rel="noopener noreferrer"` (tested); https only (unit test). |
+| Microphone | Opened only after an explicit tap on «اختبار المايك»; only a level meter reads it; nothing is recorded or uploaded; every track and the AudioContext are released when the test stops or the lab closes (tested). Speech recognition is the browser's own service (the interface says it may need internet). |
+| `GET /api/v1/tafsir/search` | Edition allow-list, length limits, normalised query, parameterised `LIKE` with escaped wildcards; injection strings tested. |
+| `GET /api/v1/learning/resources` | `topic` restricted to `^[a-z]{2,32}$`; data comes from a checksummed dataset that must contain https URLs only. |
+| Datasets | `learning_resources.json` is in `checksums.json`; a tampered file is refused like every other dataset. |

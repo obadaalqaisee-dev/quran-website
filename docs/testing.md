@@ -52,7 +52,26 @@ LIVE_URL=https://obadaalqaisee-dev.github.io/quran-website/ LIVE_MAP_TO=127.0.0.
 
 Set `SCREENSHOT_DIR=/some/dir` when running `quality.test.mjs` to save screenshots of every viewport.
 
-## Latest results (2026-11-19, this branch)
+## Latest results (2026-11-23, platform evolution, `feature/ultimate-quran-platform-evolution`)
+
+Run in the development container; its network allows package registries only (see `evolution_audit.md` §3).
+
+| Suite | Before (on `main`) | After |
+|---|---|---|
+| Backend pytest | 91 passed | **106 passed**, 0 failed (15 new in `test_learning.py`) |
+| ruff | clean | clean |
+| pip-audit (runtime requirements) | — | no known vulnerabilities |
+| Database: `alembic upgrade head` → `seed` → `verify` (fresh SQLite) | — | passed; also upgrade from a populated 0001 database, downgrade to 0001, and `alembic check` (no model drift) |
+| Frontend unit (`node:test`) | 18 passed | **37 passed**, 0 failed (19 new in `evolution.test.mjs`) |
+| Playwright end-to-end | 62 passed, **1 failed**, 2 skipped | **87 passed, 0 failed**, 2 skipped (24 new in `evolution.test.mjs`) |
+| Link check (`scripts/check_links.py`) | — | not runnable here (no internet: 0/50 reachable through the proxy); runs weekly and on demand in `.github/workflows/link-check.yml` |
+
+The previously failing test was a real defect (an upstream 502 marked the whole backend as down), now fixed. The two
+skips need the internet: `live.test.mjs` (needs `LIVE_URL`) and the live-Aladhan proxy test. No test was removed,
+skipped or weakened; the only change to an existing test stubs the backend's prayer-times answer in the browser so
+that the production-topology test no longer depends on Aladhan being reachable.
+
+## Earlier results (2026-11-19)
 
 | Suite | Result |
 |---|---|
