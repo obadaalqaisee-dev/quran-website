@@ -10,7 +10,7 @@ tokens, light/dark theme, language selector and Content Security Policy. The CSP
 | Part | Content |
 |---|---|
 | Header | A pointed-arch artwork with the title «من أنا». Al-Isra 17:1 is loaded from the verified Quran dataset; it is never typed by hand. |
-| Photo | The Al-Aqsa photograph. It is shown only once a verified, licensed local file is configured (see §2). |
+| Photo | The Dome of the Rock in Al-Aqsa Mosque (see §2). |
 | Nasheed | An autoplaying player (see §3). |
 | Developers | Two cards with exactly the information supplied: **عبادة أبو فردة**, طالب في جامعة الزيتونة الأردنية, التخصص: الذكاء الاصطناعي; **يونس أبو صعيلك**, طالب في الجامعة الهاشمية. Side by side from 721 px wide, stacked below. No other personal details were added. |
 | Dedication | «تم تطوير هذا الموقع لوجه الله تعالى، ابتغاء الأجر والثواب، وخدمةً لكتاب الله وسنة نبيه ﷺ.» / بواسطة: / «عبادة أبو فردة ويونس أبو صعيلك.» |
@@ -19,40 +19,21 @@ Files: `about.html`, `assets/js/about.js` (page script), `assets/js/data/about-m
 and section 18 of `assets/css/main.css`. The service worker precaches the page, so it works offline after a first
 visit. `sitemap.xml` lists it. In development, the backend serves it like `index.html`.
 
-## 2. Media: what is still needed, and how to add it
+## 2. Media
 
-The photograph and the recording must be **authentic and properly licensed**. While this was built, the
-development environment could not reach Wikimedia Commons, YouTube, archive.org or any other media host (the
-network proxy refused every connection). So no photograph could be checked, and no recording could be verified
-to contain the requested lyrics. Nothing was invented or substituted:
+Both files are local and configured in `assets/js/data/about-media.js` with their source and licence:
 
-* **No photo configured:** the header shows only the decorative artwork. It is not labelled as Al-Aqsa, and no
-  other mosque is shown in its place.
-* **No recording configured:** the player says «لم يُضف تسجيل النشيد بعد», its controls are disabled, and
-  nothing is played.
+* **Photo:** `assets/img/about/dome-of-the-rock.webp`, قبة الصخرة المشرفة in Al-Aqsa Mosque, with the Dome of
+  the Chain in front. A Wikimedia Commons featured picture by Andrew Shiva, CC BY-SA 4.0
+  ([file page](https://commons.wikimedia.org/wiki/File:Jerusalem-2013-Temple_Mount-Dome_of_the_Rock_%26_Chain_02.jpg)).
+  It was cropped to 1280 × 800 around the golden dome and saved as WebP (~100 KB). The caption credits the photographer
+  and links the file page, and the service worker precaches it.
+* **Nasheed:** `assets/audio/ya-dhakir-al-ashab.mp3`, «يا ذاكر الأصحاب كن متأدباً» (3:09, MP3 128 kbps), from the
+  Internet Archive item [ya-dakera-ass7abi](https://archive.org/details/ya-dakera-ass7abi), whose description gives the
+  nasheed's full lyrics. The item states no explicit licence.
 
-### Adding the Al-Aqsa photograph
-
-1. Choose an authentic photograph of Al-Aqsa Mosque (the Qibli mosque or the compound, *not* another mosque) whose
-   licence allows republication. Wikimedia Commons has many under CC BY / CC BY-SA. Read the file page: the
-   licence, the author, and that the place shown is Al-Aqsa.
-2. Resize it to about 1600 × 1000 px and save it as WebP or JPEG, ideally under about 250 KB.
-3. Save it as `assets/img/about/al-aqsa.webp`.
-4. In `assets/js/data/about-media.js`, set `image.src` to that path, and fill in `credit`, `license`, `licenseUrl` and
-   `sourceUrl` exactly as the licence requires. The caption under the photo is built from these fields.
-5. Add the file to `SHELL_FILES` in `sw.js` and bump `VERSION`, so the photo is available offline.
-
-The page shows the photo only when `src` is a local path **and** `sourceUrl` and `license` are filled in
-(`isConfigured()`), so it cannot be published without its provenance.
-
-### Adding the nasheed
-
-1. Obtain a recording of the nasheed whose lyrics begin «سبّوا خيار الخلق من لهم العلى ولهم مقام في ذرى الأحساب...».
-   Listen to it and confirm the lyrics.
-2. Confirm that you may publish it: written permission from the munshid or publisher, or an explicit free licence.
-   A video on a sharing platform is not a licence.
-3. Save it locally as `assets/audio/nasheed.mp3`. MP3 at 96–128 kbps is enough.
-4. In `about-media.js`, set `nasheed.src`, and fill in `title`, `performer`, `license` and `sourceUrl`.
+The page shows the photo and plays the nasheed only when `src` is a local path **and** `sourceUrl` and `license`
+are filled in (`isConfigured()`).
 
 ## 3. Nasheed playback and browser autoplay rules
 
@@ -70,9 +51,7 @@ The page shows the photo only when `src` is a local path **and** `sourceUrl` and
 * **Offline:** the service worker does not intercept audio (range requests go straight to the file), so the
   nasheed needs a connection unless the browser has cached it.
 
-Tests (`tests/e2e/about.test.mjs`) cover the shipped state as it is. They also run every configured code path
-with **test-only stand-in media** (the site's own `Quran.mp3` and icon), injected into the browser by the test;
-these stand-ins never appear on the site. Autoplay is tested twice, once with Chromium allowing autoplay and once
+Tests (`tests/e2e/about.test.mjs`) load and play the real photo and nasheed files. Autoplay is tested twice, once with Chromium allowing autoplay and once
 with it refusing autoplay without a user gesture.
 
 ## 4. The rosary moved into Hisn al-Muslim
