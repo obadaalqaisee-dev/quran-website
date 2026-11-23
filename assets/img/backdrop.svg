@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <pattern id="khatam" width="80" height="80" patternUnits="userSpaceOnUse"><g fill="none" stroke="#d8bd7a" stroke-opacity="0.22" stroke-width="1.2">
+    <polygon points="40.00,18.00 46.40,24.55 55.56,24.44 55.45,33.60 62.00,40.00 55.45,46.40 55.56,55.56 46.40,55.45 40.00,62.00 33.60,55.45 24.44,55.56 24.55,46.40 18.00,40.00 24.55,33.60 24.44,24.44 33.60,24.55"/>
+    <rect x="24.4" y="24.4" width="31.2" height="31.2" transform="rotate(45 40 40)"/>
+    <rect x="24.4" y="24.4" width="31.2" height="31.2"/>
+    <path d="M0,40 H18 M62,40 H80 M40,0 V18 M40,62 V80"/>
+    <polygon points="0.00,-14.00 4.07,-9.83 9.90,-9.90 9.83,-4.07 14.00,0.00 9.83,4.07 9.90,9.90 4.07,9.83 0.00,14.00 -4.07,9.83 -9.90,9.90 -9.83,4.07 -14.00,0.00 -9.83,-4.07 -9.90,-9.90 -4.07,-9.83"/><polygon points="80.00,-14.00 84.07,-9.83 89.90,-9.90 89.83,-4.07 94.00,0.00 89.83,4.07 89.90,9.90 84.07,9.83 80.00,14.00 75.93,9.83 70.10,9.90 70.17,4.07 66.00,0.00 70.17,-4.07 70.10,-9.90 75.93,-9.83"/><polygon points="0.00,66.00 4.07,70.17 9.90,70.10 9.83,75.93 14.00,80.00 9.83,84.07 9.90,89.90 4.07,89.83 0.00,94.00 -4.07,89.83 -9.90,89.90 -9.83,84.07 -14.00,80.00 -9.83,75.93 -9.90,70.10 -4.07,70.17"/><polygon points="80.00,66.00 84.07,70.17 89.90,70.10 89.83,75.93 94.00,80.00 89.83,84.07 89.90,89.90 84.07,89.83 80.00,94.00 75.93,89.83 70.10,89.90 70.17,84.07 66.00,80.00 70.17,75.93 70.10,70.10 75.93,70.17"/>
+  </g></pattern>
+    <radialGradient id="glow" cx="50%" cy="38%" r="60%">
+      <stop offset="0" stop-color="#1b6b52"/><stop offset="0.55" stop-color="#0b3a2e"/><stop offset="1" stop-color="#062019"/>
+    </radialGradient>
+    <linearGradient id="archFill" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0f5a45" stop-opacity="0.0"/><stop offset="1" stop-color="#041a14" stop-opacity="0.55"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="1000" fill="url(#glow)"/>
+  <rect width="1600" height="1000" fill="url(#khatam)"/>
+  <!-- a pointed (Islamic) arch framing the centre -->
+  <path d="M520,1000 V520 C520,330 640,210 800,120 C960,210 1080,330 1080,520 V1000 Z" fill="url(#archFill)" stroke="#d8bd7a" stroke-opacity="0.45" stroke-width="3"/>
+  <path d="M560,1000 V530 C560,360 665,250 800,170 C935,250 1040,360 1040,530 V1000" fill="none" stroke="#d8bd7a" stroke-opacity="0.25" stroke-width="2"/>
+  <!-- side arcades -->
+  <g fill="none" stroke="#d8bd7a" stroke-opacity="0.18" stroke-width="2">
+    <path d="M120,1000 V640 C120,540 180,480 250,440 C320,480 380,540 380,640 V1000"/>
+    <path d="M1220,1000 V640 C1220,540 1280,480 1350,440 C1420,480 1480,540 1480,640 V1000"/>
+  </g>
+  <polygon points="800.00,294.00 813.38,307.70 832.53,307.47 832.30,326.62 846.00,340.00 832.30,353.38 832.53,372.53 813.38,372.30 800.00,386.00 786.62,372.30 767.47,372.53 767.70,353.38 754.00,340.00 767.70,326.62 767.47,307.47 786.62,307.70" fill="none" stroke="#d8bd7a" stroke-opacity="0.6" stroke-width="2"/>
+</svg>

@@ -172,6 +172,35 @@ export function searchAyahs(query) {
   ));
 }
 
+/**
+ * Search the text of Tafsir al-Muyassar (first 10 results). Backend: /api/v1/tafsir/search;
+ * public API: alquran.cloud's search, which accepts any text edition. Resolves { total, results }.
+ */
+export function searchTafsir(query, edition = 'ar.muyassar') {
+  const q = query.trim();
+  return memoize(`tafsir:${edition}:${q}`, () => viaBackendOr(
+    async (base) => {
+      const res = await getJSON(`${base}tafsir/search?q=${encodeURIComponent(q)}&edition=${encodeURIComponent(edition)}&page_size=10`);
+      return { total: res.meta.total, results: res.data.map((m) => ({ id: m.id, surah: m.surah, numberInSurah: m.number_in_surah, text: m.text })) };
+    },
+    async () => {
+      let res;
+      try {
+        res = await getJSON(`${UPSTREAM.quran}/search/${encodeURIComponent(q)}/all/${encodeURIComponent(edition)}`);
+      } catch (err) {
+        if (err instanceof ApiError && /HTTP 404/.test(err.message)) return { total: 0, results: [] }; // "nothing found"
+        throw err;
+      }
+      const data = res?.data;
+      if (!data || !data.count) return { total: 0, results: [] };
+      return {
+        total: data.count,
+        results: data.matches.slice(0, 10).map((m) => ({ id: m.number, surah: m.surah.number, numberInSurah: m.numberInSurah, text: m.text })),
+      };
+    },
+  ));
+}
+
 // ------------------------------------------------------------------ prayer times
 function ddmmyyyy(date) {
   return `${String(date.getDate()).padStart(2, '0')}-${String(date.getMonth() + 1).padStart(2, '0')}-${date.getFullYear()}`;

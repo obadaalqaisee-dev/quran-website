@@ -1,14 +1,16 @@
 // Prayer times (geolocation, falling back to Amman as before), Hijri date, next-prayer countdown,
-// and prayer notifications: a warning within the last 10 minutes and one at prayer time, while the site is open.
+// and prayer notifications: a warning within the last N minutes (10 by default, configurable in the
+// settings) and one at prayer time, while the site is open.
 
 import { getPrayerTimes } from '../core/api.js';
 import { h, localDateKey, pad2 } from '../core/dom.js';
 import { isArabic, locale, onLanguageChange, t } from '../core/i18n.js';
+import { getSettings } from '../core/settings.js';
 import { KEYS, getJSON, setJSON } from '../core/storage.js';
 import { toast } from '../core/toast.js';
 
 const PRAYERS = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
-const NOTIFY_BEFORE_MIN = 10;
+const notifyBeforeMin = () => getSettings().notifyBefore; // default 10, as the original
 
 const state = { data: null, source: null, dateKey: null, timer: null, notified: new Set() };
 const el = {};
@@ -90,7 +92,7 @@ async function showNotification(body) {
 
 // Browsers throttle timers in background tabs (to about once a minute), so notifications must not
 // depend on a tick landing in a narrow window:
-//  * "before": sent once, at any moment within the last NOTIFY_BEFORE_MIN minutes, stating the
+//  * "before": sent once, at any moment within the last notifyBeforeMin() minutes, stating the
 //    real number of minutes left (e.g. when notifications are enabled 4 minutes before a prayer);
 //  * "now": sent when the upcoming prayer changes because the previous one's time has passed.
 function maybeNotify(next, secondsLeft) {
@@ -106,7 +108,7 @@ function maybeNotify(next, secondsLeft) {
     }
   }
   const before = `${localDateKey(next.time)}:${next.key}:before`;
-  if (secondsLeft > 0 && secondsLeft <= NOTIFY_BEFORE_MIN * 60 && !state.notified.has(before)) {
+  if (secondsLeft > 0 && secondsLeft <= notifyBeforeMin() * 60 && !state.notified.has(before)) {
     state.notified.add(before);
     showNotification(t('notify_before', { min: Math.ceil(secondsLeft / 60), prayer: prayerLabel(next.key) }));
   }
@@ -186,5 +188,8 @@ export function initPrayer() {
   onLanguageChange(() => { renderHeader(); renderGrid(); tick(); });
   load();
 }
+
+/** Next prayer for the dashboard: { key, time } or null while loading. */
+export const upcomingPrayer = () => (state.data ? nextPrayer(state.data.timings) : null);
 
 export const _prayerState = state; // for tests
