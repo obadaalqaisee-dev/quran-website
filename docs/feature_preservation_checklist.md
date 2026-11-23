@@ -140,3 +140,38 @@ The following behaviours are preserved: auto-advance to the next surah, surah lo
 | Hero photo | CSS background, 1800 px wide | Responsive `<img>` (640/1200/1800 px) | Faster on phones. Same photo. |
 | Icons drawn by the browser | Emoji only | Same emoji, inside consistent round buttons. The mini player adds ⏮ ▶ ⏸ ⏭. | Consistency. No icon was replaced. |
 | Fonts | Google Fonts | The same Amiri and Cairo, self-hosted | Privacy, speed, offline use, stricter CSP. |
+
+## J. Platform evolution (2026-11-23): what was added
+
+Sections A–I above were re-verified after the evolution: every row still exists and works, and every
+test listed in §H still passes (see [`testing.md`](testing.md)). Nothing was removed. Added:
+
+| Area | Added | Verified by |
+|---|---|---|
+| Navigation | 🕋 تعلم الصلاة الصحيحة → `#learnSection`, 🎓 الأكاديمية → `#academySection` (nav); ⚙️ settings (header button, side-menu item, dashboard card) | `e2e/evolution` navigation |
+| Learn the correct prayer | 18 modules, 10-step illustrated tutorial (original SVG diagrams), quizzes, progress, scholarly differences, scholars and sources with link status. The original «تعلم الصلاة» dialog is unchanged and now links to the full course | `e2e/evolution` learn; `unit/evolution` content integrity (every Quran reference checked against the dataset) |
+| Academy | 5 courses (prayer, memorisation, tajweed fundamentals, basics, daily practice) | `e2e/evolution` academy |
+| Memorisation lab | Word-level comparison engine, microphone test (device, processing, level, cleanup), robust recogniser, 6 modes, ayah range, retry/hint/skip, plan, daily target, memorised surahs, spaced revision, mistake history. The original sequential behaviour is the default and still passes its original test | `features` (original) + `e2e/evolution` lab + `unit/evolution` engine |
+| Reader | Juz and page navigation, reading themes, reading log and daily goal, auto-continue, ayah-range repeat, sajda marks | `e2e/evolution` reading |
+| Player | Speeds 0.5×, 1.75×, 2× (original four kept), sleep timer, queue, recently played, retry, open/download | `e2e/evolution` player; original player tests |
+| Dashboard | «رحلتي اليومية» and «رفيقك اليومي», computed from on-device data only | `e2e/evolution` dashboard |
+| Settings | Font, reading theme, preferred reciter (original `reciter` key), translation in Arabic UI, tafsir in all languages, goals, prayer-warning minutes (default 10 = original) | `e2e/evolution` settings |
+| Search | Ayah references, lessons, Tafsir al-Muyassar (on request) after the original result types | `e2e/evolution` search; original Islamic-search test |
+| Backend | `/tafsir/search`, `/quran-index`, `/learning/resources`, Alembic 0002 | `backend/tests/test_learning.py` |
+| PWA | New icons, launch screen in standalone mode, patterned installed-app background, all artwork precached | `quality` manifest test; `e2e/evolution` PWA |
+
+### New storage keys (no existing key changed)
+
+`memorizationMode`, `memorizationData`, `micDeviceId`, `readingTheme`, `readingLog`, `userSettings`, `recentAudio`,
+`learningProgress`. The test *"using every new feature leaves the original storage keys untouched"* seeds all
+original keys, uses the new features, and checks every original value byte-for-byte.
+
+## K. Deliberate presentation changes in the evolution (nothing removed)
+
+| Item | Before | Now | Why |
+|---|---|---|---|
+| Colours | Green/ivory light theme, navy/teal dark theme | Emerald/forest/ivory/muted-gold in both themes (token names unchanged; contrast re-verified) | One identity in both themes |
+| Hero background | Photograph from images.unsplash.com | Original local vector artwork (arch + khatam pattern). The Unsplash photo remains the social-preview `og:image` | Works offline, no third-party request, unambiguous licence |
+| App icons | Previous PNG icons | New icons generated from `assets/img/icon.svg`; same file names and sizes. Root `icon.png` kept unchanged | PWA redesign |
+| Memorisation lab dialog | Standard width | Wide dialog with two tabs; every original control keeps its id and default behaviour | Room for the word view and the plan |
+| Reader toolbar | Ayah loop, font size, hint | Same controls, plus a collapsible «أدوات القراءة والتنقل» panel | Keeps the Quran text near the top |

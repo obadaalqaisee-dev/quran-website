@@ -365,6 +365,7 @@ const SPEECH_ERRORS = {
 };
 
 function stopListening() {
+  state.listenToken = (state.listenToken || 0) + 1; // cancels a start that is still awaiting permission
   state.listening = false;
   state.recognition?.stop();
   state.ayahAudio?.pause();
@@ -377,7 +378,10 @@ async function startListening() {
   if (state.index > state.to) resetSession();
   if (mic.active) { mic.close(); el.micTest.setAttribute('aria-pressed', 'false'); el.micTest.textContent = t('lab_mic_test'); }
   // Permission already refused: explain how to allow it instead of failing silently.
+  const token = (state.listenToken || 0) + 1;
+  state.listenToken = token;
   state.micState = await micPermission();
+  if (token !== state.listenToken) return; // stopped (or restarted) while waiting
   if (state.micState === 'denied') { setMicStatus('lab_mic_denied_help', 'bad'); el.result.textContent = t('voice_mic_denied'); return; }
   state.listening = true;
   el.mic.setAttribute('aria-pressed', 'true');

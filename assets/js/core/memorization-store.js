@@ -57,8 +57,12 @@ export function recordAyah(memo, surah, ayah, { score = 100, today = localDateKe
   a.best = Math.max(a.best || 0, score);
   a.last = today;
   s.ayahs[String(ayah)] = a;
+  // "Ayahs today" counts DISTINCT ayahs, so repetition mode and retries do not inflate the goal.
   const day = memo.days[today] || { ayahs: 0 };
-  day.ayahs += 1;
+  const keys = new Set(Array.isArray(day.keys) ? day.keys : []);
+  const key = `${surah}:${ayah}`;
+  if (!keys.has(key)) { keys.add(key); day.ayahs = keys.size; }
+  day.keys = [...keys];
   memo.days[today] = day;
   return memo;
 }
