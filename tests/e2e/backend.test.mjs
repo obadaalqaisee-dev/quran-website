@@ -12,7 +12,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { after, before, describe, test } from 'node:test';
 
-import { EDITIONS, REPO, chromium, collectErrors, mockUpstream, startBackend, startPagesServer } from './helpers.mjs';
+import { EDITIONS, REPO, chromium, collectErrors, defaultTimings, mockUpstream, startBackend, startPagesServer } from './helpers.mjs';
 
 let browser;
 let site;
@@ -52,6 +52,19 @@ async function openPagesWithApi(apiUrl, { blockPublicQuranApi = false } = {}) {
   if (blockPublicQuranApi) {
     await context.route(/https:\/\/api\.alquran\.cloud\/.*/, (route) => { publicCalls.push(route.request().url()); return route.abort(); });
   }
+  // Prayer times are proxied by the backend to Aladhan on the internet; that live path has its own
+  // test below (skipped when Aladhan is unreachable). Here the backend's answer is stubbed in the
+  // browser, in the backend's real response shape, so this test needs no internet access.
+  await context.route((u) => u.href.startsWith(`${apiUrl}/api/v1/prayer-times`), (route) => route.fulfill({
+    status: 200,
+    contentType: 'application/json',
+    headers: { 'Access-Control-Allow-Origin': '*' },
+    body: JSON.stringify({ data: {
+      timings: defaultTimings(),
+      date: { gregorian: '01-01-2026', hijri: { day: '9', year: '1448', month_ar: 'جُمادى الآخرة', month_en: 'Jumādá al-ākhirah' } },
+      timezone: 'Asia/Amman', method: 'test', location: { city: 'Amman', country: 'Jordan' },
+    } }),
+  }));
   const apiCalls = [];
   context.on('request', (r) => { if (r.url().startsWith(apiUrl)) apiCalls.push(r.url()); });
   const page = await context.newPage();

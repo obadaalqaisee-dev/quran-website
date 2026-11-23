@@ -103,7 +103,10 @@ async function viaBackendOr(backendCall, upstreamCall) {
       return await backendCall(state.base);
     } catch (err) {
       if (err instanceof ApiError && /HTTP 4\d\d/.test(err.message)) throw err; // a real "bad request"
-      markBackendDown();
+      // 502/504 come from the backend itself: it is up, but a third-party service it proxies (prayer
+      // times, audio look-up) failed. Fall back for this call only; marking the whole backend down
+      // would also move Quran text away from the verified backend data for a minute.
+      if (!(err instanceof ApiError && /HTTP 50[24]/.test(err.message))) markBackendDown();
     }
   }
   return upstreamCall();
