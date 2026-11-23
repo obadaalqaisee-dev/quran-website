@@ -14,6 +14,7 @@ import { initReader, readSurah } from './features/reader.js';
 import { initRosary } from './features/rosary.js';
 import { initSurahList, renderBookmarkBanner } from './features/surahs.js';
 import { initTheme } from './features/theme.js';
+import { initMemorization, notifyMemoChange } from './features/memorization.js';
 import { initVoiceLab } from './features/voice-lab.js';
 import { initWird, setWird } from './features/wird.js';
 
@@ -77,7 +78,8 @@ function boot() {
   initRosary();
   initAyahSearch({ readSurah: openReader });
   initIslamicSearch({ readSurah: openReader });
-  initVoiceLab();
+  initVoiceLab({ onMemoChange: notifyMemoChange });
+  initMemorization();
   initProfile({ onReset: refreshFavorites });
   welcome();
   registerServiceWorker();

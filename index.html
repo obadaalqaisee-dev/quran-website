@@ -494,19 +494,113 @@
   </dialog>
 
   <!-- Memorisation lab -->
-  <dialog id="voiceTestModal" class="modal" aria-labelledby="voiceTitle">
+  <dialog id="voiceTestModal" class="modal modal--wide lab" aria-labelledby="voiceTitle">
     <button class="icon-btn close-btn" type="button" data-close data-i18n-aria-label="close" aria-label="إغلاق"><span aria-hidden="true">✖</span></button>
     <h2 class="modal-title" id="voiceTitle" data-i18n="nav_voice_test">مختبر الحفظ والتسميع</h2>
     <p class="muted center" data-i18n="voice_desc">اختر السورة، اضغط المايك، وابدأ. الآية الصحيحة ستكتب أمامك لتتابع.</p>
-    <div class="center">
-      <label class="visually-hidden" for="voiceSurahSelect" data-i18n="voice_select">اختر السورة للتسميع...</label>
-      <select id="voiceSurahSelect" class="reciter-select"><option value="" data-i18n="voice_select">اختر السورة للتسميع...</option></select>
+    <div class="tabs" role="tablist" data-i18n-aria-label="lab_tabs" aria-label="أقسام مختبر الحفظ">
+      <button class="tab-btn" role="tab" type="button" id="labTabRecite" data-lab-tab="recite" aria-controls="labPaneRecite" aria-selected="true" data-i18n="lab_tab_recite">🎙️ التسميع</button>
+      <button class="tab-btn" role="tab" type="button" id="labTabPlan" data-lab-tab="plan" aria-controls="labPanePlan" aria-selected="false" tabindex="-1" data-i18n="lab_tab_plan">📈 خطتي وتقدمي</button>
     </div>
-    <button class="mic-btn" type="button" id="micBtn" aria-pressed="false" data-i18n-aria-label="voice_mic_label" aria-label="بدء أو إيقاف الاستماع"><span aria-hidden="true">🎙️</span></button>
-    <p id="voiceResultText" class="muted center" aria-live="polite" data-i18n="voice_idle">جاهز للاستماع...</p>
-    <p id="voiceFeedback" class="center voice-feedback" aria-live="assertive"></p>
-    <p id="voiceProgress" class="center small muted"></p>
-    <div id="recitedAyahsContainer" class="quran-text recited" lang="ar" dir="rtl" hidden></div>
+
+    <div id="labPaneRecite" role="tabpanel" aria-labelledby="labTabRecite">
+      <div class="lab-setup">
+        <div class="center">
+          <label class="visually-hidden" for="voiceSurahSelect" data-i18n="voice_select">اختر السورة للتسميع...</label>
+          <select id="voiceSurahSelect" class="reciter-select"><option value="" data-i18n="voice_select">اختر السورة للتسميع...</option></select>
+        </div>
+        <div class="lab-options">
+          <label class="field field--inline">
+            <span class="field-label" data-i18n="lab_mode_label">طريقة التسميع</span>
+            <select id="labMode" class="reciter-select reciter-select--compact"></select>
+          </label>
+          <div class="lab-range" id="labRangeWrap" hidden>
+            <label class="field field--inline"><span class="field-label" data-i18n="lab_from">من الآية</span><select id="labFrom" class="reciter-select reciter-select--compact"></select></label>
+            <label class="field field--inline"><span class="field-label" data-i18n="lab_to">إلى الآية</span><select id="labTo" class="reciter-select reciter-select--compact"></select></label>
+          </div>
+          <label class="field field--inline" id="labRepeatWrap" hidden>
+            <span class="field-label" data-i18n="lab_repeat_label">عدد مرات التكرار</span>
+            <select id="labRepeat" class="reciter-select reciter-select--compact">
+              <option value="2">2</option><option value="3" selected>3</option><option value="5">5</option><option value="7">7</option><option value="10">10</option>
+            </select>
+          </label>
+        </div>
+        <p id="labModeHint" class="small muted center"></p>
+      </div>
+
+      <div class="mic-panel">
+        <button type="button" class="btn btn-soft btn-small" id="micTestBtn" aria-pressed="false" data-i18n="lab_mic_test">🎚️ اختبار المايك</button>
+        <div class="mic-level" aria-hidden="true"><span id="micLevelFill"></span></div>
+        <label class="field field--inline" id="micDeviceWrap" hidden>
+          <span class="field-label" data-i18n="lab_mic_device">الميكروفون</span>
+          <select id="micDevice" class="reciter-select reciter-select--compact"></select>
+        </label>
+        <p id="micStatus" class="mic-status small" role="status"></p>
+      </div>
+
+      <button class="mic-btn" type="button" id="micBtn" aria-pressed="false" data-i18n-aria-label="voice_mic_label" aria-label="بدء أو إيقاف الاستماع"><span aria-hidden="true">🎙️</span></button>
+      <p id="voiceResultText" class="muted center" aria-live="polite" data-i18n="voice_idle">جاهز للاستماع...</p>
+      <p id="voiceFeedback" class="center voice-feedback" aria-live="assertive"></p>
+      <p id="voiceProgress" class="center small muted"></p>
+      <div class="progress progress--thin" id="labBar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-i18n-aria-label="lab_progress_label" aria-label="التقدم في السورة" hidden><span id="labBarFill"></span></div>
+
+      <section class="lab-live" id="labLive" hidden data-i18n-aria-label="lab_live_label" aria-label="الآية الحالية">
+        <p class="lab-position small" id="labPosition" aria-live="polite"></p>
+        <p class="lab-words" id="labWords" lang="ar" dir="rtl"></p>
+        <p class="lab-notes small" id="labNotes" aria-live="polite"></p>
+        <div class="lab-actions">
+          <button type="button" class="btn btn-soft btn-small" id="labRetry" data-i18n="lab_retry">🔁 أعد المحاولة</button>
+          <button type="button" class="btn btn-soft btn-small" id="labHint" data-i18n="lab_hint">💡 الكلمة التالية</button>
+          <button type="button" class="btn btn-soft btn-small" id="labPeek" aria-pressed="false" hidden data-i18n="lab_peek">👁️ إظهار الآية</button>
+          <button type="button" class="btn btn-soft btn-small" id="labListen" data-i18n="lab_listen">🔊 استمع للآية</button>
+          <button type="button" class="btn btn-soft btn-small" id="labSkip" data-i18n="lab_skip">⏭ تخطَّ الآية</button>
+          <button type="button" class="btn btn-primary btn-small" id="labNext" hidden data-i18n="lab_next">الآية التالية ←</button>
+        </div>
+      </section>
+      <p class="lab-summary" id="labSummary" role="status" hidden></p>
+      <div id="recitedAyahsContainer" class="quran-text recited" lang="ar" dir="rtl" hidden></div>
+      <p class="note" data-i18n="lab_limitation">تنبيه: يعتمد المختبر على خاصية التعرف على الكلام في المتصفح، وهي تُعيد كلمات مكتوبة فقط؛ لذلك يقارن المختبر كلمات تلاوتك بنص الآية، ولا يستطيع الحكم على أحكام التجويد أو مخارج الحروف أو الحركات. لا يغني ذلك عن القراءة على معلم متقن.</p>
+    </div>
+
+    <div id="labPanePlan" role="tabpanel" aria-labelledby="labTabPlan" hidden>
+      <div class="mini-stats mini-stats--4" id="planStats"></div>
+      <div class="plan-grid">
+        <section class="plan-card">
+          <h3 data-i18n="plan_title">🎯 خطة الحفظ</h3>
+          <form id="planTargetForm" class="plan-inline">
+            <label for="planTarget" data-i18n="plan_target_label">الهدف اليومي (عدد الآيات)</label>
+            <input type="number" id="planTarget" min="1" max="200" inputmode="numeric">
+            <button type="submit" class="btn btn-soft btn-small" data-i18n="plan_save">حفظ</button>
+          </form>
+          <div class="plan-inline">
+            <label class="visually-hidden" for="planAddSelect" data-i18n="plan_add_placeholder">أضف سورة إلى خطتك...</label>
+            <select id="planAddSelect" class="reciter-select reciter-select--compact"></select>
+            <button type="button" class="btn btn-soft btn-small" id="planAddBtn" data-i18n="plan_add">إضافة</button>
+          </div>
+          <ul class="plan-list" id="planList"></ul>
+        </section>
+        <section class="plan-card">
+          <h3 data-i18n="revision_title">🔄 جدول المراجعة</h3>
+          <p class="small muted" data-i18n="revision_explain">كل سورة أتممت تسميعها (أو حددتها كمحفوظة) تُجدول لمراجعتها بعد 1 ثم 3 ثم 7 ثم 14 ثم 30 ثم 60 يومًا.</p>
+          <ul class="plan-list" id="revisionDue"></ul>
+          <h4 class="small" data-i18n="revision_upcoming">المراجعات القادمة</h4>
+          <ul class="plan-list" id="revisionUpcoming"></ul>
+        </section>
+        <section class="plan-card">
+          <h3 data-i18n="memorized_title">📚 سور حفظتها من قبل</h3>
+          <div class="plan-inline">
+            <label class="visually-hidden" for="memorizedAddSelect" data-i18n="memorized_add_placeholder">اختر سورة تحفظها...</label>
+            <select id="memorizedAddSelect" class="reciter-select reciter-select--compact"></select>
+            <button type="button" class="btn btn-soft btn-small" id="memorizedAddBtn" data-i18n="memorized_add">تحديد كمحفوظة</button>
+          </div>
+          <ul class="chips" id="memorizedList"></ul>
+        </section>
+        <section class="plan-card">
+          <h3 data-i18n="mistakes_title">📝 سجل الأخطاء</h3>
+          <ul class="mistake-list" id="mistakeList"></ul>
+        </section>
+      </div>
+    </div>
   </dialog>
 
   <!-- Favourites -->

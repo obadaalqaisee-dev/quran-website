@@ -14,6 +14,15 @@ export const KEYS = Object.freeze({
   reciter: 'reciter', // new: last chosen reciter
   notify: 'prayerNotify', // new: prayer notifications opted in
   speed: 'playbackRate', // new: audio speed
+  // Added by the platform evolution (new keys only; none of the keys above changed):
+  labMode: 'memorizationMode', // memorisation-lab mode
+  memo: 'memorizationData', // memorisation progress, plan, revisions, mistakes (core/memorization-store.js)
+  micDevice: 'micDeviceId', // microphone chosen for the microphone test
+  readingTheme: 'readingTheme', // 'default' | 'paper' | 'sepia' | 'night'
+  readingLog: 'readingLog', // { 'YYYY-MM-DD': number[] } global ids of ayahs read that day
+  settings: 'userSettings', // { dailyGoal, notifyBefore, alwaysTafsir }
+  recentAudio: 'recentAudio', // [{ surah, reciter, at }]
+  learning: 'learningProgress', // { lessons: { id: date }, quizzes: { id: { score, total, date } } }
 });
 
 // Keys removed by "reset my data" (the original reset exactly these four).
