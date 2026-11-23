@@ -1,10 +1,8 @@
 // The «من أنا» page (about.html), the rosary in Hisn al-Muslim, and the prayer lesson migrated into the
 // academy. The site is served like GitHub Pages; third-party APIs are answered from the verified datasets.
 //
-// Media: the repository ships about-media.js with no photo or nasheed configured (no verified, licensed
-// files could be obtained while this was written). The shipped state is tested as is. The player and
-// photo behaviour are tested with STAND-IN media injected by the test only (the site's own Quran.mp3 and
-// icon): these stand-ins never appear in the site.
+// Media: the page ships a photograph of the Dome of the Rock and the nasheed «يا ذاكر الأصحاب كن متأدباً»,
+// both local files configured in about-media.js. The tests play the real files.
 
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
@@ -17,14 +15,6 @@ import { AYAHS, REPO, chromium, collectErrors, mockUpstream, startPagesServer } 
 
 const require = createRequire(import.meta.url);
 const AXE = readFileSync(require.resolve('axe-core/axe.min.js'), 'utf8');
-const MEDIA_SRC = readFileSync(join(REPO, 'assets/js/data/about-media.js'), 'utf8');
-// Test-only configuration: stand-in files and provenance fields, so the configured code paths run.
-const STANDIN_MEDIA = MEDIA_SRC
-  .replace("src: null, // e.g. 'assets/img/about/al-aqsa.webp'", "src: 'assets/icons/icon-512.png', // test stand-in")
-  .replace("src: null, // e.g. 'assets/audio/nasheed.mp3'", "src: 'Quran.mp3', // test stand-in")
-  .replaceAll("sourceUrl: '',", "sourceUrl: 'https://example.org/test-source',")
-  .replaceAll("license: '',", "license: 'test licence',")
-  .replace("credit: '',", "credit: 'Test credit',");
 
 let site;
 let allowAutoplay;
@@ -36,10 +26,9 @@ before(async () => {
 });
 after(async () => { await allowAutoplay?.close(); await blockAutoplay?.close(); await site?.close(); });
 
-async function open(browser, { path = 'about.html', viewport = { width: 1366, height: 900 }, media = false, colorScheme = 'light', bypassCSP = false } = {}) {
+async function open(browser, { path = 'about.html', viewport = { width: 1366, height: 900 }, colorScheme = 'light', bypassCSP = false } = {}) {
   const context = await browser.newContext({ viewport, colorScheme, bypassCSP, locale: 'ar', reducedMotion: 'reduce' });
   await mockUpstream(context);
-  if (media) await context.route('**/assets/js/data/about-media.js', (r) => r.fulfill({ status: 200, contentType: 'text/javascript; charset=utf-8', body: STANDIN_MEDIA }));
   const page = await context.newPage();
   const errors = collectErrors(page);
   await page.goto(site.url + path);
@@ -111,25 +100,30 @@ describe('«من أنا» page', () => {
     }
   });
 
-  test('shipped state: no photo or recording configured → no substitute image, honest player status, no playback', async () => {
+  test('shipped media: the Dome of the Rock photograph and the nasheed «يا ذاكر الأصحاب كن متأدباً» load', async () => {
     const s = await open(allowAutoplay);
-    const { page, context } = s;
-    const audioRequests = [];
-    context.on('request', (r) => { if (/\.(mp3|m4a|ogg)$/.test(r.url())) audioRequests.push(r.url()); });
-    assert.ok(await page.isHidden('#aqsaFigure'), 'no photograph is shown in place of Al-Aqsa');
-    assert.ok(await page.isHidden('.about-photo-label'), 'the decorative header is not labelled as Al-Aqsa');
-    assert.equal(await state(page), 'unavailable');
-    assert.equal(await text(page, '#nasheedStatus'), 'لم يُضف تسجيل النشيد بعد.');
-    assert.ok(await page.isDisabled('#nasheedPlay'));
-    assert.ok(await page.isHidden('#nasheedStart'));
-    assert.equal(await text(page, '#nasheedLine'), 'سبّوا خيار الخلق من لهم العلى ولهم مقام في ذرى الأحساب...');
-    assert.ok(await page.evaluate(() => document.getElementById('nasheedAudio').paused));
-    assert.deepEqual(audioRequests, []);
+    const { page } = s;
+    await page.waitForFunction(() => { const i = document.getElementById('aqsaImage'); return i.complete && i.naturalWidth > 0; });
+    assert.equal(await page.getAttribute('#aqsaImage', 'src'), 'assets/img/about/dome-of-the-rock.webp');
+    assert.equal(await page.evaluate(() => document.getElementById('aqsaImage').naturalWidth), 1280);
+    assert.equal(await page.getAttribute('#aqsaImage', 'alt'), 'قبة الصخرة المشرفة في المسجد الأقصى المبارك');
+    assert.equal(await text(page, '.about-photo-label'), 'قبة الصخرة المشرفة · المسجد الأقصى المبارك');
+    assert.equal(await page.getAttribute('#aqsaCredit a', 'href'), 'https://commons.wikimedia.org/wiki/File:Jerusalem-2013-Temple_Mount-Dome_of_the_Rock_%26_Chain_02.jpg');
+    assert.equal(await text(page, '#nasheedLine'), 'يا ذاكر الأصحاب كن متأدباً واعرف عظيم منازل الأصحابِ');
+    assert.match(await text(page, '#nasheedMeta'), /يا ذاكر الأصحاب كن متأدباً/);
+    assert.equal(await page.getAttribute('#nasheedAudio', 'src'), 'assets/audio/ya-dhakir-al-ashab.mp3');
+    // The audio file loads: its real duration (3:09) is read from the file.
+    await page.waitForFunction(() => document.getElementById('nasheedAudio').readyState >= 1);
+    assert.ok(Math.abs((await page.evaluate(() => document.getElementById('nasheedAudio').duration)) - 189.7) < 1);
+    assert.equal(await text(page, '#nasheedDuration'), '3:09');
+    assert.notEqual(await state(page), 'unavailable');
+    assert.doesNotMatch(await text(page, '.nasheed-card'), /لم يُضف/);
+    assert.ok(!(await page.isDisabled('#nasheedPlay')));
     await close(s);
   });
 
-  test('configured (stand-in) media: photo with credit, nasheed autoplays from the start, controls work', async () => {
-    const s = await open(allowAutoplay, { media: true });
+  test('photo with credit, nasheed autoplays from the start, controls work', async () => {
+    const s = await open(allowAutoplay);
     const { page } = s;
     await page.waitForFunction(() => document.getElementById('nasheedStatus').dataset.state === 'playing');
     assert.ok(!(await page.evaluate(() => document.getElementById('nasheedAudio').paused)));
@@ -138,7 +132,7 @@ describe('«من أنا» page', () => {
     assert.ok(await page.isVisible('#aqsaFigure'));
     assert.ok(await page.isVisible('.about-photo-label'));
     assert.equal(await page.getAttribute('#aqsaCredit a', 'rel'), 'noopener noreferrer');
-    assert.match(await text(page, '#aqsaCredit'), /Test credit · test licence/);
+    assert.match(await text(page, '#aqsaCredit'), /Andrew Shiva \/ Wikipedia · CC BY-SA 4\.0/);
     // Pause / play, volume (remembered), progress and time.
     await page.click('#nasheedPlay');
     await page.waitForFunction(() => document.getElementById('nasheedStatus').dataset.state === 'paused');
@@ -159,7 +153,7 @@ describe('«من أنا» page', () => {
   });
 
   test('autoplay blocked by the browser: one-tap button, no false "playing", then plays', async () => {
-    const s = await open(blockAutoplay, { media: true, viewport: { width: 390, height: 844 } });
+    const s = await open(blockAutoplay, { viewport: { width: 390, height: 844 } });
     const { page } = s;
     await page.waitForFunction(() => document.getElementById('nasheedStatus').dataset.state === 'blocked');
     assert.ok(await page.isVisible('#nasheedStart'));
@@ -173,7 +167,7 @@ describe('«من أنا» page', () => {
   });
 
   test('leaving the page pauses the nasheed; it never plays on the home page; re-entering starts from the beginning', async () => {
-    const s = await open(allowAutoplay, { media: true });
+    const s = await open(allowAutoplay);
     const { page } = s;
     await page.waitForFunction(() => document.getElementById('nasheedStatus').dataset.state === 'playing');
     // Registered after the page's own pagehide handler, so it sees the state that handler left.
@@ -194,16 +188,14 @@ describe('«من أنا» page', () => {
   });
 
   for (const colorScheme of ['light', 'dark']) {
-    test(`axe (WCAG 2.1 A/AA), ${colorScheme}: shipped and configured states`, async () => {
-      for (const media of [false, true]) {
-        const s = await open(allowAutoplay, { colorScheme, media, bypassCSP: true });
-        await s.page.waitForTimeout(300);
-        await s.page.addScriptTag({ content: AXE });
-        const violations = await s.page.evaluate(async () => (await window.axe.run(document, { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'] } }))
-          .violations.map((v) => ({ id: v.id, nodes: v.nodes.slice(0, 3).map((n) => n.target.join(' ')) })));
-        assert.deepEqual(violations, [], `media configured: ${media}`);
-        await s.context.close();
-      }
+    test(`axe (WCAG 2.1 A/AA), ${colorScheme}`, async () => {
+      const s = await open(allowAutoplay, { colorScheme, bypassCSP: true });
+      await s.page.waitForTimeout(300);
+      await s.page.addScriptTag({ content: AXE });
+      const violations = await s.page.evaluate(async () => (await window.axe.run(document, { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'] } }))
+        .violations.map((v) => ({ id: v.id, nodes: v.nodes.slice(0, 3).map((n) => n.target.join(' ')) })));
+      assert.deepEqual(violations, []);
+      await s.context.close();
     });
   }
 
@@ -218,6 +210,8 @@ describe('«من أنا» page', () => {
     await page.goto(`${site.url}about.html`);
     await page.waitForSelector('.dev-card');
     assert.equal(await text(page, '.dedication-names'), 'عبادة أبو فردة ويونس أبو صعيلك.');
+    // The service worker never caches audio, so offline the nasheed file itself cannot load; that request is the only allowed error.
+    s.errors.splice(0, s.errors.length, ...s.errors.filter((e) => !e.includes('net::ERR_INTERNET_DISCONNECTED')));
     await close(s);
   });
 
@@ -233,7 +227,7 @@ describe('«من أنا» page', () => {
     assert.doesNotMatch(about, /\sstyle="/i);
     for (const [tag] of about.matchAll(/<a\b[^>]*target="_blank"[^>]*>/g)) assert.match(tag, /rel="noopener noreferrer"/);
     const sw = readFileSync(join(REPO, 'sw.js'), 'utf8');
-    for (const f of ['about.html', 'assets/js/about.js', 'assets/js/data/about-media.js']) assert.ok(sw.includes(`'${f}'`), f);
+    for (const f of ['about.html', 'assets/js/about.js', 'assets/js/data/about-media.js', 'assets/img/about/dome-of-the-rock.webp']) assert.ok(sw.includes(`'${f}'`), f);
     assert.match(readFileSync(join(REPO, 'sitemap.xml'), 'utf8'), /about\.html/);
   });
 });
