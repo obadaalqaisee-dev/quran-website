@@ -175,3 +175,18 @@ original keys, uses the new features, and checks every original value byte-for-b
 | App icons | Previous PNG icons | New icons generated from `assets/img/icon.svg`; same file names and sizes. Root `icon.png` kept unchanged | PWA redesign |
 | Memorisation lab dialog | Standard width | Wide dialog with two tabs; every original control keeps its id and default behaviour | Room for the word view and the plan |
 | Reader toolbar | Ayah loop, font size, hint | Same controls, plus a collapsible «أدوات القراءة والتنقل» panel | Keeps the Quran text near the top |
+
+## L. Reorganisation and «من أنا» (requested by the site owners)
+
+Two entry points were removed **only after** their functionality and content were moved (details in
+[`about_page.md`](about_page.md)):
+
+| Removed entry | Where it is now | Preserved | Verified by |
+|---|---|---|---|
+| Nav item «📿 المسبحة» and its dialog | Tab «📿 المسبحة» of حصن المسلم | Same counter and reset ids and behaviour, vibration, saved count (`rosaryCount`). `rosaryModal` openers redirect to the tab. Added: dhikr phrase and 33/100 target (`tasbeehPrefs`). | `features` rosary test (now opens the tab); `about.test.mjs` rosary tests and axe |
+| Side-menu «🕌 تعلم الصلاة» and its dialog | Academy lesson «صفة صلاة النبي ﷺ» (first lesson of the prayer course, and the «ابدأ هنا» button) | Introduction, 5 steps and video, with the same translation strings in 4 languages. The stock photos are replaced by the matching original diagrams. | `features` side-menu test (checks the content in its new place); `about.test.mjs` |
+
+Also: the academy is renamed «الأكاديمية التعليمية الإسلامية», moved after the prayer times, and contains the
+«تعلم الصلاة الصحيحة» track (ids unchanged). Added: the separate «من أنا» page (`about.html`) with the nav item
+«🕊️ من أنا» and a side-menu link. New storage keys: `tasbeehPrefs`, `nasheedVolume`. Every other row of sections
+A–K is unchanged.

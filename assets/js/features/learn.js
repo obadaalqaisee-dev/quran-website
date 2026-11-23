@@ -7,7 +7,7 @@
 import { getSurah } from '../core/api.js';
 import { stripBasmala } from '../core/arabic.js';
 import { $, delegateActions, h, localDateKey } from '../core/dom.js';
-import { getLang, isArabic, onLanguageChange, t } from '../core/i18n.js';
+import { applyTranslations, getLang, isArabic, onLanguageChange, t } from '../core/i18n.js';
 import { closeDialog, onDialogOpen, openDialog } from '../core/modal.js';
 import { surahName } from '../core/quran.js';
 import { KEYS, getJSON, setJSON } from '../core/storage.js';
@@ -15,6 +15,7 @@ import { toast } from '../core/toast.js';
 import { ACADEMY_LESSONS, COURSES, findLesson } from '../data/academy.js';
 import { LESSONS, LESSON_SOURCE_NOTE, POSTURES, allQuestions, dorarSearch } from '../data/prayer-lessons.js';
 import { SCHOLARS, VERIFY_TOOLS } from '../data/scholar-resources.js';
+import { translations } from '../data/translations.js';
 
 // ----------------------------------------------------------------------------- progress store
 export function loadLearning() {
@@ -127,6 +128,19 @@ function renderBlock(block) {
       class: 'btn btn-soft btn-small', type: 'button', text: block.label,
       on: { click: () => { closeDialog('lessonModal'); ({ lab: actions.openLab, plan: actions.openPlan, adhkar: () => openDialog('adhkarModal'), settings: actions.openSettings })[block.target]?.(); } },
     }));
+    // Blocks of the migrated «صفة صلاة النبي ﷺ» lesson: original strings, translated by the i18n system
+    // (data-i18n; applyTranslations() handles their static <strong> markup).
+    case 'i18n': return h('p', { class: 'modal-lead', dataset: { i18n: block.key } });
+    case 'i18nStep': return h('div', { class: 'prayer-step' },
+      h('img', { src: block.img, alt: '', width: 130, height: 108, loading: 'lazy', decoding: 'async' }),
+      h('div', {}, h('h3', { dataset: { i18n: block.title } }), h('p', { dataset: { i18n: block.desc } })));
+    case 'video': return h('div', { class: 'video-card' },
+      h('h3', { dataset: { i18n: block.titleKey } }),
+      h('p', { class: 'muted', dataset: { i18n: block.descKey } }),
+      h('a', { class: 'video-link', href: block.url, target: '_blank', rel: 'noopener noreferrer', attrs: { 'aria-label': t('video_title') } },
+        h('img', { src: block.thumb, alt: '', width: 480, height: 360, loading: 'lazy', decoding: 'async' }),
+        h('span', { class: 'video-play', attrs: { 'aria-hidden': 'true' } })),
+      h('p', { class: 'video-hint', dataset: { i18n: block.hintKey } }));
     default: return null;
   }
 }
@@ -187,8 +201,11 @@ export function openLesson(id) {
   const body = $('#lessonBody');
   $('#lessonTitle').textContent = `${lesson.icon} ${loc(lesson.title)}`;
   const parts = [];
-  if (!isArabic()) parts.push(h('p', { class: 'note', text: t('learn_arabic_only') }));
-  const content = h('div', { class: 'lesson-content prose', lang: 'ar', dir: 'rtl' }, ...lesson.blocks.map(renderBlock).filter(Boolean));
+  if (!isArabic() && !lesson.multilingual) parts.push(h('p', { class: 'note', text: t('learn_arabic_only') }));
+  const content = lesson.multilingual
+    ? h('div', { class: 'lesson-content prose' }, ...lesson.blocks.map(renderBlock).filter(Boolean))
+    : h('div', { class: 'lesson-content prose', lang: 'ar', dir: 'rtl' }, ...lesson.blocks.map(renderBlock).filter(Boolean));
+  if (lesson.multilingual) applyTranslations(content);
   parts.push(content);
   if (LESSONS.includes(lesson) && lesson.category !== 'quiz') parts.push(h('p', { class: 'small muted', lang: 'ar', dir: 'rtl', text: LESSON_SOURCE_NOTE }));
   const questions = lesson.quiz === 'all' ? allQuestions() : lesson.quiz;
@@ -342,6 +359,7 @@ export function lessonIndex() {
   return [...LESSONS, ...ACADEMY_LESSONS].map((l) => ({
     id: l.id, icon: l.icon, title: l.title,
     text: [l.title.ar, l.title.en, ...(l.blocks || []).flatMap((b) => [b.text, ...(b.items || []), b.note].filter(Boolean)),
+      ...(l.blocks || []).flatMap((b) => [b.key, b.title, b.desc].filter((k) => k && translations.ar[k]).map((k) => translations.ar[k].replace(/<[^>]+>/g, ''))),
       ...(l.blocks || []).filter((b) => b.type === 'facts').flatMap((b) => b.items.flat())].join(' '),
   }));
 }

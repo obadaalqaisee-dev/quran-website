@@ -52,7 +52,21 @@ LIVE_URL=https://obadaalqaisee-dev.github.io/quran-website/ LIVE_MAP_TO=127.0.0.
 
 Set `SCREENSHOT_DIR=/some/dir` when running `quality.test.mjs` to save screenshots of every viewport.
 
-## Latest results (2026-11-23, platform evolution, `feature/ultimate-quran-platform-evolution`)
+## Latest results (2026-11-23, reorganisation and «من أنا», `feature/reorganization-about-page`)
+
+| Suite | Result |
+|---|---|
+| Backend pytest | **106 passed**, 0 failed |
+| ruff · pip-audit | clean · no known vulnerabilities |
+| Frontend unit (`node:test`) | **37 passed**, 0 failed |
+| Playwright end-to-end | **101 passed, 0 failed**, 2 skipped (the same two internet-only tests as before); 14 new in `about.test.mjs` |
+
+Existing tests that opened the two relocated entry points (the nav-bar rosary and the side-menu «تعلم الصلاة») were
+**updated, not removed**. They now open the same features in their new places (the rosary tab of Hisn al-Muslim,
+and the academy lesson), and they also assert that the old entry points are gone, as requested. The nasheed and
+photo code paths are tested with test-only stand-in media; see `about_page.md` §3.
+
+## Results of the platform evolution (2026-11-23, `feature/ultimate-quran-platform-evolution`)
 
 Run in the development container; its network allows package registries only (see `evolution_audit.md` §3).
 

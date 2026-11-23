@@ -63,10 +63,13 @@ describe('page structure', () => {
     const { page } = s;
     const nav = await page.locator('.nav-links > li').allTextContents();
     const norm = (t) => t.replace(/\uFE0F/g, '').trim(); // the original ar string is «🎙 التسميع» (no variation selector)
-    for (const label of ['السور', 'مواقيت الصلاة', '📿 حصن المسلم', '🕌 الإسلام', '📿 المسبحة', '🔍 بحث آيات', '🎙 التسميع']) {
+    for (const label of ['السور', 'مواقيت الصلاة', '📿 حصن المسلم', '🕌 الإسلام', '🔍 بحث آيات', '🎙 التسميع']) {
       assert.ok(nav.some((t) => norm(t) === label), `nav item ${label}`);
     }
-    const dialogs = { adhkarModal: 'adhkarModal', islamModal: 'islamModal', rosaryModal: 'rosaryModal', ayahSearchModal: 'ayahSearchModal', voiceTestModal: 'voiceTestModal' };
+    // «📿 المسبحة» was moved, at the owners' request, from the nav bar into Hisn al-Muslim (its own tab).
+    assert.ok(!nav.some((t) => norm(t) === '📿 المسبحة'), 'the rosary is no longer a separate nav item');
+    assert.equal(await page.textContent('#adhkarModal #tab_tasbeeh'), '📿 المسبحة');
+    const dialogs = { adhkarModal: 'adhkarModal', islamModal: 'islamModal', ayahSearchModal: 'ayahSearchModal', voiceTestModal: 'voiceTestModal' };
     for (const [label, id] of Object.entries(dialogs)) {
       await page.locator(`.nav-links [data-open="${label}"]`).click();
       assert.ok(await page.locator(`#${id}`).evaluate((d) => d.open), `${label} opens ${id}`);
@@ -84,7 +87,10 @@ describe('page structure', () => {
   test('side menu: all six items open their dialogs; dialogs close by button, Escape and backdrop', async () => {
     const s = await open();
     const { page } = s;
-    const items = { 'تعلم الصلاة': 'learnPrayerModal', 'المفضلة': 'favoritesModal', 'حسابي': 'profileModal', 'تسجيل دخول': 'loginModal', 'تبرع': 'donateModal', 'تواصل معنا': 'contactModal' };
+    // «تعلم الصلاة» was removed from the side menu at the owners' request; its content is in the academy (checked below).
+    assert.equal(await page.locator('#sideMenu').getByText('تعلم الصلاة', { exact: true }).count(), 0);
+    assert.equal(await page.locator('#learnPrayerModal').count(), 0);
+    const items = { 'المفضلة': 'favoritesModal', 'حسابي': 'profileModal', 'تسجيل دخول': 'loginModal', 'تبرع': 'donateModal', 'تواصل معنا': 'contactModal' };
     for (const [label, id] of Object.entries(items)) {
       await page.click('.menu-btn');
       assert.ok(await page.locator('#sideMenu').evaluate((d) => d.open));
@@ -100,8 +106,11 @@ describe('page structure', () => {
     await page.mouse.click(5, 5);
     assert.ok(!(await page.locator('#donateModal').evaluate((d) => d.open)), 'backdrop closes');
     // Static content preserved
-    assert.equal(await page.locator('#learnPrayerModal .prayer-step').count(), 5);
-    assert.equal(await page.locator('#learnPrayerModal a[href="https://www.youtube.com/watch?v=W-jX2kY0vR8"]').count(), 1);
+    // The former «تعلم الصلاة» dialog's content (5 steps, same strings; the video) is now the academy lesson «صفة صلاة النبي ﷺ».
+    await page.locator('#learnSection [data-id="prophet-prayer"]').click();
+    assert.equal(await page.locator('#lessonModal .prayer-step').count(), 5);
+    assert.equal(await page.locator('#lessonModal a[href="https://www.youtube.com/watch?v=W-jX2kY0vR8"]').count(), 1);
+    await page.keyboard.press('Escape');
     assert.equal(await page.locator('#contactModal a[href="mailto:obadanajeeb155@gmail.com"]').count(), 1);
     assert.equal(await page.locator('#islamModal .islam-content h3').count(), 3);
     // Login → "open my profile" swaps dialogs
@@ -467,7 +476,9 @@ describe('tools', () => {
   test('rosary: tap and keyboard increment, survives reload, resets', async () => {
     const s = await open();
     const { page } = s;
-    await page.click('[data-open="rosaryModal"]');
+    // The rosary now lives in Hisn al-Muslim («المسبحة» tab).
+    await page.click('.nav-links [data-open="adhkarModal"]');
+    await page.click('#tab_tasbeeh');
     await page.click('#rosaryCounter');
     await page.click('#rosaryCounter');
     await page.focus('#rosaryCounter');
@@ -476,7 +487,8 @@ describe('tools', () => {
     await page.reload();
     await page.waitForSelector('#surahGrid .surah-card');
     assert.equal(await page.textContent('#rosaryCounter'), '3');
-    await page.click('[data-open="rosaryModal"]');
+    await page.evaluate(() => document.querySelector('[data-open="adhkarModal"]').click());
+    await page.click('#tab_tasbeeh');
     await page.click('#rosaryReset');
     assert.equal(await page.textContent('#rosaryCounter'), '0');
     await close(s);
@@ -584,7 +596,7 @@ describe('languages and theme', () => {
     assert.equal(await page.getAttribute('html', 'lang'), 'en');
     await page.selectOption('#langSelect', 'es');
     assert.equal(await page.textContent('#heroTitle'), 'El Sagrado Corán');
-    assert.equal(await page.textContent('.nav-links [data-open="rosaryModal"]'), '📿 Tasbih');
+    assert.equal(await page.textContent('#tab_tasbeeh'), '📿 Tasbih'); // the rosary's label, now its Hisn al-Muslim tab
     await page.selectOption('#langSelect', 'fr');
     assert.equal(await page.textContent('#heroTitle'), 'Le Saint Coran');
     await page.click('#surahGrid [data-action="read"][data-surah="1"]');

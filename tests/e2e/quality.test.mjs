@@ -97,7 +97,8 @@ describe('accessibility (axe-core, WCAG 2.1 A/AA)', () => {
     });
   }
 
-  for (const id of ['sideMenu', 'adhkarModal', 'learnPrayerModal', 'profileModal', 'voiceTestModal', 'ayahSearchModal', 'contactModal', 'rosaryModal']) {
+  // learnPrayerModal and rosaryModal were merged into the academy and Hisn al-Muslim (axe-checked in evolution/about tests).
+  for (const id of ['sideMenu', 'adhkarModal', 'settingsModal', 'profileModal', 'voiceTestModal', 'ayahSearchModal', 'contactModal', 'favoritesModal']) {
     test(`dialog #${id}: no violations, focus moves inside`, async () => {
       const { context, page } = await open();
       await page.evaluate((d) => document.querySelector(`[data-open="${d}"]`).click(), id);
@@ -117,10 +118,10 @@ describe('accessibility (axe-core, WCAG 2.1 A/AA)', () => {
     await page.focus('#ayah-3');
     await page.keyboard.press(' ');
     await page.waitForFunction(() => document.getElementById('ayah-3').classList.contains('active-ayah'));
-    await page.focus('.nav-links [data-open="rosaryModal"]');
+    await page.focus('.nav-links [data-open="islamModal"]');
     await page.keyboard.press('Enter');
     await page.keyboard.press('Escape');
-    assert.equal(await page.evaluate(() => document.activeElement.dataset.open), 'rosaryModal', 'focus returns to the opener');
+    assert.equal(await page.evaluate(() => document.activeElement.dataset.open), 'islamModal', 'focus returns to the opener');
     await context.close();
   });
 });

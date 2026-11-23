@@ -7,7 +7,7 @@
  * - Audio is never intercepted (range requests must go straight to the media servers).
  * - Prayer times and audio look-ups are never cached here (they are time/location dependent).
  */
-const VERSION = 'v3.0.0';
+const VERSION = 'v3.1.0';
 const SHELL = `shell-${VERSION}`;
 const DATA = 'quran-data-v1';
 const DATA_LIMIT = 300;
@@ -36,6 +36,7 @@ const SHELL_FILES = [
   'assets/img/prayer/qabd.svg', 'assets/img/prayer/qiyam.svg', 'assets/img/prayer/ruku.svg',
   'assets/img/prayer/sujud.svg', 'assets/img/prayer/takbir.svg', 'assets/img/prayer/tashahhud.svg',
   'assets/img/prayer/tasleem.svg', 'assets/img/prayer/tawarruk.svg',
+  'about.html', 'assets/js/about.js', 'assets/js/data/about-media.js',
 ];
 
 self.addEventListener('install', (event) => {

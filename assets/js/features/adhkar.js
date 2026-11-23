@@ -1,9 +1,10 @@
 // Hisn al-Muslim: five categories of adhkar with tap-to-count cards (keyboard operable).
 // Finishing every morning/evening dhikr also ticks that item in the daily wird.
+// A sixth tab, «المسبحة», holds the electronic rosary (features/rosary.js), moved here from its own dialog.
 
 import { $$, h } from '../core/dom.js';
 import { onLanguageChange, t } from '../core/i18n.js';
-import { onDialogOpen } from '../core/modal.js';
+import { onDialogOpen, openDialog, registerDialogAlias } from '../core/modal.js';
 import { toast } from '../core/toast.js';
 import { ADHKAR } from '../data/adhkar.js';
 import { getToday, setWird } from './wird.js';
@@ -11,17 +12,31 @@ import { getToday, setWird } from './wird.js';
 const state = { type: 'morning', counts: [] };
 
 function select(type) {
-  state.type = ADHKAR[type] ? type : 'morning';
-  state.counts = ADHKAR[state.type].map((d) => d.count);
+  const tasbeeh = type === 'tasbeeh';
+  state.type = tasbeeh || ADHKAR[type] ? type : 'morning';
   for (const tab of $$('[data-adhkar]')) {
     const active = tab.dataset.adhkar === state.type;
     tab.setAttribute('aria-selected', String(active));
     tab.tabIndex = active ? 0 : -1;
   }
+  document.getElementById('tasbeehPanel').hidden = !tasbeeh;
+  document.getElementById('adhkarGrid').hidden = tasbeeh;
+  document.getElementById('adhkarResetRow').hidden = tasbeeh;
+  if (tasbeeh) return;
+  state.counts = ADHKAR[state.type].map((d) => d.count);
   render();
 }
 
+/** Open Hisn al-Muslim directly on the rosary tab (the rosary's old entry point). */
+export function openTasbeeh() {
+  openDialog('adhkarModal');
+  select('tasbeeh');
+  document.getElementById('rosaryCounter').focus();
+  return document.getElementById('adhkarModal');
+}
+
 function render() {
+  if (!ADHKAR[state.type]) return; // the rosary tab has no adhkar list
   const grid = document.getElementById('adhkarGrid');
   grid.setAttribute('aria-labelledby', `tab_${state.type}`);
   grid.replaceChildren(...ADHKAR[state.type].map((dhikr, i) => {
@@ -69,6 +84,7 @@ export function initAdhkar() {
   document.getElementById('adhkarReset').addEventListener('click', () => select(state.type));
   // As in the original, opening Hisn al-Muslim starts on the morning adhkar with fresh counters.
   onDialogOpen('adhkarModal', () => select('morning'));
+  registerDialogAlias('rosaryModal', openTasbeeh);
   onLanguageChange(render);
   select('morning');
 }
