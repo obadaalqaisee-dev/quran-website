@@ -17,8 +17,8 @@
   <meta name="author" content="Obada najeeb AL-Qaisee">
   <meta name="robots" content="index, follow, max-image-preview:large">
   <link rel="canonical" href="https://obadaalqaisee-dev.github.io/quran-website/">
-  <meta name="theme-color" content="#0f3d3e" media="(prefers-color-scheme: light)">
-  <meta name="theme-color" content="#0b1120" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#0b3a2e" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#061510" media="(prefers-color-scheme: dark)">
   <meta name="color-scheme" content="light dark">
 
   <!-- Open Graph / social -->
@@ -75,23 +75,39 @@
   <link rel="modulepreload" href="assets/js/core/arabic.js">
   <link rel="modulepreload" href="assets/js/core/dom.js">
   <link rel="modulepreload" href="assets/js/core/i18n.js">
+  <link rel="modulepreload" href="assets/js/core/memorization-store.js">
+  <link rel="modulepreload" href="assets/js/core/mic.js">
   <link rel="modulepreload" href="assets/js/core/modal.js">
+  <link rel="modulepreload" href="assets/js/core/mushaf.js">
   <link rel="modulepreload" href="assets/js/core/quran.js">
+  <link rel="modulepreload" href="assets/js/core/reading-log.js">
+  <link rel="modulepreload" href="assets/js/core/recitation.js">
+  <link rel="modulepreload" href="assets/js/core/settings.js">
+  <link rel="modulepreload" href="assets/js/core/speech.js">
   <link rel="modulepreload" href="assets/js/core/storage.js">
   <link rel="modulepreload" href="assets/js/core/toast.js">
+  <link rel="modulepreload" href="assets/js/data/academy.js">
   <link rel="modulepreload" href="assets/js/data/adhkar.js">
+  <link rel="modulepreload" href="assets/js/data/prayer-lessons.js">
+  <link rel="modulepreload" href="assets/js/data/quran-index.js">
   <link rel="modulepreload" href="assets/js/data/reciters.js">
+  <link rel="modulepreload" href="assets/js/data/scholar-resources.js">
   <link rel="modulepreload" href="assets/js/data/surahs.js">
+  <link rel="modulepreload" href="assets/js/data/translations-ext.js">
   <link rel="modulepreload" href="assets/js/data/translations.js">
   <link rel="modulepreload" href="assets/js/features/adhkar.js">
   <link rel="modulepreload" href="assets/js/features/ayah-search.js">
+  <link rel="modulepreload" href="assets/js/features/dashboard.js">
   <link rel="modulepreload" href="assets/js/features/favorites.js">
   <link rel="modulepreload" href="assets/js/features/islamic-search.js">
+  <link rel="modulepreload" href="assets/js/features/learn.js">
+  <link rel="modulepreload" href="assets/js/features/memorization.js">
   <link rel="modulepreload" href="assets/js/features/player.js">
   <link rel="modulepreload" href="assets/js/features/prayer.js">
   <link rel="modulepreload" href="assets/js/features/profile.js">
   <link rel="modulepreload" href="assets/js/features/reader.js">
   <link rel="modulepreload" href="assets/js/features/rosary.js">
+  <link rel="modulepreload" href="assets/js/features/settings-panel.js">
   <link rel="modulepreload" href="assets/js/features/surahs.js">
   <link rel="modulepreload" href="assets/js/features/theme.js">
   <link rel="modulepreload" href="assets/js/features/voice-lab.js">
@@ -102,6 +118,11 @@
 </head>
 
 <body>
+  <!-- Launch screen of the installed app (shown only in standalone display mode; see main.css §17). -->
+  <div class="app-splash" aria-hidden="true">
+    <img src="assets/icons/icon-192.png" alt="" width="112" height="112">
+    <p>القرآن الكريم</p>
+  </div>
   <a class="skip-link" href="#main" data-i18n="skip_to_content">تخطَّ إلى المحتوى</a>
 
   <!-- ================= Header & navigation ================= -->
@@ -165,12 +186,8 @@
   <main id="main" tabindex="-1">
     <!-- ================= Hero ================= -->
     <section class="hero" id="home" aria-labelledby="heroTitle">
-      <img class="hero-bg" alt="" fetchpriority="high" decoding="async"
-           src="https://images.unsplash.com/photo-1609599006353-e629aaabfeae?auto=format&amp;fit=crop&amp;w=1200&amp;q=70"
-           srcset="https://images.unsplash.com/photo-1609599006353-e629aaabfeae?auto=format&amp;fit=crop&amp;w=640&amp;q=70 640w,
-                   https://images.unsplash.com/photo-1609599006353-e629aaabfeae?auto=format&amp;fit=crop&amp;w=1200&amp;q=70 1200w,
-                   https://images.unsplash.com/photo-1609599006353-e629aaabfeae?auto=format&amp;fit=crop&amp;w=1800&amp;q=75 1800w"
-           sizes="100vw">
+      <!-- Original vector artwork (scripts/generate_artwork.mjs): local, works offline, 3 KB. -->
+      <img class="hero-bg" alt="" fetchpriority="high" decoding="async" width="1600" height="1000" src="assets/img/backdrop.svg">
       <div class="hero-content container">
         <h1 id="heroTitle" data-i18n="hero_title">القرآن الكريم</h1>
         <p class="hero-subtitle" data-i18n="hero_subtitle">كتاب الله هدى ورحمة</p>
