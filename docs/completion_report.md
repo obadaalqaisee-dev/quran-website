@@ -157,7 +157,7 @@ Full write-up: [`innovation_phase.md`](innovation_phase.md).
   * an unbounded rate-limiter table in the backend;
   * an unlabelled form field caught by axe during development.
 * **Removed:** nothing, apart from the replaced audio file.
-* **Tests:** pytest 107 · unit 56 · e2e 125 passed (1 skipped: live without `LIVE_URL`). Live tests passed against
+* **Tests:** pytest 107 · unit 62 · e2e 130 passed (1 skipped: live without `LIVE_URL`). Live tests passed against
   both production and this branch.
 * **Remaining limitations:**
   * Only Chromium is automated.

@@ -109,3 +109,13 @@ attributes. New surfaces and how they are handled:
   third-party call, and the optional Quran word search uses the existing Quran search endpoint. Typed questions are
   capped at 300 characters and rendered with `textContent` (an e2e test types markup and checks that it is shown as
   text). The CSP is unchanged.
+* **On-device model (assistant).**
+  * **CSP:** `script-src` adds `'wasm-unsafe-eval'`, which allows compiling WebAssembly only. `eval` and inline
+    scripts stay forbidden. `connect-src` adds the model hosts (`huggingface.co`, `*.huggingface.co`, `*.hf.co`,
+    `raw.githubusercontent.com`). The policy is identical in the backend, both meta tags and
+    `scripts/set_api_url.py`.
+  * **Code:** the model library is self-hosted and pinned (WebLLM 0.2.86), with its licence and provenance in
+    `assets/vendor/web-llm-0.2.86/README.md`. No third-party script runs.
+  * **Data:** questions never leave the device, and the model is downloaded only after explicit consent.
+  * **Output:** it is treated as untrusted and inserted with `textContent`. Quran quotations not found in the
+    sources are removed (`guardAnswer`), and the verified passages are always displayed with it.
