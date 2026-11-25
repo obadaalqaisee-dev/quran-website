@@ -136,3 +136,29 @@ See [deployment.md](deployment.md). In short:
 ## 13. Git
 
 All commits are on `Obada_Ub`: <https://github.com/obadaalqaisee-dev/quran-website/tree/Obada_Ub>. The commit list is in `git log main..Obada_Ub`.
+
+## 14. Innovation phase (2026-11-25), branch `feature/quran-innovative-enhancements`
+
+Full write-up: [`innovation_phase.md`](innovation_phase.md).
+
+* **Added:**
+  * «بصيرة» insights (next step with reasons, activity map and streaks, khatma planner, listening statistics, revision
+    order, weak ayahs, missed words, accuracy trend);
+  * ayah notes and collections, with a text export;
+  * backup and restore of all local data;
+  * a daily question drawn from the existing lesson quizzes.
+* **Replaced at the owner's request:** the «من أنا» nasheed is now «أبداً لا لن نحيد». The recording's rights are
+  not stated by its source, and the owner accepted that (see `about_page.md` §2).
+* **Fixed:**
+  * a start-up crash on partial memorisation history;
+  * feature start-up isolation;
+  * an unbounded rate-limiter table in the backend;
+  * an unlabelled form field caught by axe during development.
+* **Removed:** nothing, apart from the replaced audio file.
+* **Tests:** pytest 107 · unit 52 · e2e 117 passed (1 skipped: live without `LIVE_URL`). Live tests passed against
+  both production and this branch.
+* **Remaining limitations:**
+  * Only Chromium is automated.
+  * There is no real screen-reader test.
+  * The nasheed audio was identified from archive metadata, not by listening.
+  * Word-level audio sync for all reciters is deferred, because timing data is not available for every reciter.

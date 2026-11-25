@@ -14,7 +14,11 @@ A bilingual (Arabic-first, also English, Spanish and French) Quran platform:
 - juz/page navigation, reading themes, ayah-range repeat, a sleep timer and a play queue;
 - prayer times with a live countdown and notifications;
 - Hisn al-Muslim adhkar with the electronic rosary (its own tab), the daily wird, favourites, settings and a local profile;
-- a «من أنا» page (`about.html`) introducing the developers and the site's dedication, with an autoplaying nasheed player.
+- a «من أنا» page (`about.html`) introducing the developers and the site's dedication, with an autoplaying player for the nasheed «أبداً لا لن نحيد»;
+- **«بصيرة» insights** on the dashboard: the next step with its reason, a 12-week activity map and streaks, a khatma
+  planner, listening statistics, the suggested revision order, ayahs and words that need strengthening, and recitation accuracy;
+- **ayah notes and collections** (reflection, memorisation, review, Quranic supplications, or your own), a daily
+  question from the site's own lessons, and a **backup/restore** file for everything stored on the device.
 
 The site is a static frontend served by **GitHub Pages**. An optional **Python (FastAPI) backend** serves verified Quran data and privacy-preserving proxies. The site works fully without it.
 
@@ -22,13 +26,14 @@ The site is a static frontend served by **GitHub Pages**. An optional **Python (
 |---|---|
 | Frontend | HTML + CSS + native ES modules, no build step (GitHub Pages) |
 | Backend | Python 3.11+, FastAPI, SQLAlchemy 2, Alembic, SQLite/PostgreSQL |
-| Tests | 106 pytest · 37 Node unit · 88 Playwright end-to-end (+1 live smoke test) |
+| Tests | 107 pytest · 52 Node unit · 117 Playwright end-to-end (+ live smoke tests) |
 | CI | GitHub Actions (`.github/workflows/ci.yml`) |
 
 ## Documentation
 
 | Document | Contents |
 |---|---|
+| [docs/innovation_phase.md](docs/innovation_phase.md) | The innovation phase (2026-11-25): research, evaluated ideas, what was built and why, privacy |
 | [docs/about_page.md](docs/about_page.md) | The «من أنا» page, its media (Al-Aqsa photo, nasheed) and autoplay behaviour; the rosary and prayer-learning reorganisation |
 | [docs/evolution_audit.md](docs/evolution_audit.md) | Audit before the platform evolution: test baseline, findings and resolutions, content policy |
 | [docs/technical_audit.md](docs/technical_audit.md) | Audit of the original site: features, defects, security, performance, SEO |

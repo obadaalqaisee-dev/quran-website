@@ -90,3 +90,18 @@ attributes. New surfaces and how they are handled:
 | `GET /api/v1/tafsir/search` | Edition allow-list, length limits, normalised query, parameterised `LIKE` with escaped wildcards; injection strings tested. |
 | `GET /api/v1/learning/resources` | `topic` restricted to `^[a-z]{2,32}$`; data comes from a checksummed dataset that must contain https URLs only. |
 | Datasets | `learning_resources.json` is in `checksums.json`; a tampered file is refused like every other dataset. |
+
+## Innovation phase (2026-11-25)
+
+* **Backup import is untrusted input.** `core/backup.js` accepts only this site's format and version. Only the
+  site's own storage keys are written; any other key is skipped and reported, never stored. The file is capped at
+  5 MB and each value at 2 MB, and JSON-valued keys must parse as JSON. Nothing is written before the visitor
+  confirms, and existing keys absent from the file are kept.
+* **Notes are rendered as text.** Notes and collection names, typed or imported, are inserted only with
+  `textContent`. Lengths are capped (1,000 / 40 characters, 2,000 notes, 20 collections). The e2e suite checks that
+  markup in a note is displayed literally.
+* **No new network surface.** The new features make no requests, the CSP is unchanged, and the exported files are
+  created locally with `Blob` URLs.
+* **Rate limiter memory bound.** `SlidingWindowLimiter` previously evicted only idle clients. A flood from many
+  distinct, active addresses could therefore grow its table beyond `max_keys`. It now also drops the least recently
+  seen half when every tracked client is active (`test_limiter_memory_is_bounded_even_when_every_client_is_active`).

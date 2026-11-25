@@ -52,7 +52,28 @@ LIVE_URL=https://obadaalqaisee-dev.github.io/quran-website/ LIVE_MAP_TO=127.0.0.
 
 Set `SCREENSHOT_DIR=/some/dir` when running `quality.test.mjs` to save screenshots of every viewport.
 
-## Latest results (2026-11-23, reorganisation and «من أنا», `feature/reorganization-about-page`)
+## Latest results (2026-11-25, innovation phase, `feature/quran-innovative-enhancements`)
+
+The network for this run allowed the site's real upstream services, so the live tests ran too.
+
+| Suite | Before (on `main` @ `711d28d`) | After |
+|---|---|---|
+| Backend pytest | 106 passed | **107 passed**, 0 failed (1 new: rate-limiter memory bound) |
+| ruff · pip-audit | clean · no known vulnerabilities | clean · no known vulnerabilities |
+| Database: `alembic upgrade head` → `seed` → `verify` (fresh SQLite) | — | passed (114 surahs, 6,236 ayahs, 24,944 edition texts, 16 reciters, 36 adhkar) |
+| Frontend unit (`node:test`) | 37 passed | **52 passed**, 0 failed (15 new in `innovation.test.mjs`) |
+| Playwright end-to-end | 101 passed, 2 skipped | **117 passed, 0 failed**, 1 skipped (`live.test.mjs` without `LIVE_URL`); 16 new in `innovation.test.mjs`. The live-Aladhan proxy test now runs and passes. |
+| Live test, the current GitHub Pages site (`main`), real network | — | passed |
+| Live test, **this branch** on a local static server, real network (real Quran text, tafsir, audio, prayer times) | — | passed |
+
+Changes to existing tests (none removed, skipped or weakened):
+
+* `about.test.mjs`: the shipped-media test now expects the new nasheed «أبداً لا لن نحيد» (title, performers, src,
+  4:33 duration), and checks that the old title is no longer shown.
+* `evolution.test.mjs`: the side menu has one more entry («📝 ملاحظاتي»), so the expected count went from 7 to 8. The
+  test also asserts that the new entry exists.
+
+## Results (2026-11-23, reorganisation and «من أنا», `feature/reorganization-about-page`)
 
 | Suite | Result |
 |---|---|

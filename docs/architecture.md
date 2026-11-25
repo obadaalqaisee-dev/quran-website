@@ -96,6 +96,24 @@ Both paths return the same normalised shapes, so feature modules do not know whi
 └── docs/                 audit, checklist, architecture, API, deployment, security, testing
 ```
 
+### 4.1 Added by the innovation phase (2026-11-25)
+
+```
+assets/js/core/insights.js        pure analytics (activity, streaks, khatma plan, revision priority, weak ayahs,
+                                  missed words, accuracy, recommendations); no DOM, unit-tested
+assets/js/core/listening-log.js   real playing time per day and reciter ("listeningLog")
+assets/js/core/notes.js           ayah notes and collections ("ayahNotes")
+assets/js/core/backup.js          backup file build / validate / apply (only the site's own keys)
+assets/js/core/challenge.js       daily question from the existing lesson quizzes ("dailyChallenge")
+assets/js/features/insights.js    «بصيرة» dashboard section and the «سؤال اليوم» card
+assets/js/features/notes.js       note editor in the ayah details panel and the «ملاحظاتي» dialog
+assets/js/features/backup-panel.js backup section of the profile dialog
+assets/js/data/translations-insights.js  strings for the above in ar/en/es/fr
+```
+
+Feature modules talk through small DOM events (`surahrendered`, `ayahselect` from the reader), so the reader does
+not depend on the notes module. `main.js` starts each feature through `safely()`, so a failure stays contained.
+
 ## 5. Data design
 
 ```
