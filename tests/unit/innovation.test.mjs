@@ -327,3 +327,91 @@ test('assistant: text helpers', () => {
   assert.ok(ex.length <= 106 && ex.startsWith('…'));
   assert.equal(assistant.excerpt('قصير', []), 'قصير');
 });
+
+// ------------------------------------------------------- assistant: Quran + tafsir knowledge and on-device model
+test('assistant knowledge file equals the verified Quran and Tafsir al-Muyassar datasets', async () => {
+  const { readFileSync } = await import('node:fs');
+  const { gunzipSync } = await import('node:zlib');
+  const { createHash } = await import('node:crypto');
+  const doc = JSON.parse(readFileSync(new URL('../../assets/data/quran-tafsir.json', import.meta.url), 'utf8'));
+  const data = (f) => readFileSync(new URL(`../../backend/app/data/${f}`, import.meta.url));
+  const checksums = JSON.parse(data('checksums.json'));
+  for (const [f, sha] of Object.entries(doc.sources)) {
+    assert.equal(sha, checksums[f], `${f} checksum recorded`);
+    assert.equal(createHash('sha256').update(data(f)).digest('hex'), sha, `${f} unchanged since the build`);
+  }
+  const ayahs = JSON.parse(gunzipSync(data('ayahs.json.gz')));
+  const tafsir = JSON.parse(gunzipSync(data('edition-ar.muyassar.json.gz')));
+  const c = Object.fromEntries(ayahs.columns.map((k, i) => [k, i]));
+  assert.equal(doc.rows.length, 6236);
+  doc.rows.forEach(([id, surah, ayah, uthmani, simple, tf], i) => {
+    const r = ayahs.rows[i];
+    assert.deepEqual([id, surah, ayah, uthmani, simple], [r[c.id], r[c.surah], r[c.number_in_surah], r[c.text_uthmani], r[c.text_simple]]);
+    assert.equal(tf, tafsir.texts[i]);
+  });
+});
+
+test('assistant: ranked search over the whole Quran with its tafsir', async () => {
+  const { readFileSync } = await import('node:fs');
+  const doc = JSON.parse(readFileSync(new URL('../../assets/data/quran-tafsir.json', import.meta.url), 'utf8'));
+  const index = assistant.buildQuranIndex(doc.rows);
+  const top = (q) => assistant.searchQuran(index, q, 3).map((r) => `${r.doc.surah}:${r.doc.ayah}`);
+  assert.equal(top('الصلاة الوسطى')[0], '2:238');
+  assert.equal(top('الرحمن على العرش استوى')[0], '20:5');
+  assert.ok(top('قصة يوسف مع إخوته').every((r) => r.startsWith('12:')));
+  assert.ok(top('ما هو الربا').includes('2:275'));
+  assert.deepEqual(top('الله'), [], 'a very common word alone is not enough');
+  assert.deepEqual(top('ما رأيك في العملات الرقمية'), []);
+  assert.deepEqual(assistant.searchQuran(null, 'الصبر'), []);
+});
+
+test('assistant: the on-device model gets numbered verified sources and strict rules', () => {
+  const sources = [{ label: 'البقرة 238', text: '﴿حَٰفِظُوا۟ عَلَى ٱلصَّلَوَٰتِ﴾ — التفسير الميسر: حافظوا على الصلوات الخمس' }];
+  const [system, user] = assistant.buildPrompt('ما الصلاة الوسطى؟', sources, 'en');
+  assert.equal(system.role, 'system');
+  assert.match(system.content, /المصادر المرقّمة التالية فقط/);
+  assert.match(system.content, /لا تكتب نص أي آية أو حديث من عندك/);
+  assert.match(system.content, /لا تُصدر فتوى/);
+  assert.match(system.content, /English/);
+  assert.match(user.content, /\[1\] \(البقرة 238\)/);
+  assert.match(user.content, /السؤال: ما الصلاة الوسطى؟/);
+});
+
+test('assistant: the guard removes Quran quotations that are not in the sources and invalid citations', () => {
+  const sources = [{ label: 'x', text: '﴿حَٰفِظُوا۟ عَلَى ٱلصَّلَوَٰتِ وَٱلصَّلَوٰةِ ٱلْوُسْطَىٰ﴾ تفسير' }];
+  const ok = assistant.guardAnswer('قال تعالى: ﴿حافظوا على الصلوات والصلاة الوسطى﴾ [1].', sources);
+  assert.equal(ok.removed, 0, 'a quotation from the sources (any spelling) is kept');
+  assert.match(ok.text, /﴿حافظوا على الصلوات والصلاة الوسطى﴾ \[1\]/);
+  const bad = assistant.guardAnswer('وقال: ﴿إن الله مع الصابرين في كل حال﴾ كما في [1] و[7].', sources);
+  assert.equal(bad.removed, 1);
+  assert.doesNotMatch(bad.text, /الصابرين في كل حال/);
+  assert.match(bad.text, /\[…\]/);
+  assert.doesNotMatch(bad.text, /\[7\]/, 'a citation to a source that does not exist is dropped');
+  assert.equal(assistant.guardAnswer('﴿بلا نهاية', sources).removed, 1, 'an unterminated quotation is removed too');
+});
+
+test('assistant: model choice by device memory and GPU 16-bit support; feature off by default', async () => {
+  store.clear();
+  globalThis.navigator ??= {};
+  const ai = await import('../../assets/js/features/assistant-ai.js');
+  assert.equal(ai.chooseModel({ deviceMemory: 8, f16: true }).id, 'Qwen2.5-1.5B-Instruct-q4f16_1-MLC');
+  assert.equal(ai.chooseModel({ deviceMemory: 4, f16: true }).id, 'Qwen2.5-0.5B-Instruct-q4f16_1-MLC');
+  assert.equal(ai.chooseModel({ deviceMemory: 8, f16: false }).id, 'Qwen2.5-1.5B-Instruct-q4f32_1-MLC');
+  assert.equal(ai.chooseModel({ deviceMemory: 2, f16: false }).id, 'Qwen2.5-0.5B-Instruct-q4f32_1-MLC');
+  assert.equal(ai.chooseModel({ deviceMemory: undefined, f16: true }).id, 'Qwen2.5-1.5B-Instruct-q4f16_1-MLC');
+  assert.equal(ai.aiPreference(), null, 'off until the visitor turns it on');
+  assert.equal(await ai.aiSupported(), false, 'no WebGPU here');
+  assert.equal(ai.aiState().status, 'off');
+  await assert.rejects(ai.answerFromSources('x', []), /not ready/);
+});
+
+test('assistant: broken model output (gibberish) is detected and never shown', () => {
+  // The exact kind of output seen when the model ran on an emulated GPU during development.
+  assert.ok(assistant.looksBroken('03289:item 1 scourge_oftensor_eyebrows_ús 503289:763339:300000', 'ar'));
+  assert.ok(assistant.looksBroken('1234 5678 9012 3456 7890 1234 5678 ____ ::::', 'en'));
+  assert.ok(assistant.looksBroken('the model answered in English although the interface is Arabic, which is wrong', 'ar'));
+  assert.ok(!assistant.looksBroken('الصبر جزاؤه عظيم، فالصابرون يوفَّون أجرهم بغير حساب كما في المصدر [1].', 'ar'));
+  assert.ok(!assistant.looksBroken('Patience is greatly rewarded: the patient receive their reward without measure [1].', 'en'));
+  assert.ok(!assistant.looksBroken('قصير', 'ar'), 'short beginnings are not judged');
+  assert.ok(!assistant.looksBroken('قال تعالى ﴿إِنَّمَا يُوَفَّى ٱلصَّـٰبِرُونَ أَجْرَهُم بِغَيْرِ حِسَابٍ﴾ [1] وهذا في الآخرة', 'ar'), 'quotations and citations are not judged');
+});

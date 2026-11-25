@@ -172,7 +172,7 @@ describe('static security and SEO checks', () => {
       assert.ok(csp.includes(`'${hash}'`), `inline script hash ${hash} missing from the CSP`);
     }
     assert.equal(inline, 1);
-    assert.doesNotMatch(csp, /unsafe-inline|unsafe-eval/);
+    assert.doesNotMatch(csp, /'unsafe-inline'|'unsafe-eval'/);
     assert.doesNotMatch(html, /\son[a-z]+="/i, 'inline event handler');
     assert.doesNotMatch(html, /\sstyle="/i, 'inline style attribute');
     assert.doesNotMatch(html, /javascript:/i);

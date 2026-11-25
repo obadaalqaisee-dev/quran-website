@@ -21,7 +21,9 @@ from urllib.parse import urlsplit
 INDEX = Path(__file__).resolve().parents[1] / "index.html"
 BASE_CONNECT = (
     "connect-src 'self' https://api.alquran.cloud https://www.mp3quran.net https://api.aladhan.com "
-    "https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com"
+    "https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com "
+    # Optional on-device model of the site assistant (same list as backend/app/core/security.py).
+    "https://huggingface.co https://*.huggingface.co https://*.hf.co https://raw.githubusercontent.com"
 )
 
 

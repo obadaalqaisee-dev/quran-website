@@ -374,7 +374,7 @@ describe('site assistant («💬 مساعد الموقع»)', () => {
     const reply = await ask(page, 'ما هي شروط الصلاة؟');
     assert.match(await reply.locator('.asst-result').first().textContent(), /وشروط الصلاة تسعة/);
     assert.match(await reply.locator('.asst-source').first().textContent(), /المصدر: درس «📋 شروط الصلاة»/);
-    assert.match(await reply.textContent(), /لا أُنشئ إجابات من عندي/);
+    assert.match(await reply.textContent(), /ولا أخترع معلومات/);
     await reply.locator('.asst-result').first().locator('button', { hasText: 'افتح الدرس' }).click();
     await page.waitForSelector('#lessonModal[open]');
     assert.match(await page.textContent('#lessonTitle'), /شروط الصلاة/);
@@ -456,5 +456,146 @@ describe('site assistant («💬 مساعد الموقع»)', () => {
     const overflow = await page.evaluate(() => { const d = document.getElementById('assistantModal'); return d.scrollWidth - d.clientWidth; });
     assert.ok(overflow <= 0, `dialog overflow ${overflow}`);
     await close(s);
+  });
+});
+
+describe('site assistant: whole Quran + tafsir, and the optional on-device model', () => {
+  // A stand-in for the WebLLM engine (the real model needs WebGPU and a large download; its real run is
+  // documented in docs/innovation_phase.md). It streams a fixed answer and records the prompt it received.
+  const FAKE_GPU_AND_ENGINE = `
+    Object.defineProperty(navigator, 'gpu', { configurable: true, value: { requestAdapter: async () => ({ features: new Set(['shader-f16']) }) } });
+    window.__prompts = [];
+    window.__assistantEngineFactory = async (modelId, onProgress) => {
+      window.__modelId = modelId;
+      onProgress({ progress: 0.5 }); onProgress({ progress: 1 });
+      return {
+        unload: async () => {},
+        chat: { completions: { create: async ({ messages }) => {
+          window.__prompts.push(messages);
+          const parts = ['الصلاة الوسطى ', 'هي صلاة العصر في قول كثير من المفسرين ', '[1]. ', 'وقال: ', '﴿آية مخترعة ليست في المصادر﴾', ' [9]'];
+          return (async function* () { for (const p of parts) { await new Promise((r) => setTimeout(r, 20)); yield { choices: [{ delta: { content: p } }] }; } })();
+        } } },
+      };
+    };`;
+
+  const ask = async (page, q) => {
+    const before = await page.locator('#assistantLog .asst-msg--bot').count();
+    await page.fill('#assistantInput', q);
+    await page.press('#assistantInput', 'Enter');
+    await page.waitForFunction((n) => document.querySelectorAll('#assistantLog .asst-msg--bot').length > n
+      && !document.querySelector('#assistantLog .asst-msg--bot:last-child .loading'), before);
+    return page.locator('#assistantLog .asst-msg--bot').last();
+  };
+
+  test('content questions search the whole Quran with Tafsir al-Muyassar (verified text, source, open in Mushaf)', async () => {
+    const s = await open();
+    const { page } = s;
+    await page.click('#assistantFab');
+    const reply = await ask(page, 'ما هي الصلاة الوسطى');
+    const first = reply.locator('.asst-knowledge').filter({ hasText: 'من القرآن الكريم والتفسير الميسر' }).locator('.asst-result').first();
+    assert.match(await first.textContent(), /حافظوا -أيها المسلمون- على الصلوات الخمس/);
+    assert.match(await first.locator('.asst-source').textContent(), /الآية 238/);
+    await first.locator('button').click();
+    await page.waitForSelector('#ayah-237.active-ayah, #ayah-237');
+    // Site-help questions are answered by the help topics, without searching the Quran.
+    await page.click('#assistantFab');
+    const help = await ask(page, 'كيف أغير اللغة');
+    assert.equal(await help.locator('.asst-knowledge').count(), 0);
+    await close(s);
+  });
+
+  test('devices without WebGPU: the smart answer is explained as unavailable; the assistant works as before', async () => {
+    const s = await open();
+    const { page } = s;
+    await page.click('#assistantFab');
+    await page.waitForFunction(() => document.getElementById('assistantAI').textContent.length > 10);
+    assert.match(await page.textContent('#assistantAI'), /لا يدعم تشغيل نموذج الذكاء الاصطناعي على الجهاز/);
+    assert.equal(await page.locator('#assistantAI button').count(), 0);
+    const reply = await ask(page, 'ما هي شروط الصلاة؟');
+    assert.equal(await reply.locator('.asst-ai').count(), 0);
+    await close(s);
+  });
+
+  test('turned on with consent: answers only from the shown sources, guarded, labelled, and remembered', async () => {
+    const context = await browser.newContext({ viewport: { width: 1280, height: 900 }, locale: 'ar', reducedMotion: 'reduce' });
+    await mockUpstream(context);
+    await context.addInitScript(FAKE_GPU_AND_ENGINE);
+    const page = await context.newPage();
+    const errors = collectErrors(page);
+    await page.goto(site.url);
+    await page.waitForSelector('#assistantFab');
+    await page.click('#assistantFab');
+    await page.waitForSelector('#assistantAI .btn-primary');
+    assert.match(await page.textContent('#assistantAI'), /يعمل النموذج على جهازك فقط ولا يُرسل أسئلتك لأي جهة/);
+    // Declining the confirmation downloads nothing.
+    page.once('dialog', (d) => d.dismiss());
+    await page.click('#assistantAI .btn-primary');
+    assert.equal(await page.evaluate(() => window.__modelId ?? null), null);
+    page.once('dialog', (d) => d.accept());
+    await page.click('#assistantAI .btn-primary');
+    await page.waitForFunction(() => /مفعّلة/.test(document.getElementById('assistantAI').textContent));
+    assert.equal(await page.evaluate(() => window.__modelId), 'Qwen2.5-1.5B-Instruct-q4f16_1-MLC');
+    assert.deepEqual(JSON.parse(await page.evaluate(() => localStorage.getItem('assistantAI'))), { enabled: true, model: 'Qwen2.5-1.5B-Instruct-q4f16_1-MLC' });
+
+    const reply = await ask(page, 'ما هي الصلاة الوسطى');
+    await page.waitForSelector('#assistantLog .asst-ai-text[aria-live="polite"]');
+    const ai = reply.locator('.asst-ai');
+    const text = await ai.locator('.asst-ai-text').textContent();
+    assert.match(text, /الصلاة الوسطى هي صلاة العصر/);
+    assert.doesNotMatch(text, /آية مخترعة/, 'a quotation that is not in the sources is removed');
+    assert.doesNotMatch(text, /\[9\]/, 'a citation to a missing source is removed');
+    assert.match(await ai.textContent(), /صياغة آلية من المصادر المعروضة أدناه فقط/);
+    assert.match(await ai.textContent(), /حُذف اقتباس قرآني/);
+    // The verified sources are still shown, below the machine-written answer.
+    assert.ok(await reply.locator('.asst-ai ~ .asst-knowledge .asst-result').count() >= 1);
+    // The prompt contained the verified passages, numbered, and the rules.
+    const [system, user] = (await page.evaluate(() => window.__prompts))[0];
+    assert.match(system.content, /المصادر المرقّمة التالية فقط/);
+    assert.match(user.content, /\[1\] \(.+ 238\) ﴿/);
+    // Help questions and questions without sources never call the model.
+    await ask(page, 'كيف أغير اللغة');
+    await ask(page, 'ما رأيك في العملات الرقمية');
+    assert.equal((await page.evaluate(() => window.__prompts)).length, 1);
+
+    // Remembered: after a reload the model is loaded again when the assistant opens.
+    await page.reload();
+    await page.waitForSelector('#assistantFab');
+    await page.click('#assistantFab');
+    await page.waitForFunction(() => /مفعّلة/.test(document.getElementById('assistantAI').textContent));
+    // Turning it off is remembered too.
+    await page.click('#assistantAI >> text=إيقاف');
+    await page.waitForFunction(() => /فعّل الإجابة الذكية/.test(document.getElementById('assistantAI').textContent));
+    assert.deepEqual(JSON.parse(await page.evaluate(() => localStorage.getItem('assistantAI'))), { enabled: false });
+    await context.close();
+    assert.deepEqual(errors, []);
+  });
+
+  test('gibberish from the model (e.g. a GPU that computes wrongly) is stopped and never shown', async () => {
+    const context = await browser.newContext({ viewport: { width: 1280, height: 900 }, locale: 'ar', reducedMotion: 'reduce' });
+    await mockUpstream(context);
+    await context.addInitScript(FAKE_GPU_AND_ENGINE.replace(
+      "['الصلاة الوسطى ', 'هي صلاة العصر في قول كثير من المفسرين ', '[1]. ', 'وقال: ', '﴿آية مخترعة ليست في المصادر﴾', ' [9]']",
+      "['03289:item 1 ', 'scourge_oftensor_', 'eyebrows_ús 503289:', '763339:300000']"));
+    await context.addInitScript(() => localStorage.setItem('assistantAI', JSON.stringify({ enabled: true, model: 'x' })));
+    const page = await context.newPage();
+    await page.goto(site.url);
+    await page.click('#assistantFab');
+    await page.waitForFunction(() => /مفعّلة/.test(document.getElementById('assistantAI').textContent));
+    const reply = await ask(page, 'ما هي الصلاة الوسطى');
+    await reply.locator('.asst-ai >> text=تعذّرت الصياغة الآلية').waitFor();
+    assert.doesNotMatch(await reply.textContent(), /scourge|eyebrows|503289/);
+    assert.ok(await reply.locator('.asst-result').count() >= 1, 'the verified sources are still shown');
+    await context.close();
+  });
+
+  test('the security policy allows the self-hosted model library and only the model hosts', () => {
+    const html = readFileSync(new URL('../../index.html', import.meta.url), 'utf8');
+    const csp = /http-equiv="Content-Security-Policy" content="([^"]+)"/.exec(html)[1];
+    const script = csp.split('; ').find((d) => d.startsWith('script-src'));
+    assert.match(script, /'wasm-unsafe-eval'/);
+    assert.doesNotMatch(script, /'unsafe-eval'|'unsafe-inline'/);
+    const connect = csp.split('; ').find((d) => d.startsWith('connect-src'));
+    for (const host of ['https://huggingface.co', 'https://*.hf.co', 'https://raw.githubusercontent.com']) assert.ok(connect.includes(host), host);
+    assert.doesNotMatch(csp, /cdn\.jsdelivr|esm\.run|unpkg/, 'no third-party script CDN');
   });
 });
