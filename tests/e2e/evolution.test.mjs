@@ -82,7 +82,9 @@ describe('learn the correct prayer', () => {
     assert.equal(srcs.size, 10);
     assert.match(await text(page, '#postureTutorial .stepper-title'), /10\. التسليم/);
     assert.ok(await page.locator('#postureTutorial .stepper-nav .btn-primary').isDisabled());
-    // The diagrams load (offline-capable local files).
+    // The diagrams load (offline-capable local files). Wait for the load instead of checking the instant the
+    // step changes: on a slow CI runner the image may still be decoding (this was a flaky failure in CI).
+    await page.waitForFunction(() => { const img = document.querySelector('#postureTutorial img'); return img.complete && img.naturalWidth > 0; }, null, { timeout: 10_000 });
     assert.ok(await page.locator('#postureTutorial img').evaluate((img) => img.complete && img.naturalWidth > 0));
 
     // Lesson: wudu — the Quran citation is the verified text of 5:6.
