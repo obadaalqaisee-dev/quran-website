@@ -18,7 +18,11 @@ import { initSurahList, renderBookmarkBanner } from './features/surahs.js';
 import { initTheme } from './features/theme.js';
 import { initLearn } from './features/learn.js';
 import { initMemorization, notifyMemoChange, onMemoChange } from './features/memorization.js';
-import { initVoiceLab } from './features/voice-lab.js';
+import { initVoiceLab, practiceAyah, startRevision } from './features/voice-lab.js';
+import { initBackupPanel } from './features/backup-panel.js';
+import { initInsights } from './features/insights.js';
+import { initNotes } from './features/notes.js';
+import { trackAudio } from './core/listening-log.js';
 import { initWird, setWird } from './features/wird.js';
 
 function initLanguageSelect() {
@@ -56,6 +60,14 @@ function registerServiceWorker() {
   });
 }
 
+/**
+ * Start one feature. A feature that fails to start (for example on corrupt stored data) is reported in the
+ * console and the rest of the site keeps working, instead of one exception stopping every later feature.
+ */
+function safely(name, start) {
+  try { start(); } catch (err) { console.error(`[${name}] could not start`, err); }
+}
+
 function boot() {
   setLanguage(initialLanguage(), { persist: false });
   initDialogs();
@@ -66,33 +78,45 @@ function boot() {
 
   // Surah actions are shared by several features.
   const openReader = (n, ayahIndex = null) => readSurah(n, ayahIndex);
-  initPlayer();
-  initReader({
+  safely('initPlayer', () => initPlayer());
+  safely('initReader', () => initReader({
     onBookmark: () => {
       setWird('quran', true, { announce: false }); // saving a bookmark completes the Quran wird (as before)
       renderBookmarkBanner();
     },
-  });
-  initSurahList({ playSurah, readSurah: openReader });
-  initFavorites({ readSurah: openReader });
-  initWird();
-  initPrayer();
-  initAdhkar();
-  initRosary();
-  initAyahSearch({ readSurah: openReader });
-  initIslamicSearch({ readSurah: openReader });
-  initVoiceLab({ onMemoChange: notifyMemoChange });
-  initMemorization();
+  }));
+  safely('initSurahList', () => initSurahList({ playSurah, readSurah: openReader }));
+  safely('initFavorites', () => initFavorites({ readSurah: openReader }));
+  safely('initWird', () => initWird());
+  safely('initPrayer', () => initPrayer());
+  safely('initAdhkar', () => initAdhkar());
+  safely('initRosary', () => initRosary());
+  safely('initAyahSearch', () => initAyahSearch({ readSurah: openReader }));
+  safely('initIslamicSearch', () => initIslamicSearch({ readSurah: openReader }));
+  safely('initVoiceLab', () => initVoiceLab({ onMemoChange: notifyMemoChange }));
+  safely('initMemorization', () => initMemorization());
 
   // Added by the platform evolution: learning, dashboard and settings.
   const openLab = () => openDialog('voiceTestModal');
   const openPlan = () => { openLab(); document.getElementById('labTabPlan').click(); };
   const openSettings = () => openDialog('settingsModal');
-  initLearn({ readSurah: openReader, openLab, openPlan, openSettings });
-  initSettingsPanel({ onMemoGoalChange: notifyMemoChange });
-  initDashboard({ readSurah: openReader, openLab, openSettings });
+  safely('initLearn', () => initLearn({ readSurah: openReader, openLab, openPlan, openSettings }));
+  safely('initSettingsPanel', () => initSettingsPanel({ onMemoGoalChange: notifyMemoChange }));
+  safely('initDashboard', () => initDashboard({ readSurah: openReader, openLab, openSettings }));
   onMemoChange(refreshDashboard);
-  initProfile({ onReset: refreshFavorites });
+  safely('initProfile', () => initProfile({ onReset: refreshFavorites }));
+
+  // Added by the innovation phase: insights, ayah notes and collections, backup, listening statistics.
+  safely('initInsights', () => initInsights({
+    readSurah: openReader,
+    openLab,
+    startRevision: (surah) => { openLab(); startRevision(surah); },
+    practiceAyah: (surah, ayah) => { openLab(); practiceAyah(surah, ayah); },
+  }));
+  safely('initNotes', () => initNotes({ readSurah: (n, index) => readSurah(n, index, { play: false }) }));
+  safely('initBackupPanel', () => initBackupPanel());
+  safely('trackAudio', () => trackAudio(document.getElementById('audioPlayer'), () => document.getElementById('reciterSelect').value));
+  safely('trackAudio', () => trackAudio(document.getElementById('ayahPlayer'), () => 'ayah'));
   welcome();
   registerServiceWorker();
   document.documentElement.classList.add('js-ready');

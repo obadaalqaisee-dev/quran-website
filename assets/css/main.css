@@ -923,6 +923,84 @@ input[type="number"] { min-height: 42px; padding: 6px 12px; border: 2px solid va
   .lesson-content .prayer-step { flex-direction: column; align-items: center; text-align: center; }
 }
 
+/* 19. Innovation phase: insights, notes, backup, daily challenge ------------------------------------- */
+.insights-intro { margin: -6px 0 12px; }
+.insights-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 14px; align-items: start; }
+.insight-card {
+  display: grid; align-content: start; gap: 8px; background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 18px; box-shadow: var(--shadow-sm); position: relative; overflow: hidden; min-width: 0;
+}
+.insight-card::before { content: ""; position: absolute; inset-block-start: 0; inset-inline: 0; height: 3px; background: linear-gradient(90deg, var(--accent), var(--primary)); }
+.insight-title { font-size: 1.05rem; color: var(--primary-strong); }
+.insight-sub { font-size: .95rem; color: var(--accent-text); margin-top: 6px; }
+.insight-empty { margin: 0; }
+.insight-list { display: grid; gap: 6px; padding: 0; list-style: none; margin: 0; }
+.insight-list li { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 10px; padding: 6px 0; border-bottom: 1px dashed var(--border); }
+.insight-list li:last-child { border-bottom: 0; }
+.insight-actions { display: inline-flex; flex-wrap: wrap; gap: 6px; }
+.next-list { display: grid; gap: 8px; padding: 0; margin: 0; list-style: none; }
+.next-item { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 10px; padding: 10px 12px; border-radius: var(--radius-sm); background: var(--surface-2); border: 1px solid var(--border); }
+.next-icon { font-size: 1.4rem; line-height: 1; }
+.next-body { display: grid; gap: 2px; min-width: 0; }
+.stat-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px; }
+.stat-tile { display: grid; gap: 2px; padding: 10px; border-radius: var(--radius-sm); background: var(--surface-2); text-align: center; }
+.stat-tile strong { font-family: var(--font-display); font-size: 1.45rem; color: var(--primary); line-height: 1.2; }
+.stat-tile span { font-size: .85rem; color: var(--muted); }
+.stat-note { grid-column: 1 / -1; margin: 0; }
+.heat-wrap { display: grid; gap: 6px; }
+.heat-map { display: flex; gap: 3px; direction: ltr; overflow-x: auto; padding-block: 4px; }
+[dir="rtl"] .heat-map { flex-direction: row-reverse; justify-content: flex-start; } /* oldest week on the right, newest on the left */
+.heat-col { display: grid; grid-template-rows: repeat(7, 1fr); gap: 3px; }
+.heat-cell { display: inline-block; width: 14px; height: 14px; border-radius: 3px; background: var(--surface-3); }
+.heat-1 { background: color-mix(in srgb, var(--primary) 30%, var(--surface-3)); }
+.heat-2 { background: color-mix(in srgb, var(--primary) 55%, var(--surface-3)); }
+.heat-3 { background: color-mix(in srgb, var(--primary) 78%, var(--surface-3)); }
+.heat-4 { background: var(--primary); }
+.heat-legend { display: flex; align-items: center; gap: 3px; }
+.heat-legend span:first-child { margin-inline-end: 4px; }
+.heat-legend span:last-child { margin-inline-start: 4px; }
+.khatma-form { display: grid; gap: 6px; }
+.khatma-row, .note-form-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+input[type="date"], textarea {
+  min-height: 42px; padding: 6px 12px; border: 2px solid var(--border); border-radius: 12px; background: var(--surface); color: var(--text); font: inherit;
+}
+textarea { width: 100%; min-height: 84px; resize: vertical; line-height: 1.7; }
+input[type="date"]:focus-visible, textarea:focus-visible { outline: 3px solid var(--ring); outline-offset: 1px; border-color: var(--primary); }
+.khatma-result { display: grid; gap: 4px; }
+.word-chips { display: flex; flex-wrap: wrap; gap: 8px; padding: 0; margin: 0; list-style: none; }
+.word-chip { display: inline-flex; align-items: center; gap: 8px; padding: 4px 12px; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--border); }
+.word-chip-text { font-family: var(--font-quran); font-size: 1.2rem; color: var(--quran); }
+.word-chip-count { font-size: .8rem; font-weight: 700; color: var(--accent-text); }
+.challenge-card { grid-column: 1 / -1; }
+.challenge-q { font-weight: 700; line-height: 1.8; }
+.challenge-card .quiz-options { margin-block: 4px; }
+.details-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.note-form { text-align: start; display: grid; gap: 6px; margin-top: 12px; padding: 12px; border-radius: var(--radius-sm); background: var(--surface-2); border: 1px solid var(--border); }
+.ayah-span.has-note { text-decoration: underline dotted var(--accent); text-decoration-thickness: 2px; text-underline-offset: 10px; }
+.notes-toolbar { display: flex; flex-wrap: wrap; align-items: end; gap: 10px; margin: 10px 0; }
+.notes-list { display: grid; gap: 10px; padding: 0; margin: 0; list-style: none; }
+.note-item { display: grid; gap: 6px; padding: 12px 14px; border-radius: var(--radius-sm); background: var(--surface-2); border: 1px solid var(--border); }
+.note-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; }
+.note-badge { font-size: .8rem; padding: 2px 10px; background: var(--primary-soft); color: var(--primary-strong); }
+.note-text { white-space: pre-wrap; overflow-wrap: anywhere; }
+.note-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.note-actions .small { margin-inline-end: auto; }
+.notes-new { margin-top: 16px; display: grid; gap: 6px; }
+.backup-box { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--border); display: grid; gap: 6px; }
+.backup-title { font-size: 1.05rem; color: var(--primary-strong); }
+.file-btn { cursor: pointer; position: relative; }
+.file-btn:focus-within { outline: 3px solid var(--ring); outline-offset: 2px; }
+.bad { color: var(--danger); }
+/* Typography refinements (no change to the Quran text itself) */
+h1, h2, h3, .modal-title, .sub-title { text-wrap: balance; }
+p, li { text-wrap: pretty; }
+.quran-text, .companion-verse, .word-chip-text { text-rendering: optimizeLegibility; font-kerning: normal; }
+@media (max-width: 460px) {
+  .next-item { grid-template-columns: auto 1fr; }
+  .next-item .btn { grid-column: 1 / -1; justify-self: stretch; }
+  .heat-cell { width: 12px; height: 12px; }
+}
+
 /* 16. Motion & print ---------------------------------------------------------------------- */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }

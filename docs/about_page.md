@@ -28,9 +28,26 @@ Both files are local and configured in `assets/js/data/about-media.js` with thei
   ([file page](https://commons.wikimedia.org/wiki/File:Jerusalem-2013-Temple_Mount-Dome_of_the_Rock_%26_Chain_02.jpg)).
   It was cropped to 1280 × 800 around the golden dome and saved as WebP (~100 KB). The caption credits the photographer
   and links the file page, and the service worker precaches it.
-* **Nasheed:** `assets/audio/ya-dhakir-al-ashab.mp3`, «يا ذاكر الأصحاب كن متأدباً» (3:09, MP3 128 kbps), from the
-  Internet Archive item [ya-dakera-ass7abi](https://archive.org/details/ya-dakera-ass7abi), whose description gives the
-  nasheed's full lyrics. The item states no explicit licence.
+* **Nasheed (since 2026-11-25):** `assets/audio/abadan-la-lan-nahid.mp3`, «أبداً لا لن نحيد» (4:33, MP3 128 kbps).
+  It replaced «يا ذاكر الأصحاب كن متأدباً» at the site owner's request; the player, autoplay behaviour and controls
+  are unchanged.
+  * **What it is:** track 5, «جند الله», of the album «وأعدوا 2» by تسجيلات الإسراء (Kuwait), performed by عبدالله
+    الكندري and صباح عنان. The album's track list names it «جند الله أبداً لا لن نحيد».
+  * **Source:** the Internet Archive item [wa-a-3do-2](https://archive.org/details/wa-a-3do-2), file
+    `Wa_A3edoo_2_-_05_-_Jond_Allah.mp3`. The shipped file is byte-identical to it (MD5
+    `40374cad3619ef30d6ae0dab9d99d2c1`, the value the archive publishes; a unit test checks it).
+  * **How it was identified:** three independent archive.org uploads carry this title with matching durations
+    (4:28–4:33): `wa-a-3do-2` (full album with label and performers), `lalnn7ed` and `dawla_20140501_1353`. The
+    album upload was chosen because it is fully attributed. The other two were not used: one is flagged
+    "deemphasize" by the archive, and the other comes from an uploader whose name suggested an extremist-media source.
+    The audio itself was not listened to during development; identification rests on this metadata.
+  * **Rights:** the file's ID3 tag reads «©2002 Enshad.com». No upload states a licence or a permission to
+    redistribute. The site owner was told this and chose to use the recording on their own responsibility. If a
+    rights holder objects, replace `src` in `assets/js/data/about-media.js` (the page then says plainly that no
+    recording is available, see `isConfigured()`).
+* **Previous nasheed (until 2026-11-24):** `assets/audio/ya-dhakir-al-ashab.mp3`, «يا ذاكر الأصحاب كن متأدباً» (3:09),
+  from the Internet Archive item [ya-dakera-ass7abi](https://archive.org/details/ya-dakera-ass7abi). It is no longer
+  shipped; it remains in the git history.
 
 The page shows the photo and plays the nasheed only when `src` is a local path **and** `sourceUrl` and `license`
 are filled in (`isConfigured()`).

@@ -578,4 +578,17 @@ export async function startRevision(surah) {
   await chooseSurah();
 }
 
+/**
+ * Practise one ayah (from the insights panel): select its surah, then narrow the existing range selector to
+ * that ayah. The chosen practice mode is kept; nothing else in the lab changes.
+ */
+export async function practiceAyah(surah, ayah) {
+  await startRevision(surah);
+  const index = state.ayahs.findIndex((a) => a.numberInSurah === Number(ayah));
+  if (index < 0 || state.surah !== Number(surah)) return;
+  el.from.value = String(index);
+  el.to.value = String(index);
+  el.from.dispatchEvent(new Event('change'));
+}
+
 export const _voiceState = state; // for tests

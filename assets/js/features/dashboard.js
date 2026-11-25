@@ -17,6 +17,7 @@ import { LESSONS } from '../data/prayer-lessons.js';
 import { learningStats, onLearningChange, openLesson } from './learn.js';
 import { onRecentChange, playWith, reciterBySlug, reciterLabel, recentlyPlayed } from './player.js';
 import { getToday } from './wird.js';
+import { challengeCard } from './insights.js';
 
 // Self-contained ayahs for the "verse of the day" (references only; the text comes from the dataset).
 export const DAILY_AYAHS = [
@@ -131,6 +132,7 @@ async function renderCompanion() {
         ? h('p', { text: profile.goal.trim() })
         : h('p', { class: 'small muted', text: t('companion_no_goal') }),
       h('button', { class: 'btn btn-soft btn-small', type: 'button', text: t('companion_edit_goal'), on: { click: () => openDialog('profileModal') } })),
+    challengeCard(), // added: the daily knowledge challenge (questions from the site's own quizzes)
   );
   try {
     const data = await getSurah(s);

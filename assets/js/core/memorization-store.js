@@ -29,8 +29,9 @@ export function loadMemo() {
     surahs: Array.isArray(plan.surahs) ? plan.surahs.map(Number).filter((n) => n >= 1 && n <= 114) : [],
   };
   out.days = raw.days && typeof raw.days === 'object' && !Array.isArray(raw.days) ? raw.days : {};
-  out.mistakes = Array.isArray(raw.mistakes) ? raw.mistakes.slice(-MAX_MISTAKES) : [];
-  out.sessions = Array.isArray(raw.sessions) ? raw.sessions.slice(-MAX_SESSIONS) : [];
+  const isEntry = (x) => x && typeof x === 'object' && !Array.isArray(x);
+  out.mistakes = Array.isArray(raw.mistakes) ? raw.mistakes.filter(isEntry).slice(-MAX_MISTAKES) : [];
+  out.sessions = Array.isArray(raw.sessions) ? raw.sessions.filter(isEntry).slice(-MAX_SESSIONS) : [];
   return out;
 }
 

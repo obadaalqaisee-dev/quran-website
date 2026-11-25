@@ -25,6 +25,11 @@ export const KEYS = Object.freeze({
   learning: 'learningProgress', // { lessons: { id: date }, quizzes: { id: { score, total, date } } }
   tasbeeh: 'tasbeehPrefs', // { phrase, target } of the rosary in Hisn al-Muslim (the count stays in rosaryCount)
   nasheedVolume: 'nasheedVolume', // volume of the nasheed player on the «من أنا» page
+  // Added by the innovation phase (new keys only; none of the keys above changed):
+  listening: 'listeningLog', // { days: { date: seconds }, reciters: { slug: seconds } } (core/listening-log.js)
+  notes: 'ayahNotes', // { v, items: [{ surah, ayah, collection, note, updated }], custom } (core/notes.js)
+  khatma: 'khatmaPlan', // { target: 'YYYY-MM-DD', start: 'YYYY-MM-DD' } khatma planner
+  challenge: 'dailyChallenge', // { days: { date: { q, ok } } } daily knowledge challenge
 });
 
 // Keys removed by "reset my data" (the original reset exactly these four).

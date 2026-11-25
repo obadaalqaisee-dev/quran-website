@@ -94,6 +94,19 @@ def test_sliding_window_expires():
     assert limiter.hit("k", 1, now=10.5)[0]
 
 
+def test_limiter_memory_is_bounded_even_when_every_client_is_active():
+    # A flood from many distinct addresses inside one window must not grow the table past max_keys.
+    limiter = SlidingWindowLimiter(window_seconds=60, max_keys=100)
+    for n in range(1_000):
+        assert limiter.hit(f"default:10.0.{n // 256}.{n % 256}", 5, now=1.0 + n / 1_000)[0]
+    assert len(limiter._hits) <= 100
+    # The most recently seen clients are kept, so their limits still apply.
+    recent = "default:10.0.3.231"  # n = 999
+    for _ in range(4):
+        assert limiter.hit(recent, 5, now=2.0)[0]
+    assert limiter.hit(recent, 5, now=2.0)[0] is False
+
+
 @pytest.mark.parametrize(
     "url",
     [

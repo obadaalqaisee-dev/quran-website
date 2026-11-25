@@ -75,6 +75,7 @@ export async function readSurah(number, scrollToAyahIndex = null, { play = true 
     const fragment = document.createDocumentFragment();
     data.ayahs.forEach((ayah, i) => fragment.append(ayahNode(ayah, i), ' '));
     el.text.replaceChildren(fragment);
+    document.dispatchEvent(new CustomEvent('surahrendered', { detail: { surah: n } })); // notes mark their ayahs
     el.controls.hidden = false;
     populateRange();
     observeAyahs();
@@ -138,6 +139,7 @@ export function playAyah(index) {
   el.details.hidden = false;
   el.detailsTitle.textContent = `${t('ayah_label')} ﴿${ayah.numberInSurah}﴾`;
   resetBookmarkButton();
+  document.dispatchEvent(new CustomEvent('ayahselect', { detail: { surah: state.surah, ayah: ayah.numberInSurah } }));
   loadDetails();
   renderPosition(index);
   scrollIntoViewSmart(span, 'center');

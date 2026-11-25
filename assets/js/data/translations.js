@@ -2,6 +2,7 @@
 // The original strings are kept verbatim; see docs/feature_preservation_checklist.md.
 // Values may contain trusted, static markup (<strong>, <span>); never put remote data here.
 import { EXTRA } from './translations-ext.js';
+import { INSIGHTS } from './translations-insights.js';
 
 export const translations = {
   "ar": {
@@ -969,8 +970,9 @@ export const translations = {
 export const LANGUAGES = ['ar', 'en', 'es', 'fr'];
 
 // Strings added by the platform evolution (translations-ext.js). Existing keys are never overwritten.
+// Strings added by the innovation phase (translations-insights.js) are merged the same way.
 for (const lang of LANGUAGES) {
-  for (const [key, value] of Object.entries(EXTRA[lang] || {})) {
+  for (const [key, value] of [...Object.entries(EXTRA[lang] || {}), ...Object.entries(INSIGHTS[lang] || {})]) {
     if (!(key in translations[lang])) translations[lang][key] = value;
   }
 }

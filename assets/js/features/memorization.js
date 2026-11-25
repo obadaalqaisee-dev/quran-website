@@ -19,6 +19,7 @@ export function notifyMemoChange() { for (const fn of listeners) fn(); render();
 const ayahCount = (n) => getSurahMeta(n)?.ayahCount || 0;
 
 function formatDate(key) {
+  if (typeof key !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(key)) return ''; // tolerate partial or imported data
   const [y, m, d] = key.split('-').map(Number);
   try { return new Intl.DateTimeFormat(document.documentElement.lang, { day: 'numeric', month: 'short' }).format(new Date(y, m - 1, d)); } catch { return key; }
 }

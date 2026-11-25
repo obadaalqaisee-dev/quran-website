@@ -46,8 +46,15 @@ class SlidingWindowLimiter:
             return True, limit - len(q), 0.0
 
     def _evict(self, cutoff: float) -> None:
+        """Free room for a new client: drop idle clients first; if every tracked client is still active
+        (e.g. a flood from many addresses), drop the least recently seen half, so memory stays bounded by
+        ``max_keys`` whatever the traffic. A dropped client simply starts a fresh window."""
         for k in [k for k, q in self._hits.items() if not q or q[-1] <= cutoff]:
             del self._hits[k]
+        if len(self._hits) >= self.max_keys:
+            by_last_seen = sorted(self._hits, key=lambda k: self._hits[k][-1])
+            for k in by_last_seen[: max(1, len(by_last_seen) // 2)]:
+                del self._hits[k]
 
     def reset(self) -> None:
         with self._lock:

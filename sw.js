@@ -7,7 +7,7 @@
  * - Audio is never intercepted (range requests must go straight to the media servers).
  * - Prayer times and audio look-ups are never cached here (they are time/location dependent).
  */
-const VERSION = 'v3.1.1';
+const VERSION = 'v3.2.0';
 const SHELL = `shell-${VERSION}`;
 const DATA = 'quran-data-v1';
 const DATA_LIMIT = 300;
@@ -20,7 +20,7 @@ const SHELL_FILES = [
   'assets/js/core/recitation.js', 'assets/js/core/settings.js', 'assets/js/core/speech.js',
   'assets/js/core/storage.js', 'assets/js/core/toast.js', 'assets/js/data/academy.js', 'assets/js/data/adhkar.js',
   'assets/js/data/prayer-lessons.js', 'assets/js/data/quran-index.js', 'assets/js/data/reciters.js',
-  'assets/js/data/scholar-resources.js', 'assets/js/data/surahs.js', 'assets/js/data/translations-ext.js',
+  'assets/js/data/scholar-resources.js', 'assets/js/data/surahs.js', 'assets/js/data/translations-ext.js', 'assets/js/data/translations-insights.js',
   'assets/js/data/translations.js', 'assets/js/features/adhkar.js', 'assets/js/features/ayah-search.js',
   'assets/js/features/dashboard.js', 'assets/js/features/favorites.js', 'assets/js/features/islamic-search.js',
   'assets/js/features/learn.js', 'assets/js/features/memorization.js', 'assets/js/features/player.js',
@@ -36,6 +36,8 @@ const SHELL_FILES = [
   'assets/img/prayer/qabd.svg', 'assets/img/prayer/qiyam.svg', 'assets/img/prayer/ruku.svg',
   'assets/img/prayer/sujud.svg', 'assets/img/prayer/takbir.svg', 'assets/img/prayer/tashahhud.svg',
   'assets/img/prayer/tasleem.svg', 'assets/img/prayer/tawarruk.svg',
+  'assets/js/core/backup.js', 'assets/js/core/challenge.js', 'assets/js/core/insights.js', 'assets/js/core/listening-log.js',
+  'assets/js/core/notes.js', 'assets/js/features/backup-panel.js', 'assets/js/features/insights.js', 'assets/js/features/notes.js',
   'about.html', 'assets/js/about.js', 'assets/js/data/about-media.js', 'assets/img/about/dome-of-the-rock.webp',
 ];
 

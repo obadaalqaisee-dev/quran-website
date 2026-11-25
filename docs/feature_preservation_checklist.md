@@ -190,3 +190,30 @@ Also: the academy is renamed «الأكاديمية التعليمية الإس�
 «تعلم الصلاة الصحيحة» track (ids unchanged). Added: the separate «من أنا» page (`about.html`) with the nav item
 «🕊️ من أنا» and a side-menu link. New storage keys: `tasbeehPrefs`, `nasheedVolume`. Every other row of sections
 A–K is unchanged.
+
+## M. Innovation phase (2026-11-25): what was added, what changed
+
+Every row of sections A–L was re-verified after this phase (see [`testing.md`](testing.md)): the original suites
+`features`, `evolution`, `about` and `quality` pass. **No feature, page, dialog, reciter, lesson, course,
+translation or icon was removed.** Details are in [`innovation_phase.md`](innovation_phase.md).
+
+| Area | Added | Verified by |
+|---|---|---|
+| Dashboard | «📊 بصيرة» insights: next step with reasons, 12-week activity map, streaks, khatma planner, listening minutes, revision order, weak ayahs, missed words, accuracy trend; «💡 سؤال اليوم» card; «📝 ملاحظاتي» tool card | `e2e/innovation` insights + challenge; `unit/innovation` |
+| Reader | «📝 ملاحظة وتصنيف» in the ayah details panel (next to the unchanged «🔖 حفظ كآخر قراءة»); ayahs with notes are underlined | `e2e/innovation` notes |
+| Dialogs | «📝 ملاحظاتي ومجموعاتي» (`notesModal`); side-menu entry | `e2e/innovation` notes + axe |
+| Profile | «💾 نسخة احتياطية»: save / restore all local data | `e2e/innovation` backup; `unit/innovation` |
+| Audio | Listening statistics (real playing time) for the surah player and the per-ayah player; all 16 reciters unchanged | `e2e/innovation` listening; original player tests |
+| Memorisation lab | `practiceAyah()`: open the lab on one ayah (uses the existing range selector) | `e2e/innovation` |
+
+### New storage keys (no existing key changed)
+
+`listeningLog`, `ayahNotes`, `khatmaPlan`, `dailyChallenge`.
+
+### Deliberate changes
+
+| Item | Before | Now | Why |
+|---|---|---|---|
+| «من أنا» nasheed | «يا ذاكر الأصحاب كن متأدباً» (`ya-dhakir-al-ashab.mp3`, 3:09) | «أبداً لا لن نحيد» (`abadan-la-lan-nahid.mp3`, 4:33); same player, autoplay and manual fallback | Requested by the site owner (see `about_page.md` §2 for source and rights) |
+| Start-up | One failing feature stopped every later one | Each feature starts in isolation (`safely()` in `main.js`) | A corrupt stored entry made most of the page inert |
+| Memorisation history | An entry without a date crashed the page | Tolerated; malformed entries dropped on load | Robustness (regression test added) |
