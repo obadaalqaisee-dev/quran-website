@@ -205,6 +205,7 @@ translation or icon was removed.** Details are in [`innovation_phase.md`](innova
 | Profile | «💾 نسخة احتياطية»: save / restore all local data | `e2e/innovation` backup; `unit/innovation` |
 | Audio | Listening statistics (real playing time) for the surah player and the per-ayah player; all 16 reciters unchanged | `e2e/innovation` listening; original player tests |
 | Memorisation lab | `practiceAyah()`: open the lab on one ayah (uses the existing range selector) | `e2e/innovation` |
+| Site assistant | «💬 المساعد» floating button, side-menu entry and dashboard card; dialog `assistantModal`: site help (26 topics × 4 languages) and answers from the verified content only, with sources and a no-fatwa notice | `e2e/innovation` assistant + axe; `unit/innovation` assistant |
 
 ### New storage keys (no existing key changed)
 

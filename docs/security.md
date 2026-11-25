@@ -105,3 +105,7 @@ attributes. New surfaces and how they are handled:
 * **Rate limiter memory bound.** `SlidingWindowLimiter` previously evicted only idle clients. A flood from many
   distinct, active addresses could therefore grow its table beyond `max_keys`. It now also drops the least recently
   seen half when every tracked client is active (`test_limiter_memory_is_bounded_even_when_every_client_is_active`).
+* **Site assistant.** Its answers come only from static strings and the verified data modules. It makes no AI or
+  third-party call, and the optional Quran word search uses the existing Quran search endpoint. Typed questions are
+  capped at 300 characters and rendered with `textContent` (an e2e test types markup and checks that it is shown as
+  text). The CSP is unchanged.
