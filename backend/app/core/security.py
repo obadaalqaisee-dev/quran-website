@@ -14,7 +14,8 @@ from starlette.types import ASGIApp, Message, Receive, Scope, Send
 CSP_SOURCES = {
     "default-src": ["'self'"],
     # The hash allows exactly one inline script: the theme initialiser in index.html (no 'unsafe-inline').
-    "script-src": ["'self'", "'sha256-ANrF7JP3nCCxPbHOeznx86QJisMdocwvh/00wruFO+g='", "https://www.googletagmanager.com"],
+    # 'wasm-unsafe-eval' lets the self-hosted on-device model (WebLLM) compile WebAssembly; it does not allow eval().
+    "script-src": ["'self'", "'sha256-ANrF7JP3nCCxPbHOeznx86QJisMdocwvh/00wruFO+g='", "'wasm-unsafe-eval'", "https://www.googletagmanager.com"],
     "style-src": ["'self'"],
     "font-src": ["'self'"],  # fonts are self-hosted
     "img-src": [
@@ -39,6 +40,12 @@ CSP_SOURCES = {
         "https://*.google-analytics.com",
         "https://*.analytics.google.com",
         "https://www.googletagmanager.com",
+        # Optional on-device model of the site assistant, downloaded only after the visitor agrees:
+        # model weights (Hugging Face and its file CDNs) and the WebGPU model library (GitHub raw).
+        "https://huggingface.co",
+        "https://*.huggingface.co",
+        "https://*.hf.co",
+        "https://raw.githubusercontent.com",
     ],
     "manifest-src": ["'self'"],
     "worker-src": ["'self'"],

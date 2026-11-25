@@ -8,7 +8,7 @@
     APIs (GitHub Pages works either way). Set a URL with: python3 scripts/set_api_url.py https://your-api
   -->
   <meta name="quran-api" content="auto">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-ANrF7JP3nCCxPbHOeznx86QJisMdocwvh/00wruFO+g=' https://www.googletagmanager.com; style-src 'self'; font-src 'self'; img-src 'self' data: https://images.unsplash.com https://images.pexels.com https://i.ytimg.com https://www.googletagmanager.com https://*.google-analytics.com; media-src 'self' https://*.mp3quran.net https://cdn.islamic.network; connect-src 'self' https://api.alquran.cloud https://www.mp3quran.net https://api.aladhan.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-ANrF7JP3nCCxPbHOeznx86QJisMdocwvh/00wruFO+g=' 'wasm-unsafe-eval' https://www.googletagmanager.com; style-src 'self'; font-src 'self'; img-src 'self' data: https://images.unsplash.com https://images.pexels.com https://i.ytimg.com https://www.googletagmanager.com https://*.google-analytics.com; media-src 'self' https://*.mp3quran.net https://cdn.islamic.network; connect-src 'self' https://api.alquran.cloud https://www.mp3quran.net https://api.aladhan.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://huggingface.co https://*.huggingface.co https://*.hf.co https://raw.githubusercontent.com; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
   <meta name="referrer" content="strict-origin-when-cross-origin">
 
   <title>القرآن الكريم | تلاوة، قراءة، أذكار وتفسير - The Noble Quran</title>
@@ -106,6 +106,7 @@
   <link rel="modulepreload" href="assets/js/data/translations-insights.js">
   <link rel="modulepreload" href="assets/js/data/translations.js">
   <link rel="modulepreload" href="assets/js/features/adhkar.js">
+  <link rel="modulepreload" href="assets/js/features/assistant-ai.js">
   <link rel="modulepreload" href="assets/js/features/assistant.js">
   <link rel="modulepreload" href="assets/js/features/ayah-search.js">
   <link rel="modulepreload" href="assets/js/features/backup-panel.js">
@@ -829,6 +830,7 @@
       <input type="search" id="assistantInput" maxlength="300" autocomplete="off" enterkeyhint="send" placeholder="مثال: كيف أسمّع سورة؟ أو ما هي شروط الصلاة؟" data-i18n-placeholder="asst_placeholder">
       <button class="btn btn-primary" type="submit" data-i18n="asst_send">اسأل</button>
     </form>
+    <section id="assistantAI" class="asst-ai-panel" aria-live="polite"></section>
   </dialog>
 
   <!-- Ayah notes and collections -->

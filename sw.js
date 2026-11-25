@@ -6,11 +6,16 @@
  * - Quran text / tafsir / translations (public API or our backend): stale-while-revalidate, size-capped.
  * - Audio is never intercepted (range requests must go straight to the media servers).
  * - Prayer times and audio look-ups are never cached here (they are time/location dependent).
+ * - The site assistant's knowledge file (assets/data/) and the self-hosted model library (assets/vendor/) are large
+ *   and loaded only on use: they get their own cache, kept across app-shell versions.
+ * - Caches this worker does not own (for example the on-device model files that WebLLM stores) are never deleted.
  */
-const VERSION = 'v3.3.0';
+const VERSION = 'v3.4.0';
 const SHELL = `shell-${VERSION}`;
 const DATA = 'quran-data-v1';
 const DATA_LIMIT = 300;
+const ASSISTANT = 'assistant-v1';
+const OWN = /^(shell-|quran-data-|assistant-)/;
 
 const SHELL_FILES = [
   './', 'index.html', 'manifest.json', 'assets/css/main.css', 'assets/js/analytics.js', 'assets/js/core/api.js',
@@ -36,7 +41,8 @@ const SHELL_FILES = [
   'assets/img/prayer/qabd.svg', 'assets/img/prayer/qiyam.svg', 'assets/img/prayer/ruku.svg',
   'assets/img/prayer/sujud.svg', 'assets/img/prayer/takbir.svg', 'assets/img/prayer/tashahhud.svg',
   'assets/img/prayer/tasleem.svg', 'assets/img/prayer/tawarruk.svg',
-  'assets/js/core/assistant.js', 'assets/js/features/assistant.js', 'assets/js/data/translations-assistant.js',
+  'assets/js/core/assistant.js', 'assets/js/features/assistant.js', 'assets/js/features/assistant-ai.js',
+  'assets/workers/llm-worker.js', 'assets/js/data/translations-assistant.js',
   'assets/js/core/backup.js', 'assets/js/core/challenge.js', 'assets/js/core/insights.js', 'assets/js/core/listening-log.js',
   'assets/js/core/notes.js', 'assets/js/features/backup-panel.js', 'assets/js/features/insights.js', 'assets/js/features/notes.js',
   'about.html', 'assets/js/about.js', 'assets/js/data/about-media.js', 'assets/img/about/dome-of-the-rock.webp',
@@ -48,8 +54,9 @@ self.addEventListener('install', (event) => {
 
 self.addEventListener('activate', (event) => {
   event.waitUntil((async () => {
-    const keep = new Set([SHELL, DATA]);
-    for (const key of await caches.keys()) if (!keep.has(key)) await caches.delete(key);
+    const keep = new Set([SHELL, DATA, ASSISTANT]);
+    // Only this worker's own old caches are removed; others (e.g. the on-device model) are left alone.
+    for (const key of await caches.keys()) if (OWN.test(key) && !keep.has(key)) await caches.delete(key);
     await self.clients.claim();
   })());
 });
@@ -85,6 +92,10 @@ self.addEventListener('fetch', (event) => {
 
   if (request.mode === 'navigate') {
     event.respondWith(fetch(request).catch(async () => (await caches.match(request)) || caches.match('index.html')));
+    return;
+  }
+  if (url.origin === self.location.origin && /\/assets\/(data|vendor)\//.test(url.pathname)) {
+    event.respondWith(staleWhileRevalidate(request, ASSISTANT));
     return;
   }
   if (url.origin === self.location.origin && !url.pathname.includes('/api/')) {
