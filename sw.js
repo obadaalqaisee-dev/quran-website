@@ -7,7 +7,7 @@
  * - Audio is never intercepted (range requests must go straight to the media servers).
  * - Prayer times and audio look-ups are never cached here (they are time/location dependent).
  */
-const VERSION = 'v3.2.0';
+const VERSION = 'v3.3.0';
 const SHELL = `shell-${VERSION}`;
 const DATA = 'quran-data-v1';
 const DATA_LIMIT = 300;
@@ -36,6 +36,7 @@ const SHELL_FILES = [
   'assets/img/prayer/qabd.svg', 'assets/img/prayer/qiyam.svg', 'assets/img/prayer/ruku.svg',
   'assets/img/prayer/sujud.svg', 'assets/img/prayer/takbir.svg', 'assets/img/prayer/tashahhud.svg',
   'assets/img/prayer/tasleem.svg', 'assets/img/prayer/tawarruk.svg',
+  'assets/js/core/assistant.js', 'assets/js/features/assistant.js', 'assets/js/data/translations-assistant.js',
   'assets/js/core/backup.js', 'assets/js/core/challenge.js', 'assets/js/core/insights.js', 'assets/js/core/listening-log.js',
   'assets/js/core/notes.js', 'assets/js/features/backup-panel.js', 'assets/js/features/insights.js', 'assets/js/features/notes.js',
   'about.html', 'assets/js/about.js', 'assets/js/data/about-media.js', 'assets/img/about/dome-of-the-rock.webp',

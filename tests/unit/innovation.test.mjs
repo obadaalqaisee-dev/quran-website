@@ -259,3 +259,71 @@ test('nasheed «أبداً لا لن نحيد»: the shipped file is the documen
   assert.ok(file.length > 4_000_000);
   assert.ok(!existsSync(new URL('../../assets/audio/ya-dhakir-al-ashab.mp3', import.meta.url)), 'the replaced recording is not shipped');
 });
+
+// ----------------------------------------------------------------------------------- site assistant
+const assistant = await import('../../assets/js/core/assistant.js');
+const { LESSONS: P_LESSONS } = await import('../../assets/js/data/prayer-lessons.js');
+const { ACADEMY_LESSONS: A_LESSONS } = await import('../../assets/js/data/academy.js');
+const { ADHKAR: ALL_ADHKAR } = await import('../../assets/js/data/adhkar.js');
+
+test('assistant: site-help questions in four languages reach the right feature', () => {
+  const cases = {
+    'كيف أسمّع سورة من حفظي؟': 'memorize', 'وين ألاقي أذكار المساء': 'adhkar', 'كيف أغير حجم الخط': 'settings',
+    'كيف أنقل تقدمي لجهاز آخر نسخة احتياطية': 'backup', 'المايك ما بشتغل': 'mic', 'كيف أفعل الوضع الليلي': 'theme',
+    'مواقيت الصلاة': 'prayer_times', 'How do I listen to a reciter?': 'listen', '¿Cómo cambio el idioma?': 'language',
+    "comment installer l'application": 'install', 'كيف أفعّل تنبيهات الصلاة؟': 'notify', 'وين المسبحة': 'rosary',
+  };
+  for (const [q, id] of Object.entries(cases)) assert.equal(assistant.matchHelp(q)[0]?.id, id, q);
+  assert.deepEqual(assistant.matchHelp('؟؟'), []);
+  assert.deepEqual(assistant.matchHelp('ما هي العملات الرقمية'), []);
+});
+
+test('assistant: every help topic has its texts in all four languages and an action that exists', async () => {
+  const { translations, LANGUAGES } = await import('../../assets/js/data/translations.js');
+  const { readFileSync } = await import('node:fs');
+  const html = readFileSync(new URL('../../index.html', import.meta.url), 'utf8');
+  for (const topic of assistant.HELP_TOPICS) {
+    for (const lang of LANGUAGES) {
+      assert.ok(translations[lang][`help_${topic.id}`], `${lang} help_${topic.id}`);
+      assert.ok(translations[lang][`help_${topic.id}_q`], `${lang} help_${topic.id}_q`);
+    }
+    const a = topic.action;
+    if (!a) continue;
+    if (a.dialog) assert.match(html, new RegExp(`<dialog[^>]*id="${a.dialog}"`), a.dialog);
+    if (a.anchor) assert.match(html, new RegExp(`id="${a.anchor.slice(1)}"`), a.anchor);
+    if (a.href) assert.ok(readFileSync(new URL(`../../${a.href}`, import.meta.url)));
+    if (a.run) assert.ok(['plan', 'rosary', 'theme', 'language'].includes(a.run));
+  }
+});
+
+test('assistant: Islamic questions are answered only with verbatim passages of the verified content', () => {
+  const kb = assistant.buildKnowledge({ lessons: [...P_LESSONS, ...A_LESSONS], adhkar: ALL_ADHKAR, adhkarTitles: { sleep: { ar: 'النوم 🛏️' } } });
+  // Every passage is made of text that exists in the data modules (nothing is generated).
+  const sources = JSON.stringify([P_LESSONS, A_LESSONS, ALL_ADHKAR]);
+  for (const p of kb) for (const piece of p.text.split(/ • | — |\. |﴿[\d:]+﴾ | \(|\) |: /).map((x) => x.replace(/^[•(\s]+/, '').replace(/[).]+$/, '').trim()).filter((x) => x.length > 3)) {
+    assert.ok(sources.includes(piece.replace(/"/g, '\\"')), `not verbatim: ${piece.slice(0, 60)}`);
+  }
+  const top = (q) => assistant.searchKnowledge(kb, q, 3).map((r) => r.passage);
+  assert.equal(top('ما هي شروط الصلاة')[0].lessonId, 'conditions');
+  assert.match(top('كم عدد أركان الإسلام')[0].text, /خمسة/);
+  assert.equal(top('سجود السهو')[0].lessonId, 'sahw');
+  assert.equal(top('what are the pillars of prayer')[0].lessonId, 'pillars');
+  assert.equal(top('دعاء قبل النوم')[0].category, 'sleep');
+  assert.deepEqual(top('ما هي العملات الرقمية'), [], 'no source, no answer');
+  assert.deepEqual(top('ما'), []);
+  assert.ok(assistant.asksForRuling('ما حكم قراءة الفاتحة'));
+  assert.ok(assistant.asksForRuling('Is music halal?'));
+  assert.ok(!assistant.asksForRuling('كم عدد أركان الإسلام'));
+});
+
+test('assistant: text helpers', () => {
+  assert.equal(assistant.stem('والصلاة'), 'صلاة');
+  assert.equal(assistant.stem('الليلي'), 'ليلي');
+  assert.deepEqual(assistant.terms('ما هي شروط الصلاة؟'), ['شروط', 'صلاه']);
+  assert.deepEqual(assistant.terms('How do I listen?'), ['listen']);
+  assert.deepEqual(assistant.terms('¿Cómo cambio el idioma?'), ['cambio', 'idioma']);
+  const long = 'أ'.repeat(200) + ' الهدف ' + 'ب'.repeat(300);
+  const ex = assistant.excerpt(long, ['هدف'], 100);
+  assert.ok(ex.length <= 106 && ex.startsWith('…'));
+  assert.equal(assistant.excerpt('قصير', []), 'قصير');
+});

@@ -339,3 +339,122 @@ describe('compatibility and quality', () => {
     await close(s);
   });
 });
+
+describe('site assistant («💬 مساعد الموقع»)', () => {
+  const ask = async (page, q) => {
+    const before = await page.locator('#assistantLog .asst-msg--bot').count();
+    await page.fill('#assistantInput', q);
+    await page.press('#assistantInput', 'Enter');
+    await page.waitForFunction((n) => document.querySelectorAll('#assistantLog .asst-msg--bot').length > n, before);
+    return page.locator('#assistantLog .asst-msg--bot').last();
+  };
+
+  test('opens from the floating button; suggestions answer site-help questions and lead to the feature', async () => {
+    const s = await open();
+    const { page } = s;
+    await page.click('#assistantFab');
+    await page.waitForSelector('#assistantModal[open]');
+    assert.match(await page.textContent('#assistantLog'), /اسألني كيف تستخدم أي ميزة/);
+    assert.match(await page.textContent('#assistantLog'), /لست مفتيًا/);
+    assert.equal(await page.locator('#assistantSuggestions .chip-btn').count(), 6);
+    await page.locator('#assistantSuggestions .chip-btn', { hasText: 'كيف أسمّع سورة من حفظي؟' }).click();
+    const reply = page.locator('#assistantLog .asst-msg--bot').last();
+    await reply.locator('.asst-help').waitFor();
+    assert.match(await reply.textContent(), /اضغط «🎙️ التسميع» في الأعلى/);
+    await reply.locator('.asst-help .btn-primary').click();
+    await page.waitForSelector('#voiceTestModal[open]');
+    assert.equal(await page.locator('#assistantModal[open]').count(), 0);
+    await close(s);
+  });
+
+  test('Islamic questions: verbatim passages from the lessons with their source; the lesson opens', async () => {
+    const s = await open();
+    const { page } = s;
+    await page.click('#dashboardSection [data-open="assistantModal"]');
+    const reply = await ask(page, 'ما هي شروط الصلاة؟');
+    assert.match(await reply.locator('.asst-result').first().textContent(), /وشروط الصلاة تسعة/);
+    assert.match(await reply.locator('.asst-source').first().textContent(), /المصدر: درس «📋 شروط الصلاة»/);
+    assert.match(await reply.textContent(), /لا أُنشئ إجابات من عندي/);
+    await reply.locator('.asst-result').first().locator('button', { hasText: 'افتح الدرس' }).click();
+    await page.waitForSelector('#lessonModal[open]');
+    assert.match(await page.textContent('#lessonTitle'), /شروط الصلاة/);
+    await close(s);
+  });
+
+  test('rulings carry the "not a fatwa" notice; unknown topics get an honest "no source" answer', async () => {
+    const s = await open();
+    const { page } = s;
+    await page.click('#assistantFab');
+    const ruling = await ask(page, 'هل يجوز الجمع بين الصلاتين؟');
+    assert.match(await ruling.locator('.asst-notice').textContent(), /الموقع لا يُصدر فتاوى/);
+    assert.match(await ruling.textContent(), /صلاة المسافر/);
+    const unknown = await ask(page, 'ما رأيك في العملات الرقمية');
+    assert.match(await unknown.textContent(), /لم أجد في محتوى الموقع ما يجيب/);
+    assert.equal(await unknown.locator('.asst-result').count(), 0);
+    // Typed text is shown as text, never as HTML.
+    await ask(page, '<img src=x onerror=alert(1)> سجود السهو');
+    assert.equal(await page.locator('#assistantLog img').count(), 0);
+    assert.match(await page.locator('#assistantLog .asst-msg--user').last().textContent(), /<img src=x/);
+    await close(s);
+  });
+
+  test('a word can be searched in the Quran text and the ayah opened in the Mushaf', async () => {
+    const s = await open();
+    const { page } = s;
+    await page.click('#assistantFab');
+    const reply = await ask(page, 'الصابرين');
+    await reply.locator('.asst-quran .chip-btn').first().click();
+    await reply.locator('.asst-quran .asst-result').first().waitFor();
+    assert.match(await reply.locator('.asst-quran').textContent(), /آيات فيها «الصابرين»/);
+    await reply.locator('.asst-quran .asst-result').first().locator('button').click();
+    await page.waitForSelector('#readingSection:not([hidden]) .ayah-span');
+    await close(s);
+  });
+
+  test('works in English, Spanish and French', async () => {
+    const s = await open();
+    const { page } = s;
+    const cases = [['en', 'How do I change the language?', /Use the 🌐 menu at the top/], ['es', '¿Dónde están los adhkar de la tarde?', /Pulsa «📿 Hisn al-Muslim»/], ['fr', 'Comment activer le mode sombre ?', /Appuyez sur 🌙/]];
+    for (const [lang, q, expected] of cases) {
+      await page.selectOption('#langSelect', lang);
+      await page.click('#assistantFab');
+      const reply = await ask(page, q);
+      assert.match(await reply.textContent(), expected, lang);
+      await page.keyboard.press('Escape');
+    }
+    await page.selectOption('#langSelect', 'en');
+    await page.click('#assistantFab');
+    const reply = await ask(page, 'What are the pillars of prayer?');
+    assert.match(await reply.textContent(), /This content is available in Arabic/);
+    assert.match(await reply.textContent(), /Source: lesson “🏛️ Pillars of prayer”/);
+    await close(s);
+  });
+
+  for (const scheme of ['light', 'dark']) {
+    test(`axe: assistant dialog with answers (${scheme} theme)`, async () => {
+      const s = await open({ colorScheme: scheme, bypassCSP: true, storage: { theme: scheme } });
+      const { page } = s;
+      await page.click('#assistantFab');
+      await ask(page, 'ما حكم قراءة الفاتحة؟');
+      await ask(page, 'كيف أفعّل تنبيهات الصلاة؟');
+      assert.deepEqual(await axe(page, '#assistantModal'), []);
+      await close(s);
+    });
+  }
+
+  test('phone: the floating button is compact, does not overlap the back-to-top button, and the dialog fits', async () => {
+    const s = await open({ viewport: { width: 360, height: 740 } });
+    const { page } = s;
+    const fab = await page.locator('#assistantFab').boundingBox();
+    assert.ok(fab.width >= 40 && fab.height >= 40 && fab.width <= 60, `fab ${fab.width}×${fab.height}`);
+    await page.evaluate(() => window.scrollTo(0, 2000));
+    await page.waitForSelector('#topButton:not([hidden])');
+    const top = await page.locator('#topButton').boundingBox();
+    assert.ok(fab.x + fab.width <= top.x || top.x + top.width <= fab.x, 'no overlap');
+    await page.click('#assistantFab');
+    await ask(page, 'ما هي شروط الصلاة؟');
+    const overflow = await page.evaluate(() => { const d = document.getElementById('assistantModal'); return d.scrollWidth - d.clientWidth; });
+    assert.ok(overflow <= 0, `dialog overflow ${overflow}`);
+    await close(s);
+  });
+});
