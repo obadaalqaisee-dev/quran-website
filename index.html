@@ -74,12 +74,17 @@
   <link rel="modulepreload" href="assets/js/about.js">
   <link rel="modulepreload" href="assets/js/core/api.js">
   <link rel="modulepreload" href="assets/js/core/arabic.js">
+  <link rel="modulepreload" href="assets/js/core/backup.js">
+  <link rel="modulepreload" href="assets/js/core/challenge.js">
   <link rel="modulepreload" href="assets/js/core/dom.js">
   <link rel="modulepreload" href="assets/js/core/i18n.js">
+  <link rel="modulepreload" href="assets/js/core/insights.js">
+  <link rel="modulepreload" href="assets/js/core/listening-log.js">
   <link rel="modulepreload" href="assets/js/core/memorization-store.js">
   <link rel="modulepreload" href="assets/js/core/mic.js">
   <link rel="modulepreload" href="assets/js/core/modal.js">
   <link rel="modulepreload" href="assets/js/core/mushaf.js">
+  <link rel="modulepreload" href="assets/js/core/notes.js">
   <link rel="modulepreload" href="assets/js/core/quran.js">
   <link rel="modulepreload" href="assets/js/core/reading-log.js">
   <link rel="modulepreload" href="assets/js/core/recitation.js">
@@ -96,14 +101,18 @@
   <link rel="modulepreload" href="assets/js/data/scholar-resources.js">
   <link rel="modulepreload" href="assets/js/data/surahs.js">
   <link rel="modulepreload" href="assets/js/data/translations-ext.js">
+  <link rel="modulepreload" href="assets/js/data/translations-insights.js">
   <link rel="modulepreload" href="assets/js/data/translations.js">
   <link rel="modulepreload" href="assets/js/features/adhkar.js">
   <link rel="modulepreload" href="assets/js/features/ayah-search.js">
+  <link rel="modulepreload" href="assets/js/features/backup-panel.js">
   <link rel="modulepreload" href="assets/js/features/dashboard.js">
   <link rel="modulepreload" href="assets/js/features/favorites.js">
+  <link rel="modulepreload" href="assets/js/features/insights.js">
   <link rel="modulepreload" href="assets/js/features/islamic-search.js">
   <link rel="modulepreload" href="assets/js/features/learn.js">
   <link rel="modulepreload" href="assets/js/features/memorization.js">
+  <link rel="modulepreload" href="assets/js/features/notes.js">
   <link rel="modulepreload" href="assets/js/features/player.js">
   <link rel="modulepreload" href="assets/js/features/prayer.js">
   <link rel="modulepreload" href="assets/js/features/profile.js">
@@ -181,6 +190,7 @@
       <li><button type="button" data-open="donateModal"><span class="ico" aria-hidden="true">💖</span> <span data-i18n="side_donate">تبرع</span></button></li>
       <li><button type="button" data-open="contactModal"><span class="ico" aria-hidden="true">✉️</span> <span data-i18n="side_contact">تواصل معنا</span></button></li>
       <li><button type="button" data-open="settingsModal"><span class="ico" aria-hidden="true">⚙️</span> <span data-i18n="side_settings">الإعدادات</span></button></li>
+      <li><button type="button" data-open="notesModal"><span class="ico" aria-hidden="true">📝</span> <span data-i18n="notes_tool">ملاحظاتي</span></button></li>
       <li><a href="about.html" class="drawer-link"><span class="ico" aria-hidden="true">🕊️</span> <span data-i18n="side_about">من أنا</span></a></li>
     </ul>
   </dialog>
@@ -239,12 +249,16 @@
         <button type="button" class="tool-card" data-open="islamicSearchModal"><span class="tool-icon" aria-hidden="true">🔎</span><strong data-i18n="dash_btn_search">البحث الإسلامي</strong><small data-i18n="dash_btn_search_sub">آيات وأذكار ومحتوى الموقع</small></button>
         <button type="button" class="tool-card" data-open="profileModal"><span class="tool-icon" aria-hidden="true">👤</span><strong data-i18n="dash_btn_profile">حسابي</strong><small data-i18n="dash_btn_profile_sub">حفظ تقدمك على هذا الجهاز</small></button>
         <button type="button" class="tool-card" data-open="settingsModal"><span class="tool-icon" aria-hidden="true">⚙️</span><strong data-i18n="settings_title">الإعدادات</strong><small data-i18n="settings_sub">الخط، القارئ، الأهداف، التنبيهات</small></button>
+        <button type="button" class="tool-card" data-open="notesModal"><span class="tool-icon" aria-hidden="true">📝</span><strong data-i18n="notes_tool">ملاحظاتي</strong><small data-i18n="notes_tool_sub">آيات صنّفتها وكتبت عنها</small></button>
       </div>
       <div class="container journey">
         <h2 class="sub-title" data-i18n="journey_title">🌿 رحلتي اليومية</h2>
         <div id="journeyGrid" class="journey-grid" aria-live="polite"></div>
         <h2 class="sub-title" data-i18n="companion_title">☀️ رفيقك اليومي</h2>
         <div id="companionGrid" class="companion-grid"></div>
+        <h2 class="sub-title" id="insightsTitle" data-i18n="insights_title">📊 بصيرة: تحليل تقدمك</h2>
+        <p class="small muted insights-intro" data-i18n="insights_intro">تُحسب هذه الأرقام من نشاطك المحفوظ على هذا الجهاز فقط، ولا تُرسل إلى أي خادم.</p>
+        <div id="insightsGrid" class="insights-grid" aria-labelledby="insightsTitle"></div>
       </div>
     </section>
 
@@ -472,7 +486,24 @@
               <strong id="translationLabel">English Translation:</strong>
               <p id="translationText" dir="ltr">Loading...</p>
             </div>
-            <button class="btn btn-primary btn-small" type="button" id="saveBookmarkBtn" data-i18n="btn_save_bookmark">🔖 حفظ كآخر قراءة</button>
+            <div class="details-actions">
+              <button class="btn btn-primary btn-small" type="button" id="saveBookmarkBtn" data-i18n="btn_save_bookmark">🔖 حفظ كآخر قراءة</button>
+              <button class="btn btn-soft btn-small" type="button" id="ayahNoteBtn" aria-controls="ayahNoteForm" aria-expanded="false" data-i18n="notes_btn_add">📝 ملاحظة وتصنيف</button>
+            </div>
+            <form id="ayahNoteForm" class="note-form" hidden>
+              <label class="field-label" for="ayahNoteCollection" data-i18n="notes_collection">المجموعة</label>
+              <div class="note-form-row">
+                <select id="ayahNoteCollection" class="reciter-select reciter-select--compact"></select>
+                <button class="btn btn-soft btn-small" type="button" id="ayahNoteNewCol" data-i18n="notes_new_collection">＋ مجموعة جديدة</button>
+              </div>
+              <label class="field-label" for="ayahNoteText" data-i18n="notes_text">ملاحظتك (اختيارية، تبقى على جهازك)</label>
+              <textarea id="ayahNoteText" rows="3"></textarea>
+              <div class="note-form-row">
+                <span class="small muted" id="ayahNoteCount" aria-live="off"></span>
+                <button class="btn btn-primary btn-small" type="submit" data-i18n="notes_save">حفظ</button>
+                <button class="btn btn-soft btn-small" type="button" id="ayahNoteRemove" data-i18n="notes_remove" hidden>إزالة</button>
+              </div>
+            </form>
           </aside>
         </article>
       </div>
@@ -767,6 +798,37 @@
       <span data-i18n="profile_notify">🔔 تنبيه قبل الصلاة</span>
       <button class="btn btn-soft btn-small" type="button" id="notifyBtn" data-i18n="profile_notify_btn">تفعيل الإشعارات</button>
     </div>
+    <section class="backup-box" aria-labelledby="backupTitle">
+      <h3 class="backup-title" id="backupTitle" data-i18n="backup_title">💾 نسخة احتياطية لبياناتك</h3>
+      <p class="small muted" data-i18n="backup_desc">تقدمك محفوظ في هذا المتصفح فقط. احفظه في ملف لتنقله إلى جهاز آخر أو تستعيده بعد مسح بيانات المتصفح. لا يُرفع الملف إلى أي مكان.</p>
+      <div class="profile-actions">
+        <button class="btn btn-soft btn-small" type="button" id="backupExport" data-i18n="backup_export">⬇ حفظ نسخة احتياطية</button>
+        <label class="btn btn-soft btn-small file-btn"><span data-i18n="backup_import">⬆ استعادة من ملف</span><input type="file" id="backupImport" accept="application/json,.json" class="visually-hidden"></label>
+      </div>
+      <p class="small" id="backupStatus" role="status"></p>
+    </section>
+  </dialog>
+
+  <!-- Ayah notes and collections -->
+  <dialog id="notesModal" class="modal modal--wide" aria-labelledby="notesTitle">
+    <button class="icon-btn close-btn" type="button" data-close data-i18n-aria-label="close" aria-label="إغلاق"><span aria-hidden="true">✖</span></button>
+    <h2 class="modal-title" id="notesTitle" data-i18n="notes_title">📝 ملاحظاتي ومجموعاتي</h2>
+    <p class="small muted" data-i18n="notes_intro">اضغط على أي آية في وضع القراءة ثم «📝 ملاحظة وتصنيف» لتضيفها إلى مجموعة وتكتب ملاحظتك. تبقى الملاحظات على هذا الجهاز.</p>
+    <div class="notes-toolbar">
+      <label class="field field--inline"><span class="field-label" data-i18n="notes_filter">المجموعة</span>
+        <select id="notesFilter" class="reciter-select reciter-select--compact"></select></label>
+      <label class="field field--inline"><span class="field-label" data-i18n="notes_search">بحث في الملاحظات</span>
+        <input type="search" id="notesSearch" maxlength="60" enterkeyhint="search"></label>
+      <button class="btn btn-soft btn-small" type="button" id="notesExport" data-i18n="notes_export">⬇ تصدير كنص</button>
+    </div>
+    <ul id="notesList" class="notes-list" aria-live="polite"></ul>
+    <form id="notesNewCollection" class="notes-new">
+      <label class="field-label" for="notesNewCollectionName" data-i18n="notes_new_collection_label">إنشاء مجموعة جديدة</label>
+      <div class="note-form-row">
+        <input id="notesNewCollectionName" maxlength="40" required>
+        <button class="btn btn-soft btn-small" type="submit" data-i18n="notes_create">إنشاء</button>
+      </div>
+    </form>
   </dialog>
 
   <!-- Settings -->

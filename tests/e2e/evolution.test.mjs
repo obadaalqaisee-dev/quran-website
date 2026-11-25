@@ -55,8 +55,9 @@ describe('navigation', () => {
     }
     await page.click('.nav-links a[href="#learnSection"]');
     await page.waitForFunction(() => Math.abs(document.getElementById('learnSection').getBoundingClientRect().top) < 200);
-    // Original six items − «تعلم الصلاة» (moved to the academy) + settings + «من أنا».
-    assert.equal(await page.locator('#sideMenu .drawer-links li').count(), 7);
+    // Original six items − «تعلم الصلاة» (moved to the academy) + settings + «من أنا» + «ملاحظاتي» (innovation phase).
+    assert.equal(await page.locator('#sideMenu .drawer-links li').count(), 8);
+    assert.equal(await page.locator('#sideMenu [data-open="notesModal"]').count(), 1);
     await page.click('.menu-btn');
     await page.locator('#sideMenu').getByText('الإعدادات', { exact: true }).click();
     assert.ok(await page.locator('#settingsModal').evaluate((d) => d.open));
