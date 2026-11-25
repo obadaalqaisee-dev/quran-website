@@ -61,8 +61,8 @@ The network for this run allowed the site's real upstream services, so the live 
 | Backend pytest | 106 passed | **107 passed**, 0 failed (1 new: rate-limiter memory bound) |
 | ruff · pip-audit | clean · no known vulnerabilities | clean · no known vulnerabilities |
 | Database: `alembic upgrade head` → `seed` → `verify` (fresh SQLite) | — | passed (114 surahs, 6,236 ayahs, 24,944 edition texts, 16 reciters, 36 adhkar) |
-| Frontend unit (`node:test`) | 37 passed | **52 passed**, 0 failed (15 new in `innovation.test.mjs`) |
-| Playwright end-to-end | 101 passed, 2 skipped | **117 passed, 0 failed**, 1 skipped (`live.test.mjs` without `LIVE_URL`); 16 new in `innovation.test.mjs`. The live-Aladhan proxy test now runs and passes. |
+| Frontend unit (`node:test`) | 37 passed | **56 passed**, 0 failed (19 new in `innovation.test.mjs`, including the site assistant) |
+| Playwright end-to-end | 101 passed, 2 skipped | **125 passed, 0 failed**, 1 skipped (`live.test.mjs` without `LIVE_URL`); 24 new in `innovation.test.mjs` (8 for the site assistant). The live-Aladhan proxy test now runs and passes. |
 | Live test, the current GitHub Pages site (`main`), real network | — | passed |
 | Live test, **this branch** on a local static server, real network (real Quran text, tafsir, audio, prayer times) | — | passed |
 
@@ -70,8 +70,8 @@ Changes to existing tests (none removed, skipped or weakened):
 
 * `about.test.mjs`: the shipped-media test now expects the new nasheed «أبداً لا لن نحيد» (title, performers, src,
   4:33 duration), and checks that the old title is no longer shown.
-* `evolution.test.mjs`: the side menu has one more entry («📝 ملاحظاتي»), so the expected count went from 7 to 8. The
-  test also asserts that the new entry exists.
+* `evolution.test.mjs`: the side menu has two more entries («📝 ملاحظاتي» and «💬 المساعد»), so the expected count went
+  from 7 to 9. The test also asserts that both new entries exist.
 
 ## Results (2026-11-23, reorganisation and «من أنا», `feature/reorganization-about-page`)
 

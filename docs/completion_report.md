@@ -146,7 +146,9 @@ Full write-up: [`innovation_phase.md`](innovation_phase.md).
     order, weak ayahs, missed words, accuracy trend);
   * ayah notes and collections, with a text export;
   * backup and restore of all local data;
-  * a daily question drawn from the existing lesson quizzes.
+  * a daily question drawn from the existing lesson quizzes;
+  * a site assistant («💬 المساعد»): help for every feature, and Islamic answers only from the verified content, with
+    sources, no AI model, and no fatwas.
 * **Replaced at the owner's request:** the «من أنا» nasheed is now «أبداً لا لن نحيد». The recording's rights are
   not stated by its source, and the owner accepted that (see `about_page.md` §2).
 * **Fixed:**
@@ -155,7 +157,7 @@ Full write-up: [`innovation_phase.md`](innovation_phase.md).
   * an unbounded rate-limiter table in the backend;
   * an unlabelled form field caught by axe during development.
 * **Removed:** nothing, apart from the replaced audio file.
-* **Tests:** pytest 107 · unit 52 · e2e 117 passed (1 skipped: live without `LIVE_URL`). Live tests passed against
+* **Tests:** pytest 107 · unit 56 · e2e 125 passed (1 skipped: live without `LIVE_URL`). Live tests passed against
   both production and this branch.
 * **Remaining limitations:**
   * Only Chromium is automated.

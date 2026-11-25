@@ -93,6 +93,35 @@ source lesson, which holds the explanation and references.
 The surah player and the per-ayah player count real playing time per day and per reciter (`listeningLog`, 90 days).
 The count is flushed every 30 s, on pause and when the page is hidden.
 
+### Site assistant («💬 مساعد الموقع»), added at the owner's request
+
+There is a floating «💬 المساعد» button on every screen, plus entries in the side menu and on the dashboard. The
+assistant runs entirely in the browser. **No AI model, no account, no API key and no network request is used for
+its answers.**
+
+* **Using the site:** 26 help topics in four languages, including reading, listening, repetition, tafsir,
+  memorisation, the microphone, revisions, bookmarks, notes, prayer times, notifications, adhkar, rosary,
+  prayer learning, academy, search, settings, dark mode, language, insights, backup, favourites, installation,
+  sleep timer and wird. Each topic has step-by-step instructions that use the interface's real button names, and a
+  «خذني إليها» button that opens the feature.
+* **Islamic questions:** answered **only** with passages that already exist in the site's verified content, each
+  with its source and a button to open it:
+  * the prayer curriculum and academy lessons, including their reviewed quiz answers;
+  * Hisn al-Muslim;
+  * «رسالة الإسلام».
+
+  Passages are ranked by matched terms (Arabic light stemming, stop words, at least half of the question's terms).
+  The assistant never composes text. When nothing in the content answers, it says so plainly, refers the visitor to
+  scholars, and offers a search of the Quran text instead.
+* **Rulings:** questions asking for a ruling (حكم، يجوز، حلال، حرام، فتوى…) always carry a notice that the site issues
+  no fatwas and that the visitor should ask a trusted scholar or the official fatwa body.
+* **Checks:** a unit test checks that every passage the assistant can show is verbatim text from the data modules,
+  and that every help topic exists in four languages and points to an element that exists. Typed questions are
+  rendered as text.
+* **Why not an AI model (option B, deferred):** GitHub Pages cannot hide an API key, and a model can misquote a
+  hadith or ruling. The architecture allows adding one later through the optional backend, restricted to these same
+  passages with citations, with this local assistant as the fallback.
+
 ### Reliability fixes found during the work
 
 * **A memorisation-history entry without a date crashed the start-up** (`features/memorization.js`). Every feature
@@ -126,13 +155,13 @@ storage keys untouched"* (e2e) and *"original storage keys are unchanged"* (unit
 
 ## 6. Files
 
-New: `assets/js/core/{insights,listening-log,notes,backup,challenge}.js`,
-`assets/js/features/{insights,notes,backup-panel}.js`, `assets/js/data/translations-insights.js`,
+New: `assets/js/core/{insights,listening-log,notes,backup,challenge,assistant}.js`,
+`assets/js/features/{insights,notes,backup-panel,assistant}.js`, `assets/js/data/translations-{insights,assistant}.js`,
 `assets/audio/abadan-la-lan-nahid.mp3`, `tests/unit/innovation.test.mjs`, `tests/e2e/innovation.test.mjs`, this
 document.
 
 Changed: `index.html` (insights section, notes button, editor and dialog, backup section, side-menu and dashboard
-entries, module preloads), `about.html` (preload), `sw.js` (precache list, `VERSION` v3.2.0),
+entries, module preloads), `about.html` (preload), `sw.js` (precache list, `VERSION` v3.3.0),
 `assets/css/main.css` (§19), `assets/js/main.js`, `core/storage.js`, `core/memorization-store.js`,
 `features/{reader,voice-lab,dashboard,memorization}.js`, `data/{translations,about-media}.js`,
 `backend/app/core/rate_limit.py`, `backend/tests/test_security.py`, `tests/e2e/about.test.mjs`, the docs.

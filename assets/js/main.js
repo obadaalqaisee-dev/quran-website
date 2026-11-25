@@ -19,6 +19,7 @@ import { initTheme } from './features/theme.js';
 import { initLearn } from './features/learn.js';
 import { initMemorization, notifyMemoChange, onMemoChange } from './features/memorization.js';
 import { initVoiceLab, practiceAyah, startRevision } from './features/voice-lab.js';
+import { initAssistant } from './features/assistant.js';
 import { initBackupPanel } from './features/backup-panel.js';
 import { initInsights } from './features/insights.js';
 import { initNotes } from './features/notes.js';
@@ -115,6 +116,7 @@ function boot() {
   }));
   safely('initNotes', () => initNotes({ readSurah: (n, index) => readSurah(n, index, { play: false }) }));
   safely('initBackupPanel', () => initBackupPanel());
+  safely('initAssistant', () => initAssistant({ readSurah: openReader, openPlan }));
   safely('trackAudio', () => trackAudio(document.getElementById('audioPlayer'), () => document.getElementById('reciterSelect').value));
   safely('trackAudio', () => trackAudio(document.getElementById('ayahPlayer'), () => 'ayah'));
   welcome();
