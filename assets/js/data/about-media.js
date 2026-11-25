@@ -17,14 +17,20 @@ export const ABOUT_MEDIA = Object.freeze({
     sourceUrl: 'https://commons.wikimedia.org/wiki/File:Jerusalem-2013-Temple_Mount-Dome_of_the_Rock_%26_Chain_02.jpg',
   }),
   nasheed: Object.freeze({
-    // نشيد «يا ذاكر الأصحاب كن متأدباً» (3:09, MP3 128 kbps), from the Internet Archive item below,
-    // whose description gives the full lyrics of this nasheed.
-    src: 'assets/audio/ya-dhakir-al-ashab.mp3',
-    firstLine: 'يا ذاكر الأصحاب كن متأدباً واعرف عظيم منازل الأصحابِ',
-    title: 'نشيد يا ذاكر الأصحاب كن متأدباً',
-    performer: '',
-    license: 'Internet Archive (audio_islamic)',
-    sourceUrl: 'https://archive.org/details/ya-dakera-ass7abi',
+    // نشيد «أبداً لا لن نحيد» (track 5 «جند الله» of the album «وأعدوا 2», تسجيلات الإسراء – الكويت;
+    // performed by عبدالله الكندري and صباح عنان; 4:33, MP3 128 kbps). The file is byte-identical to the
+    // Internet Archive copy below (MD5 40374cad3619ef30d6ae0dab9d99d2c1). Its ID3 tag reads «©2002 Enshad.com»;
+    // no licence is stated by the upload, and the site owner chose to use it on their own responsibility
+    // (replacing «يا ذاكر الأصحاب كن متأدباً», at the owner's request). See docs/about_page.md §2.
+    src: 'assets/audio/abadan-la-lan-nahid.mp3',
+    firstLine: 'أبداً لا لن نحيد',
+    title: 'نشيد أبداً لا لن نحيد',
+    performer: 'عبدالله الكندري وصباح عنان',
+    album: 'وأعدوا 2 — تسجيلات الإسراء (الكويت)',
+    copyright: '©2002 Enshad.com',
+    license: 'No licence stated; used at the site owner\'s decision (Internet Archive community upload)',
+    sourceUrl: 'https://archive.org/details/wa-a-3do-2',
+    md5: '40374cad3619ef30d6ae0dab9d99d2c1',
   }),
 });
 

@@ -1,7 +1,8 @@
 // The «من أنا» page (about.html), the rosary in Hisn al-Muslim, and the prayer lesson migrated into the
 // academy. The site is served like GitHub Pages; third-party APIs are answered from the verified datasets.
 //
-// Media: the page ships a photograph of the Dome of the Rock and the nasheed «يا ذاكر الأصحاب كن متأدباً»,
+// Media: the page ships a photograph of the Dome of the Rock and the nasheed «أبداً لا لن نحيد» (it replaced
+// «يا ذاكر الأصحاب كن متأدباً» at the site owner's request),
 // both local files configured in about-media.js. The tests play the real files.
 
 import assert from 'node:assert/strict';
@@ -100,7 +101,7 @@ describe('«من أنا» page', () => {
     }
   });
 
-  test('shipped media: the Dome of the Rock photograph and the nasheed «يا ذاكر الأصحاب كن متأدباً» load', async () => {
+  test('shipped media: the Dome of the Rock photograph and the nasheed «أبداً لا لن نحيد» load', async () => {
     const s = await open(allowAutoplay);
     const { page } = s;
     await page.waitForFunction(() => { const i = document.getElementById('aqsaImage'); return i.complete && i.naturalWidth > 0; });
@@ -109,13 +110,14 @@ describe('«من أنا» page', () => {
     assert.equal(await page.getAttribute('#aqsaImage', 'alt'), 'قبة الصخرة المشرفة في المسجد الأقصى المبارك');
     assert.equal(await text(page, '.about-photo-label'), 'قبة الصخرة المشرفة · المسجد الأقصى المبارك');
     assert.equal(await page.getAttribute('#aqsaCredit a', 'href'), 'https://commons.wikimedia.org/wiki/File:Jerusalem-2013-Temple_Mount-Dome_of_the_Rock_%26_Chain_02.jpg');
-    assert.equal(await text(page, '#nasheedLine'), 'يا ذاكر الأصحاب كن متأدباً واعرف عظيم منازل الأصحابِ');
-    assert.match(await text(page, '#nasheedMeta'), /يا ذاكر الأصحاب كن متأدباً/);
-    assert.equal(await page.getAttribute('#nasheedAudio', 'src'), 'assets/audio/ya-dhakir-al-ashab.mp3');
-    // The audio file loads: its real duration (3:09) is read from the file.
+    assert.equal(await text(page, '#nasheedLine'), 'أبداً لا لن نحيد');
+    assert.equal(await text(page, '#nasheedMeta'), 'نشيد أبداً لا لن نحيد — عبدالله الكندري وصباح عنان');
+    assert.doesNotMatch(await text(page, '.nasheed-card'), /يا ذاكر الأصحاب/, 'the previous nasheed is no longer shown');
+    assert.equal(await page.getAttribute('#nasheedAudio', 'src'), 'assets/audio/abadan-la-lan-nahid.mp3');
+    // The audio file loads: its real duration (4:33) is read from the file.
     await page.waitForFunction(() => document.getElementById('nasheedAudio').readyState >= 1);
-    assert.ok(Math.abs((await page.evaluate(() => document.getElementById('nasheedAudio').duration)) - 189.7) < 1);
-    assert.equal(await text(page, '#nasheedDuration'), '3:09');
+    assert.ok(Math.abs((await page.evaluate(() => document.getElementById('nasheedAudio').duration)) - 273.4) < 1);
+    assert.equal(await text(page, '#nasheedDuration'), '4:33');
     assert.notEqual(await state(page), 'unavailable');
     assert.doesNotMatch(await text(page, '.nasheed-card'), /لم يُضف/);
     assert.ok(!(await page.isDisabled('#nasheedPlay')));
