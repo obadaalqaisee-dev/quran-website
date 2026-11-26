@@ -253,7 +253,7 @@
         <button type="button" class="tool-card" data-open="islamicSearchModal"><span class="tool-icon" aria-hidden="true">🔎</span><strong data-i18n="dash_btn_search">البحث الإسلامي</strong><small data-i18n="dash_btn_search_sub">آيات وأذكار ومحتوى الموقع</small></button>
         <button type="button" class="tool-card" data-open="profileModal"><span class="tool-icon" aria-hidden="true">👤</span><strong data-i18n="dash_btn_profile">حسابي</strong><small data-i18n="dash_btn_profile_sub">حفظ تقدمك على هذا الجهاز</small></button>
         <button type="button" class="tool-card" data-open="settingsModal"><span class="tool-icon" aria-hidden="true">⚙️</span><strong data-i18n="settings_title">الإعدادات</strong><small data-i18n="settings_sub">الخط، القارئ، الأهداف، التنبيهات</small></button>
-        <button type="button" class="tool-card" data-open="assistantModal"><span class="tool-icon" aria-hidden="true">💬</span><strong data-i18n="asst_open">المساعد</strong><small data-i18n="asst_tool_sub">كيف تستخدم الموقع، وأسئلة من دروسه</small></button>
+        <button type="button" class="tool-card" data-open="assistantModal"><span class="tool-icon" aria-hidden="true">💬</span><strong data-i18n="asst_open">المساعد</strong><small data-i18n="asst_tool_sub">اسأل عن الموقع أو عن الإسلام</small></button>
         <button type="button" class="tool-card" data-open="notesModal"><span class="tool-icon" aria-hidden="true">📝</span><strong data-i18n="notes_tool">ملاحظاتي</strong><small data-i18n="notes_tool_sub">آيات صنّفتها وكتبت عنها</small></button>
       </div>
       <div class="container journey">
@@ -815,7 +815,8 @@
     </section>
   </dialog>
 
-  <!-- Site assistant: site help + answers from the verified content (no AI model, no network for answers) -->
+  <!-- Site assistant: a conversational guide to the site and to Islam, answering only from reviewed content
+       with its sources (no AI model, no API, nothing typed is sent or stored). -->
   <dialog id="assistantModal" class="modal modal--wide assistant" aria-labelledby="assistantTitle">
     <button class="icon-btn close-btn" type="button" data-close data-i18n-aria-label="close" aria-label="إغلاق"><span aria-hidden="true">✖</span></button>
     <h2 class="modal-title" id="assistantTitle" data-i18n="asst_title">💬 مساعد الموقع</h2>
@@ -826,9 +827,10 @@
     </div>
     <form id="assistantForm" class="asst-form">
       <label class="visually-hidden" for="assistantInput" data-i18n="asst_input_label">اكتب سؤالك</label>
-      <input type="search" id="assistantInput" maxlength="300" autocomplete="off" enterkeyhint="send" placeholder="مثال: كيف أسمّع سورة؟ أو ما هي شروط الصلاة؟" data-i18n-placeholder="asst_placeholder">
+      <input type="search" id="assistantInput" maxlength="300" autocomplete="off" enterkeyhint="send" dir="auto" placeholder="اكتب رسالتك… مثل: كيف أبدأ بحفظ القرآن؟" data-i18n-placeholder="asst_placeholder">
       <button class="btn btn-primary" type="submit" data-i18n="asst_send">اسأل</button>
     </form>
+    <div class="asst-tools"><button type="button" id="assistantReset" class="link-btn small" data-i18n="asst_reset">🧹 محادثة جديدة</button></div>
   </dialog>
 
   <!-- Ayah notes and collections -->
