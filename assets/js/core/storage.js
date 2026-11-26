@@ -30,6 +30,11 @@ export const KEYS = Object.freeze({
   notes: 'ayahNotes', // { v, items: [{ surah, ayah, collection, note, updated }], custom } (core/notes.js)
   khatma: 'khatmaPlan', // { target: 'YYYY-MM-DD', start: 'YYYY-MM-DD' } khatma planner
   challenge: 'dailyChallenge', // { days: { date: { q, ok } } } daily knowledge challenge
+  // Added by the platform transformation (new keys only; none of the keys above changed):
+  sidebar: 'sidebarState', // { collapsed, groups: { id: open } } sidebar layout (features/sidebar.js)
+  journey: 'quranJourney', // Quran Journey paths, steps, goals and history (core/journey.js)
+  reminders: 'journeyReminders', // { id: { on, time, last } } gentle daily reminders (core/reminders.js)
+  recentRead: 'recentSurahs', // [surah numbers] surahs opened in the reader, newest first (features/home.js)
 });
 
 // Keys removed by "reset my data" (the original reset exactly these four).

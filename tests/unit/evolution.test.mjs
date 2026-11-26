@@ -248,18 +248,23 @@ test('ayah references are parsed in Arabic, English and numeric forms', async ()
 });
 
 // ------------------------------------------------------------------ links and assets
-test('every internal link, dialog opener, local asset and precached file exists', () => {
+test('every internal link, dialog opener, local asset and precached file exists', async () => {
+  const { parseHash } = await import('../../assets/js/core/routes.js');
   const html = read('index.html');
   const ids = new Set([...html.matchAll(/\sid="([^"]+)"/g)].map((m) => m[1]));
-  for (const [, target] of html.matchAll(/href="#([^"]*)"/g)) assert.ok(target === '' || ids.has(target), `#${target}`);
-  for (const [, target] of html.matchAll(/data-open="([^"]+)"/g)) assert.match(html, new RegExp(`<dialog[^>]*id="${target}"`), target);
+  // Hash links are either in-page anchors or page routes ("#/quran"), which must name an existing page.
+  const pages = new Set([...html.matchAll(/data-page="([^"]+)"/g)].map((m) => m[1]));
+  const isRoute = (target) => { const r = parseHash(`#${target}`); return !r.anchor && !r.unknown && pages.has(r.page); };
+  for (const [, target] of html.matchAll(/href="#([^"]*)"/g)) assert.ok(target === '' || ids.has(target) || isRoute(target), `#${target}`);
+  // "sideMenu" (the old drawer) is now an alias that opens the sidebar.
+  for (const [, target] of html.matchAll(/data-open="([^"]+)"/g)) if (target !== 'sideMenu') assert.match(html, new RegExp(`<dialog[^>]*id="${target}"`), target);
   for (const [, attr] of html.matchAll(/\s(?:src|href)="([^"#:][^"]*)"/g)) {
     if (/^(https?:|mailto:|data:)/.test(attr) || attr === './') continue;
     assert.ok(existsSync(new URL(attr, REPO)), attr);
   }
   const manifest = JSON.parse(read('manifest.json'));
   for (const icon of manifest.icons) assert.ok(existsSync(new URL(icon.src, REPO)), icon.src);
-  for (const s of manifest.shortcuts) assert.ok(ids.has(s.url.split('#')[1]), s.url);
+  for (const s of manifest.shortcuts) assert.ok(ids.has(s.url.split('#')[1]) || isRoute(s.url.split('#')[1]), s.url);
   const sw = read('sw.js');
   const list = sw.slice(sw.indexOf('const SHELL_FILES = ['), sw.indexOf('];', sw.indexOf('const SHELL_FILES = [')));
   const files = [...list.matchAll(/'([^']+)'/g)].map((m) => m[1]).filter((f) => f !== './');

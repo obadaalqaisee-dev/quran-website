@@ -57,6 +57,11 @@
       "url": "./index.html#learnSection"
     },
     {
+      "name": "رحلتي مع القرآن",
+      "short_name": "رحلتي",
+      "url": "./index.html#/journey"
+    },
+    {
       "name": "أكاديمية القرآن",
       "short_name": "الأكاديمية",
       "url": "./index.html#academySection"

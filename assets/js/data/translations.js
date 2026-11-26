@@ -4,6 +4,7 @@
 import { EXTRA } from './translations-ext.js';
 import { INSIGHTS } from './translations-insights.js';
 import { ASSISTANT } from './translations-assistant.js';
+import { PLATFORM } from './translations-platform.js';
 
 export const translations = {
   "ar": {
@@ -971,9 +972,10 @@ export const translations = {
 export const LANGUAGES = ['ar', 'en', 'es', 'fr'];
 
 // Strings added by the platform evolution (translations-ext.js). Existing keys are never overwritten.
-// Strings added by the innovation phase (translations-insights.js, translations-assistant.js) are merged the same way.
+// Strings added by the innovation phase (translations-insights.js, translations-assistant.js) and by the platform
+// transformation (translations-platform.js) are merged the same way.
 for (const lang of LANGUAGES) {
-  for (const [key, value] of [...Object.entries(EXTRA[lang] || {}), ...Object.entries(INSIGHTS[lang] || {}), ...Object.entries(ASSISTANT[lang] || {})]) {
+  for (const [key, value] of [...Object.entries(EXTRA[lang] || {}), ...Object.entries(INSIGHTS[lang] || {}), ...Object.entries(ASSISTANT[lang] || {}), ...Object.entries(PLATFORM[lang] || {})]) {
     if (!(key in translations[lang])) translations[lang][key] = value;
   }
 }

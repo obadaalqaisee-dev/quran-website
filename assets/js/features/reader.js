@@ -52,7 +52,7 @@ function ayahNode(ayah, index) {
  * Open a surah. `scrollToAyahIndex` plays and shows that ayah (original behaviour);
  * with { play: false } it is only scrolled into view (juz / page navigation).
  */
-export async function readSurah(number, scrollToAyahIndex = null, { play = true } = {}) {
+export async function readSurah(number, scrollToAyahIndex = null, { play = true, details = false } = {}) {
   const n = Number(number);
   if (!(n >= 1 && n <= 114)) return;
   stopRange();
@@ -83,6 +83,7 @@ export async function readSurah(number, scrollToAyahIndex = null, { play = true 
     if (scrollToAyahIndex !== null && scrollToAyahIndex >= 0 && scrollToAyahIndex < data.ayahs.length) {
       requestAnimationFrame(() => {
         if (play) playAyah(scrollToAyahIndex);
+        else if (details) playAyah(scrollToAyahIndex, { audio: false }); // tafsir page: show the details, no sound
         else scrollIntoViewSmart(document.getElementById(`ayah-${scrollToAyahIndex}`), 'center');
         renderPosition(scrollToAyahIndex);
       });
@@ -122,7 +123,7 @@ async function loadDetails() {
   }
 }
 
-export function playAyah(index) {
+export function playAyah(index, { audio = true } = {}) {
   const ayah = state.ayahs[index];
   const span = document.getElementById(`ayah-${index}`);
   if (!ayah || !span) return;
@@ -130,10 +131,12 @@ export function playAyah(index) {
   for (const s of el.text.querySelectorAll('.active-ayah')) s.classList.remove('active-ayah');
   span.classList.add('active-ayah');
 
-  pauseSurah();
-  el.ayahAudio.src = AYAH_AUDIO(ayah.id);
-  el.ayahAudio.loop = el.loopCheck.checked && !state.range;
-  el.ayahAudio.play().catch(() => {});
+  if (audio) {
+    pauseSurah();
+    el.ayahAudio.src = AYAH_AUDIO(ayah.id);
+    el.ayahAudio.loop = el.loopCheck.checked && !state.range;
+    el.ayahAudio.play().catch(() => {});
+  }
 
   span.after(el.details); // show tafsir and translation right under the ayah (original behaviour)
   el.details.hidden = false;

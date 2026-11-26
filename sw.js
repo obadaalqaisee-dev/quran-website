@@ -7,7 +7,7 @@
  * - Audio is never intercepted (range requests must go straight to the media servers).
  * - Prayer times and audio look-ups are never cached here (they are time/location dependent).
  */
-const VERSION = 'v3.3.0';
+const VERSION = 'v4.0.0';
 const SHELL = `shell-${VERSION}`;
 const DATA = 'quran-data-v1';
 const DATA_LIMIT = 300;
@@ -39,6 +39,7 @@ const SHELL_FILES = [
   'assets/js/core/assistant.js', 'assets/js/features/assistant.js', 'assets/js/data/translations-assistant.js',
   'assets/js/core/backup.js', 'assets/js/core/challenge.js', 'assets/js/core/insights.js', 'assets/js/core/listening-log.js',
   'assets/js/core/notes.js', 'assets/js/features/backup-panel.js', 'assets/js/features/insights.js', 'assets/js/features/notes.js',
+  'assets/js/core/routes.js', 'assets/js/core/router.js', 'assets/js/core/conversation.js', 'assets/js/core/journey.js', 'assets/js/core/reminders.js', 'assets/js/features/sidebar.js', 'assets/js/features/home.js', 'assets/js/features/journey.js', 'assets/js/data/assistant-kb.js', 'assets/js/data/islamic-kb.js', 'assets/js/data/journey-paths.js', 'assets/js/data/translations-platform.js',
   'about.html', 'assets/js/about.js', 'assets/js/data/about-media.js', 'assets/img/about/dome-of-the-rock.webp',
 ];
 

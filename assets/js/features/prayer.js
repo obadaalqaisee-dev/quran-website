@@ -49,6 +49,7 @@ function renderGrid() {
     class: `prayer-card${next?.key === key ? ' next' : ''}`,
     attrs: next?.key === key ? { 'aria-current': 'time' } : {},
   }, h('h3', { text: prayerLabel(key) }), h('p', { dir: 'ltr', text: formatTime(state.data.timings[key]) }))));
+  document.dispatchEvent(new CustomEvent('prayerupdate')); // the home page's compact list follows the grid
 }
 
 function renderHeader() {
@@ -191,5 +192,9 @@ export function initPrayer() {
 
 /** Next prayer for the dashboard: { key, time } or null while loading. */
 export const upcomingPrayer = () => (state.data ? nextPrayer(state.data.timings) : null);
+
+/** Today's timings and Hijri date as loaded for the prayer page ({ timings, hijri }), or null while loading. */
+export const prayerData = () => state.data;
+export const PRAYER_KEYS = PRAYERS;
 
 export const _prayerState = state; // for tests

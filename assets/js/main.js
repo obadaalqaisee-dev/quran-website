@@ -25,6 +25,18 @@ import { initInsights } from './features/insights.js';
 import { initNotes } from './features/notes.js';
 import { trackAudio } from './core/listening-log.js';
 import { initWird, setWird } from './features/wird.js';
+// Added by the platform transformation: multi-page navigation, sidebar, home dashboard, Quran Journey.
+import { setRevealHandler } from './core/dom.js';
+import { bindPageDialogs } from './core/modal.js';
+import { currentPage, initRouter, navigate, registerRouteAction, revealElement } from './core/router.js';
+import { PAGE_DIALOGS } from './core/routes.js';
+import { initSidebar, openSidebar } from './features/sidebar.js';
+import { initHome } from './features/home.js';
+import { initJourney, refreshJourney, showJourney } from './features/journey.js';
+import { askAssistant } from './features/assistant.js';
+import { openTasbeeh } from './features/adhkar.js';
+import { openLesson } from './features/learn.js';
+import { getJSON, KEYS } from './core/storage.js';
 
 function initLanguageSelect() {
   const select = document.getElementById('langSelect');
@@ -34,7 +46,7 @@ function initLanguageSelect() {
 
 function initTopButton() {
   const button = document.getElementById('topButton');
-  const hero = document.getElementById('home');
+  const hero = document.getElementById('topSentinel') || document.getElementById('home');
   button.addEventListener('click', () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
     document.getElementById('main').focus({ preventScroll: true });
@@ -72,18 +84,23 @@ function safely(name, start) {
 function boot() {
   setLanguage(initialLanguage(), { persist: false });
   initDialogs();
+  // Pages: dialogs that became pages navigate there; scrolling to an element on another page shows that page.
+  bindPageDialogs(PAGE_DIALOGS, navigate, currentPage);
+  setRevealHandler(revealElement);
+  safely('initSidebar', () => initSidebar());
   initTheme();
   initLanguageSelect();
   initTopButton();
   hideBrokenHero();
 
   // Surah actions are shared by several features.
-  const openReader = (n, ayahIndex = null) => readSurah(n, ayahIndex);
+  const openReader = (n, ayahIndex = null, opts) => readSurah(n, ayahIndex, opts);
   safely('initPlayer', () => initPlayer());
   safely('initReader', () => initReader({
     onBookmark: () => {
       setWird('quran', true, { announce: false }); // saving a bookmark completes the Quran wird (as before)
       renderBookmarkBanner();
+      document.dispatchEvent(new CustomEvent('bookmarkchange'));
     },
   }));
   safely('initSurahList', () => initSurahList({ playSurah, readSurah: openReader }));
@@ -105,6 +122,7 @@ function boot() {
   safely('initSettingsPanel', () => initSettingsPanel({ onMemoGoalChange: notifyMemoChange }));
   safely('initDashboard', () => initDashboard({ readSurah: openReader, openLab, openSettings }));
   onMemoChange(refreshDashboard);
+  onMemoChange(() => refreshJourney({ keepStep: true }));
   safely('initProfile', () => initProfile({ onReset: refreshFavorites }));
 
   // Added by the innovation phase: insights, ayah notes and collections, backup, listening statistics.
@@ -116,10 +134,34 @@ function boot() {
   }));
   safely('initNotes', () => initNotes({ readSurah: (n, index) => readSurah(n, index, { play: false }) }));
   safely('initBackupPanel', () => initBackupPanel());
-  safely('initAssistant', () => initAssistant({ readSurah: openReader, openPlan }));
+  safely('initAssistant', () => initAssistant({ readSurah: openReader, openPlan, navigate, openMenu: openSidebar }));
+  safely('initHome', () => initHome({ readSurah: openReader }));
+  safely('initJourney', () => initJourney({
+    navigate, readSurah: openReader, openLab, openPlan, openLesson, openDialog, openTasbeeh, ask: askAssistant,
+  }));
+
+  // Route actions: "#/quran/18", "#/read", "#/memorize/plan", "#/learn-prayer/wudu", "#/adhkar/evening", "#/journey/…".
+  registerRouteAction('quran', (param) => { const n = Number(param); if (n >= 1 && n <= 114) readSurah(n, null, { play: false }); });
+  registerRouteAction('read', () => {
+    const b = getJSON(KEYS.bookmark, null);
+    if (b && Number(b.surahNum) >= 1 && Number(b.surahNum) <= 114) readSurah(Number(b.surahNum), Number(b.ayahIndex) || 0, { play: false });
+    else if (!document.getElementById('readingSection').hidden) document.getElementById('readingSection').scrollIntoView();
+    else readSurah(1, null, { play: false });
+  });
+  registerRouteAction('memorize', (param) => {
+    const tab = document.getElementById(param === 'plan' ? 'labTabPlan' : 'labTabRecite');
+    if (param) tab?.click();
+  });
+  registerRouteAction('learn-prayer', (param) => { if (param) openLesson(param); });
+  registerRouteAction('wudu', () => openLesson('wudu'));
+  registerRouteAction('tasbih', () => openTasbeeh());
+  registerRouteAction('adhkar', (param) => { if (param) document.getElementById(`tab_${param}`)?.click(); });
+  registerRouteAction('journey', (param) => showJourney(param));
+  registerRouteAction('reminders', () => showJourney('reminders'));
   safely('trackAudio', () => trackAudio(document.getElementById('audioPlayer'), () => document.getElementById('reciterSelect').value));
   safely('trackAudio', () => trackAudio(document.getElementById('ayahPlayer'), () => 'ayah'));
   welcome();
+  initRouter(); // shows the page in the address (direct links, refresh, back/forward)
   registerServiceWorker();
   document.documentElement.classList.add('js-ready');
 }
