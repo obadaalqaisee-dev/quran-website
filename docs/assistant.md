@@ -36,7 +36,7 @@ core/assistant-engine.js     pure functions, unit-tested
    5. compose      structured blocks: title, text, steps, notice, shahada, quran(ref), hadith, tafsir, action,
                    lesson, sources, follow-up chips
    6. validate     drops invalid ayah refs, unsourced hadith, unknown actions/hrefs, empty or unknown blocks
-data/assistant/site-faq.js   128 website questions (10 categories), 26 of them reuse the original help_* strings
+data/assistant/site-faq.js   127 website questions (10 categories), 26 of them reuse the original help_* strings
 data/assistant/islamic-kb.js 67 Islamic records (7 categories) — Quran refs + hadith with collection and Dorar link
 data/assistant/small-talk.js greetings, thanks, "who are you", "explain more", "what next", "I don't understand"
 data/assistant/entities.js   topics used to resolve follow-ups
