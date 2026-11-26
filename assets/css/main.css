@@ -1029,6 +1029,27 @@ html.has-dialog .assistant-fab { visibility: hidden; }
 .asst-source { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; color: var(--accent-text); }
 .asst-notice { padding: 8px 12px; border-radius: var(--radius-sm); background: var(--warn-bg); color: var(--text); font-weight: 600; }
 .asst-suggest { display: grid; gap: 6px; margin-bottom: 10px; }
+.asst-talk { font-weight: 600; }
+.asst-answer { border-inline-start: 3px solid var(--accent, var(--primary)); padding-inline-start: 10px; }
+.asst-steps { margin: 0; padding-inline-start: 1.4em; display: grid; gap: 4px; list-style: disc; }
+ol.asst-steps { list-style: decimal; }
+.asst-cite { margin: 0; }
+.asst-cite .asst-ayah, .asst-tafsir .asst-ayah { font-family: var(--font-quran); font-size: 1.15rem; line-height: 2; }
+.asst-ayah-meaning { margin-top: 4px; }
+.asst-shahada { margin: 0; display: grid; gap: 6px; padding: 10px 12px; border-radius: var(--radius-sm); background: var(--surface); border: 1px solid var(--border); }
+.asst-shahada-ar { font-family: var(--font-quran); font-size: 1.3rem; line-height: 2; color: var(--quran); font-weight: 700; }
+.asst-sources { color: var(--accent-text); }
+.asst-notice--info { background: var(--surface); border: 1px solid var(--border); font-weight: 500; }
+.asst-tafsir { display: grid; gap: 8px; }
+.asst-tafsir .btn { justify-self: start; }
+.asst-followups { padding-top: 4px; border-top: 1px dashed var(--border); }
+.asst-tools { display: flex; justify-content: flex-end; margin-top: 6px; }
+.asst-typing { justify-self: start; display: inline-flex; gap: 4px; padding: 12px 16px; border-radius: var(--radius); background: var(--surface-2); border: 1px solid var(--border); }
+.asst-typing span { width: 7px; height: 7px; border-radius: 50%; background: var(--muted, currentColor); opacity: 0.4; animation: asst-dot 1s infinite ease-in-out; }
+.asst-typing span:nth-child(2) { animation-delay: 0.15s; }
+.asst-typing span:nth-child(3) { animation-delay: 0.3s; }
+@keyframes asst-dot { 0%, 80%, 100% { opacity: 0.25; transform: translateY(0); } 40% { opacity: 1; transform: translateY(-3px); } }
+@media (prefers-reduced-motion: reduce) { .asst-typing span { animation: none; } }
 .asst-form { display: flex; gap: 8px; }
 .asst-form input { flex: 1; min-width: 0; }
 @media (max-width: 460px) {

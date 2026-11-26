@@ -19,8 +19,11 @@ A bilingual (Arabic-first, also English, Spanish and French) Quran platform:
   planner, listening statistics, the suggested revision order, ayahs and words that need strengthening, and recitation accuracy;
 - **ayah notes and collections** (reflection, memorisation, review, Quranic supplications, or your own), a daily
   question from the site's own lessons, and a **backup/restore** file for everything stored on the device;
-- a **site assistant** («💬 المساعد») that explains how to use every feature and answers Islamic questions only with
-  passages from the site's verified content, citing the source (no AI model, works offline, issues no fatwas).
+- a **conversational assistant** («💬 المساعد») that greets naturally, keeps the topic across follow-up questions,
+  explains every feature (127 website questions), answers general questions about Islam with Quran references
+  loaded from the verified Mushaf and hadith cited by collection, and gives a careful, welcoming guide for people who
+  want to become Muslim — in Arabic (including dialect), English, Spanish and French. No AI model or API, nothing
+  typed leaves the page, works offline, issues no fatwas. See [docs/assistant.md](docs/assistant.md).
 
 The site is a static frontend served by **GitHub Pages**. An optional **Python (FastAPI) backend** serves verified Quran data and privacy-preserving proxies. The site works fully without it.
 

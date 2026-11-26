@@ -357,10 +357,10 @@ describe('site assistant («💬 مساعد الموقع»)', () => {
     assert.match(await page.textContent('#assistantLog'), /اسألني كيف تستخدم أي ميزة/);
     assert.match(await page.textContent('#assistantLog'), /لست مفتيًا/);
     assert.equal(await page.locator('#assistantSuggestions .chip-btn').count(), 6);
-    await page.locator('#assistantSuggestions .chip-btn', { hasText: 'كيف أسمّع سورة من حفظي؟' }).click();
-    const reply = page.locator('#assistantLog .asst-msg--bot').last();
+    await page.locator('#assistantSuggestions .chip-btn', { hasText: 'كيف أبدأ بحفظ القرآن؟' }).click();
+    const reply = page.locator('#assistantLog .asst-msg--bot').nth(1);
     await reply.locator('.asst-help').waitFor();
-    assert.match(await reply.textContent(), /اضغط «🎙️ التسميع» في الأعلى/);
+    assert.match(await reply.textContent(), /افتح «🎙️ التسميع»، اختر السورة/);
     await reply.locator('.asst-help .btn-primary').click();
     await page.waitForSelector('#voiceTestModal[open]');
     assert.equal(await page.locator('#assistantModal[open]').count(), 0);
