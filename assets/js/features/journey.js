@@ -30,6 +30,8 @@ let actions = {
 const el = {};
 const view = { path: null, step: null };
 
+// replaceChildren() would insert «null» as text: drop empty children first.
+const put = (node, ...kids) => node.replaceChildren(...kids.flat().filter((k) => k !== null && k !== undefined && k !== false));
 const loc = (o) => (o ? o[getLang()] ?? o.en ?? o.ar : '');
 const today = () => localDateKey();
 const persist = (data) => { saveJourney(data); refresh(); };
@@ -154,7 +156,7 @@ function renderOverview(data, auto) {
   const day = today();
   const todaySteps = stepsOn(data, day);
   const week = stepsThisWeek(data, day);
-  el.overview.replaceChildren(
+  put(el.overview, 
     h('div', { class: 'jr-stats' },
       h('div', { class: 'jr-stat' }, h('strong', { text: `${all.pct}%` }), h('span', { class: 'small', text: t(all.startedPaths ? 'jr_overall' : 'jr_overall_none') })),
       h('div', { class: 'jr-stat' }, h('strong', { text: `${todaySteps}/${data.goals.daily}` }), h('span', { class: 'small', text: t('jr_today') })),
@@ -224,12 +226,12 @@ function renderDetail() {
   const path = view.path ? findPath(view.path) : null;
   el.detail.hidden = !path;
   el.paths.hidden = !!path;
-  if (!path) { el.detail.replaceChildren(); return; }
+  if (!path) { put(el.detail, ); return; }
   const data = loadJourney();
   const auto = detectAutoDone();
   const pr = pathProgress(path, data, auto);
   const openId = view.step ?? pr.next?.id ?? null;
-  el.detail.replaceChildren(
+  put(el.detail, 
     h('p', {}, h('a', { class: 'link-btn', href: '#/journey', text: t('jr_back') })),
     h('h2', { class: 'jr-detail-title' }, h('span', { attrs: { 'aria-hidden': 'true' }, text: path.icon }), ` ${loc(path.title)}`),
     h('p', { text: loc(path.desc) }),
@@ -253,17 +255,17 @@ function renderSide(data, auto) {
   el.weekly.value = String(data.goals.weekly);
   const day = today();
   const met = stepsOn(data, day) >= data.goals.daily;
-  el.goalStatus.replaceChildren(
+  put(el.goalStatus, 
     h('p', { class: 'small', text: t('jr_goal_status', { today: stepsOn(data, day), daily: data.goals.daily, week: stepsThisWeek(data, day), weekly: data.goals.weekly }) }),
     met ? h('p', { class: 'badge badge--ok', text: t('jr_goal_met') }) : null);
   // achievements
-  el.achievements.replaceChildren(...achievements(JOURNEY_PATHS, data, auto, day).map((a) => h('li', { class: `achievement${a.earned ? ' is-earned' : ''}` },
+  put(el.achievements, ...achievements(JOURNEY_PATHS, data, auto, day).map((a) => h('li', { class: `achievement${a.earned ? ' is-earned' : ''}` },
     h('span', { attrs: { 'aria-hidden': 'true' }, text: a.earned ? '🏅' : '○' }),
     h('span', { text: ` ${t(`jr_ach_${a.id}`)}` }),
     h('span', { class: 'visually-hidden', text: a.earned ? ` — ${t('jr_ach_earned')}` : ` — ${t('jr_ach_locked')}` }))));
   // history
   const hist = [...data.history].reverse().slice(0, 12);
-  el.history.replaceChildren(...(hist.length ? hist.map((ev) => {
+  put(el.history, ...(hist.length ? hist.map((ev) => {
     const path = findPath(ev.path);
     const step = path?.steps.find((s) => s.id === ev.step);
     return h('li', { class: 'small' }, h('span', { class: 'muted', dir: 'ltr', text: ev.date }), ` — ${t(`jr_hist_${ev.kind}`, { path: path ? loc(path.title) : ev.path, step: step ? loc(step.title) : '' })}`);
@@ -272,7 +274,7 @@ function renderSide(data, auto) {
 
 function renderReminders() {
   const data = loadReminders();
-  el.reminders.replaceChildren(...REMINDER_TYPES.map((type) => {
+  put(el.reminders, ...REMINDER_TYPES.map((type) => {
     const r = data[type.id];
     const check = h('input', { type: 'checkbox', id: `rem-${type.id}`, checked: r.on });
     const time = h('input', { type: 'time', class: 'reminder-time', value: r.time, attrs: { 'aria-label': `${t(`jr_rem_${type.id}`)} — ${t('jr_rem_time')}` } });
@@ -296,7 +298,7 @@ function renderHome(data, auto) {
   const path = currentPath(JOURNEY_PATHS, data, auto);
   const day = today();
   if (!path) {
-    el.home.replaceChildren(
+    put(el.home, 
       h('p', { text: t('home_journey_empty') }),
       h('div', { class: 'jr-home-suggest' }, ...['basics', 'read', 'memorize'].map((id) => {
         const p = findPath(id);
@@ -306,7 +308,7 @@ function renderHome(data, auto) {
     return;
   }
   const pr = pathProgress(path, data, auto);
-  el.home.replaceChildren(
+  put(el.home, 
     h('p', { class: 'jr-home-path' }, h('strong', { text: `${path.icon} ${loc(path.title)}` }), h('span', { class: 'muted small', text: ` — ${t('jr_steps_count', { done: pr.done, total: pr.total })}` })),
     bar(pr.pct, loc(path.title)),
     h('p', { class: 'small', text: `${pr.pct}% · ${t('jr_goal_today', { done: stepsOn(data, day), goal: data.goals.daily })}` }),
@@ -316,7 +318,7 @@ function renderHome(data, auto) {
 
 // ------------------------------------------------------------------ refresh & routing
 function renderPaths(data, auto) {
-  el.paths.replaceChildren(...JOURNEY_PATHS.map((p) => pathCard(p, data, auto)));
+  put(el.paths, ...JOURNEY_PATHS.map((p) => pathCard(p, data, auto)));
 }
 
 export function refreshJourney(opts) { refresh(opts); }

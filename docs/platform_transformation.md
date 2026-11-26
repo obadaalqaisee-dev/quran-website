@@ -92,6 +92,7 @@ answers are in Arabic, English, Spanish and French. No AI model, no network requ
 
 ## 6. Tests
 
+* Full suite result (2026-11-26): **68/68 unit, 134 passed / 0 failed / 2 skipped (live-site) e2e.**
 * Unit: 68 (56 existing + 12 new in `tests/unit/platform.test.mjs`): routes, page/dialog structure, ≥120 distinct
   questions, every question answered by its own entry (185 × 2 languages), small talk in 4 languages, follow-up
   context, adversarial input, Islamic references format, journey progress/storage repair, reminders.
@@ -110,3 +111,13 @@ answers are in Arabic, English, Spanish and French. No AI model, no network requ
 * The assistant matches keywords; unusual phrasings may fall back to the general content search.
 * Islamic content was written carefully with references but should be reviewed by a qualified scholar before wide
   promotion.
+
+## 8. Screenshots
+
+| Home (desktop) | Quran Journey | Assistant |
+|---|---|---|
+| ![](screenshots/home-desktop.png) | ![](screenshots/journey.png) | ![](screenshots/assistant.png) |
+
+| Reader with tafsir | Home (phone) | Menu (phone) |
+|---|---|---|
+| ![](screenshots/quran-reader.png) | ![](screenshots/home-mobile.png) | ![](screenshots/menu-mobile.png) |
