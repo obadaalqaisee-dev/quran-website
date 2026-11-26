@@ -1036,11 +1036,6 @@ html.has-dialog .assistant-fab { visibility: hidden; }
   .assistant-fab-label { display: none; }
   .asst-msg--user { max-width: 100%; }
 }
-.asst-tafsir { line-height: 1.9; }
-.asst-ai { display: grid; gap: 6px; padding: 12px 14px; border-radius: var(--radius-sm); background: var(--surface); border: 1px solid var(--accent); border-inline-start-width: 4px; }
-.asst-ai-text { line-height: 1.9; white-space: pre-wrap; }
-.asst-ai-panel { display: grid; gap: 8px; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border); }
-.asst-ai-panel .btn { justify-self: start; }
 @media print { .assistant-fab { display: none !important; } }
 
 /* 16. Motion & print ---------------------------------------------------------------------- */

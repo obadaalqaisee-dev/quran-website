@@ -30,7 +30,6 @@ export const KEYS = Object.freeze({
   notes: 'ayahNotes', // { v, items: [{ surah, ayah, collection, note, updated }], custom } (core/notes.js)
   khatma: 'khatmaPlan', // { target: 'YYYY-MM-DD', start: 'YYYY-MM-DD' } khatma planner
   challenge: 'dailyChallenge', // { days: { date: { q, ok } } } daily knowledge challenge
-  assistantAI: 'assistantAI', // { enabled, model } on-device model of the site assistant (features/assistant-ai.js)
 });
 
 // Keys removed by "reset my data" (the original reset exactly these four).

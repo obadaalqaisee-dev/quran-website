@@ -125,8 +125,8 @@ describe('same-origin backend (local development: uvicorn serves the site too)',
     const errors = collectErrors(page);
     const response = await page.goto(`${backend.url}/`);
     const headers = response.headers();
-    assert.match(headers['content-security-policy'], /script-src 'self' 'sha256-[A-Za-z0-9+/=]+' 'wasm-unsafe-eval' https:\/\/www\.googletagmanager\.com;/);
-    assert.doesNotMatch(headers['content-security-policy'], /'unsafe-inline'|'unsafe-eval'/);
+    assert.match(headers['content-security-policy'], /script-src 'self' 'sha256-[A-Za-z0-9+/=]+' https:\/\/www\.googletagmanager\.com;/);
+    assert.doesNotMatch(headers['content-security-policy'], /unsafe-inline|unsafe-eval/);
     assert.match(headers['content-security-policy'], /frame-ancestors 'none'/);
     assert.equal(headers['x-content-type-options'], 'nosniff');
     await page.waitForSelector('#surahGrid .surah-card');

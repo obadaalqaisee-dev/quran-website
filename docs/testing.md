@@ -61,18 +61,10 @@ The network for this run allowed the site's real upstream services, so the live 
 | Backend pytest | 106 passed | **107 passed**, 0 failed (1 new: rate-limiter memory bound) |
 | ruff · pip-audit | clean · no known vulnerabilities | clean · no known vulnerabilities |
 | Database: `alembic upgrade head` → `seed` → `verify` (fresh SQLite) | — | passed (114 surahs, 6,236 ayahs, 24,944 edition texts, 16 reciters, 36 adhkar) |
-| Frontend unit (`node:test`) | 37 passed | **62 passed**, 0 failed (25 new in `innovation.test.mjs`, including the site assistant and the on-device model) |
-| Playwright end-to-end | 101 passed, 2 skipped | **130 passed, 0 failed**, 1 skipped (`live.test.mjs` without `LIVE_URL`); 29 new in `innovation.test.mjs` (13 for the site assistant). The live-Aladhan proxy test now runs and passes. |
+| Frontend unit (`node:test`) | 37 passed | **56 passed**, 0 failed (19 new in `innovation.test.mjs`, including the site assistant) |
+| Playwright end-to-end | 101 passed, 2 skipped | **125 passed, 0 failed**, 1 skipped (`live.test.mjs` without `LIVE_URL`); 24 new in `innovation.test.mjs` (8 for the site assistant). The live-Aladhan proxy test now runs and passes. |
 | Live test, the current GitHub Pages site (`main`), real network | — | passed |
 | Live test, **this branch** on a local static server, real network (real Quran text, tafsir, audio, prayer times) | — | passed |
-
-**On-device model (site assistant), real run.** This was done in the development container, where WebGPU is
-emulated on the CPU:
-
-* The download, loading and streaming generation worked under the site's real CSP.
-* The emulated GPU produced gibberish, so answer quality was **not** verified.
-* The broken-output check hides such output.
-* Answer quality still needs a test on a real GPU (see `innovation_phase.md`).
 
 Changes to existing tests (none removed, skipped or weakened):
 

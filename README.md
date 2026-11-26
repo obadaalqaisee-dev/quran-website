@@ -20,9 +20,7 @@ A bilingual (Arabic-first, also English, Spanish and French) Quran platform:
 - **ayah notes and collections** (reflection, memorisation, review, Quranic supplications, or your own), a daily
   question from the site's own lessons, and a **backup/restore** file for everything stored on the device;
 - a **site assistant** («💬 المساعد») that explains how to use every feature and answers Islamic questions only with
-  passages from the site's verified content, including the whole Quran with Tafsir al-Muyassar, citing the source
-  (works offline, issues no fatwas). Optionally, a small AI model running **on the visitor's device** (WebGPU,
-  off by default) writes a short answer from those passages only.
+  passages from the site's verified content, citing the source (no AI model, works offline, issues no fatwas).
 
 The site is a static frontend served by **GitHub Pages**. An optional **Python (FastAPI) backend** serves verified Quran data and privacy-preserving proxies. The site works fully without it.
 
@@ -30,7 +28,7 @@ The site is a static frontend served by **GitHub Pages**. An optional **Python (
 |---|---|
 | Frontend | HTML + CSS + native ES modules, no build step (GitHub Pages) |
 | Backend | Python 3.11+, FastAPI, SQLAlchemy 2, Alembic, SQLite/PostgreSQL |
-| Tests | 107 pytest · 62 Node unit · 130 Playwright end-to-end (+ live smoke tests) |
+| Tests | 107 pytest · 56 Node unit · 125 Playwright end-to-end (+ live smoke tests) |
 | CI | GitHub Actions (`.github/workflows/ci.yml`) |
 
 ## Documentation
