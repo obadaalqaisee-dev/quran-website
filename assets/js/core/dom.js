@@ -57,6 +57,11 @@ export function localDateKey(date = new Date()) {
 
 export const prefersReducedMotion = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
+// Multi-page layout: before scrolling to an element on a hidden page, that page is shown (core/router.js).
+let reveal = () => {};
+export function setRevealHandler(fn) { reveal = typeof fn === 'function' ? fn : () => {}; }
+
 export function scrollIntoViewSmart(el, block = 'start') {
+  if (el) reveal(el);
   el?.scrollIntoView({ behavior: prefersReducedMotion() ? 'auto' : 'smooth', block });
 }

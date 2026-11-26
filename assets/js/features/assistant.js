@@ -1,63 +1,59 @@
-// «💬 مساعد الموقع» dialog: the conversation UI. The answers are built by core/assistant-engine.js (pure, no
-// network) from the site's reviewed data; this module only renders the reply blocks. Every string is inserted
-// with textContent (h() children), never as HTML — including what the visitor types.
+// «💬 المساعد» — the site assistant (its own page, #/assistant; the old dialog id still opens it).
 //
-// Network use: none for the answers themselves. Ayah texts, the Tafsir al-Muyassar and translations shown in a
-// reply are loaded with the same verified API calls as the Mushaf (core/api.js), and cached like the Mushaf.
-// The engine and its knowledge base are evaluated on first use (dynamic import; the files are module-preloaded).
-// The conversation context lives in memory only: nothing the visitor writes is stored or sent anywhere.
+// Answers, in this order (core/conversation.js decides; nothing is generated):
+//   1. greetings and small talk («السلام عليكم», «شكرًا», «How are you?»…), answered naturally;
+//   2. the written knowledge bases: 139 questions about using this site (data/assistant-kb.js) and introductory
+//      Islamic knowledge with Quran and hadith references, including a section for people who want to embrace
+//      Islam (data/islamic-kb.js). Follow-up questions keep the subject of the previous answer
+//      («كيف أقرأ القرآن؟» → «وكيف أستمع إليه؟» → «وكيف أحفظه؟»);
+//   3. otherwise, the original behaviour: help topics, passages of the site's verified lessons with their source,
+//      and the optional Quran word search (online).
+// No AI model, no account, and no request is made for the answers themselves. Everything shown comes from static
+// strings or verified data and is inserted with textContent; Quran text is shown from the verified dataset only.
 
-import { getAyahEditions, getSurah, searchAyahs } from '../core/api.js';
-import { fixSurahName, normalizeArabic, stripBasmala } from '../core/arabic.js';
-import { buildKnowledge, excerpt, searchKnowledge, terms } from '../core/assistant.js';
+import { getSurah, searchAyahs } from '../core/api.js';
+import { normalizeArabic, stripBasmala } from '../core/arabic.js';
+import { asksForRuling, buildKnowledge, excerpt, matchHelp, searchKnowledge, terms } from '../core/assistant.js';
+import { buildIndex, respond } from '../core/conversation.js';
 import { h } from '../core/dom.js';
 import { getLang, onLanguageChange, t } from '../core/i18n.js';
 import { closeDialog, onDialogOpen, openDialog } from '../core/modal.js';
-import { getSurahMeta, surahName } from '../core/quran.js';
-import { ACADEMY_LESSONS, findLesson } from '../data/academy.js';
+import { surahName } from '../core/quran.js';
+import { ACADEMY_LESSONS } from '../data/academy.js';
 import { ADHKAR } from '../data/adhkar.js';
+import { SITE_KB } from '../data/assistant-kb.js';
+import { ISLAMIC_KB, pickLang } from '../data/islamic-kb.js';
+import { SHAHADA } from '../data/journey-paths.js';
 import { LESSONS } from '../data/prayer-lessons.js';
 import { LANGUAGES, translations } from '../data/translations.js';
 import { openTasbeeh } from './adhkar.js';
 import { openLesson } from './learn.js';
 
-let actions = { readSurah: () => {}, openPlan: () => {} };
+let actions = { readSurah: () => {}, openPlan: () => {}, navigate: () => {}, openMenu: () => {} };
 const el = {};
 let knowledge = null;
-let engine = null;
-let ctx = null;
+let kbIndex = null;
+let context = null; // conversation context: { lastId, subject, turns }
 
-const SUGGESTIONS = ['asst_s1', 'asst_s2', 'asst_s3', 'asst_s4', 'asst_s5', 'asst_s6'];
-const TRANSLATION = { en: 'en.sahih', es: 'es.cortes', fr: 'fr.hamidullah' };
-const SHAHADA_AR = 'أشهد أن لا إله إلا الله، وأشهد أن محمدًا رسول الله';
-const SHAHADA_LATIN = 'Ash-hadu an lā ilāha illā-llāh, wa ash-hadu anna Muḥammadan rasūlu-llāh';
-const MAX_LOG = 60;
-
+const CONFIDENT = 6; // knowledge-base score from which an answer is used even when lesson passages also match
+const SUGGESTIONS = ['asst_s1', 'asst_s2', 'asst_s7', 'asst_s3', 'asst_s8', 'asst_s4', 'asst_s5', 'asst_s6'];
 const byLang = (key) => Object.fromEntries(LANGUAGES.map((l) => [l, translations[l][key] ?? translations.ar[key]]));
-/** Translate in the language of the reply (the visitor may write English in the Arabic interface). */
-function tl(lang, key, vars) {
-  let value = translations[lang]?.[key] ?? translations.ar[key] ?? key;
-  if (vars) for (const [k, v] of Object.entries(vars)) value = value.replaceAll(`{${k}}`, String(v));
-  return value;
-}
-const dirOf = (lang) => (lang === 'ar' ? 'rtl' : 'ltr');
-const surahLabel = (n, lang) => {
-  const s = getSurahMeta(n);
-  if (!s) return '';
-  return lang === 'ar' ? fixSurahName(s.nameAr) : s.nameEn;
+const ISLAMIC_IDS = new Set(ISLAMIC_KB.map((e) => e.id));
+const ALL_ENTRIES = [...SITE_KB, ...ISLAMIC_KB];
+const entryById = (id) => ALL_ENTRIES.find((e) => e.id === id) || null;
+
+// The original help topics now answer with the matching knowledge-base entry (up-to-date navigation).
+const HELP_TO_KB = {
+  read: 'read-quran', listen: 'audio-listen', ayah_audio: 'audio-repeat', tafsir: 'tafsir-read', memorize: 'memo-start',
+  mic: 'tr-mic', revision: 'rev-schedule', bookmark: 'read-bookmark', notes: 'fv-notes', prayer_times: 'pt-where',
+  notify: 'nt-prayer', adhkar: 'ad-where', rosary: 'ts-where', learn_prayer: 'pl-learn', academy: 'ac-what',
+  search: 'search-ayah', settings: 'st-open', theme: 'st-dark', language: 'st-language', insights: 'rev-insights',
+  backup: 'of-backup', favorites: 'fv-add', install: 'of-install', sleep: 'audio-sleep', wird: 'db-wird', about: 'ab-who',
 };
 
-/** Load the conversation engine once (it brings the knowledge base with it). */
-function loadEngine() {
-  if (!engine) {
-    engine = import('../core/assistant-engine.js').then((m) => {
-      m.setLegacyStrings(translations);
-      if (!ctx) ctx = m.newContext();
-      return m;
-    });
-    engine.catch(() => { engine = null; });
-  }
-  return engine;
+function getIndex() {
+  if (!kbIndex) kbIndex = buildIndex(ALL_ENTRIES);
+  return kbIndex;
 }
 
 function getKnowledge() {
@@ -73,143 +69,100 @@ function getKnowledge() {
 }
 
 // ---------------------------------------------------------------------------------------- actions
+/** Original help-topic actions ({ dialog } | { anchor } | { href } | { run }). */
 function runAction(action) {
   if (!action) return;
   if (action.dialog) { openDialog(action.dialog); return; }
   closeDialog('assistantModal');
-  if (action.anchor) {
-    const target = document.querySelector(action.anchor);
-    if (target) { target.hidden = false; target.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
-  } else if (action.href) {
-    window.location.href = action.href;
-  } else if (action.run === 'plan') actions.openPlan();
+  if (action.anchor) window.location.hash = action.anchor; // the router shows the page holding the anchor
+  else if (action.href) window.location.href = action.href;
+  else if (action.run === 'plan') actions.openPlan();
   else if (action.run === 'rosary') openTasbeeh();
   else if (action.run === 'theme') document.getElementById('themeToggle')?.click();
   else if (action.run === 'language') document.getElementById('langSelect')?.focus();
 }
 
-const openAyah = (s, a) => { closeDialog('assistantModal'); actions.readSurah(s, a - 1); };
-
-// ---------------------------------------------------------------------------------------- render
-const bubble = (who, lang, ...children) => h('div', { class: `asst-msg asst-msg--${who}`, attrs: { lang, dir: dirOf(lang) } }, ...children);
-
-/** One ayah (or a short range) loaded from the verified dataset, with its translation for non-Arabic replies. */
-function quranFigure(lang, { surah, ayah, to = ayah, note = '' }) {
-  const text = h('p', { class: 'asst-ayah', lang: 'ar', dir: 'rtl', text: '…' });
-  const meaning = lang !== 'ar' ? h('p', { class: 'small asst-ayah-meaning', lang, dir: dirOf(lang) }) : null;
-  const ref = h('button', {
-    class: 'cite-ref', type: 'button', text: tl(lang, 'asst_ayah_ref', { surah: surahLabel(surah, lang), ayah: to > ayah ? `${ayah}–${to}` : ayah }),
-    on: { click: () => openAyah(surah, ayah) },
-  });
-  getSurah(surah).then(async (data) => {
-    const list = data.ayahs.filter((x) => x.numberInSurah >= ayah && x.numberInSurah <= to);
-    if (!list.length) throw new Error('missing');
-    text.textContent = `﴿${list.map((x) => stripBasmala(x.text, surah, x.numberInSurah)).join(' ۝ ')}﴾`;
-    if (meaning) {
-      const m = await loadEngine();
-      const edition = TRANSLATION[lang];
-      const parts = await Promise.all(list.map((x) => getAyahEditions(m.globalAyahId(surah, x.numberInSurah), [edition]).then((r) => r[edition]).catch(() => '')));
-      const joined = parts.filter(Boolean).join(' ');
-      if (joined) meaning.replaceChildren(h('span', { class: 'muted', text: `${tl(lang, 'asst_translation')} ` }), joined);
-    }
-  }).catch(() => { text.textContent = tl(lang, 'asst_quran_unavailable'); text.classList.add('small', 'muted'); });
-  return h('figure', { class: 'cite cite--quran asst-cite' }, text, meaning,
-    h('figcaption', {}, ref, note ? h('span', { class: 'muted small', text: ` — ${note}` }) : null));
+/** Knowledge-base actions ({ route } | { dialog } | { lesson } | { href } | { run }). */
+function runGo(go) {
+  if (!go) return;
+  if (typeof go.route === 'string') actions.navigate(go.route);
+  else if (go.dialog) openDialog(go.dialog);
+  else if (go.lesson) openLesson(go.lesson);
+  else if (go.href) window.location.href = go.href;
+  else if (go.run === 'tasbih') openTasbeeh();
+  else if (go.run === 'menu') actions.openMenu();
+  else runAction(go);
 }
 
-function hadithFigure(lang, b) {
-  return h('figure', { class: 'cite cite--hadith asst-cite' },
-    h('p', { class: 'cite-text', lang: 'ar', dir: 'rtl', text: b.text }),
-    lang !== 'ar' && b.meaning ? h('p', { class: 'small' }, h('span', { class: 'muted', text: `${tl(lang, 'asst_hadith_meaning')} ` }), b.meaning) : null,
-    h('figcaption', {},
-      h('strong', { lang: 'ar', dir: 'rtl', text: b.source }), ' ',
-      h('a', { href: b.search, target: '_blank', rel: 'noopener noreferrer', class: 'cite-link', text: tl(lang, 'learn_verify_hadith') })));
+// ---------------------------------------------------------------------------------------- render helpers
+const bubble = (who, ...children) => h('div', { class: `asst-msg asst-msg--${who}` }, ...children);
+const paragraphs = (text) => String(text).split('\n').filter((x) => x.trim()).map((line) => h('p', { text: line }));
+
+function shahadaCard() {
+  return h('figure', { class: 'shahada-card' },
+    h('p', { class: 'shahada-ar', lang: 'ar', dir: 'rtl', text: SHAHADA.ar }),
+    h('p', { class: 'shahada-latin', dir: 'ltr', lang: 'en', text: SHAHADA.translit }),
+    h('figcaption', { text: pickLang(SHAHADA.meaning, getLang()) }));
 }
 
-function shahadaFigure(lang) {
-  return h('figure', { class: 'asst-shahada' },
-    h('figcaption', { class: 'asst-help-title', text: `☝️ ${tl(lang, 'asst_shahada_title')}` }),
-    h('p', { class: 'asst-shahada-ar', lang: 'ar', dir: 'rtl', text: SHAHADA_AR }),
-    h('p', { class: 'small' }, h('span', { class: 'muted', text: `${tl(lang, 'asst_shahada_translit_label')} ` }), h('bdi', { lang: 'ar-Latn', dir: 'ltr', text: SHAHADA_LATIN })),
-    h('p', { class: 'small', text: tl(lang, 'asst_shahada_meaning') }));
+/** A Quran reference: the verified ayah text (loaded from the dataset) and a button to open it in the reader. */
+function quranRef(ref) {
+  const [s, a] = ref.split(':').map(Number);
+  const text = h('p', { class: 'asst-excerpt asst-ayah', lang: 'ar', dir: 'rtl', text: '…' });
+  getSurah(s).then((data) => {
+    const ayah = data.ayahs.find((x) => x.numberInSurah === a);
+    text.textContent = ayah ? `﴿${stripBasmala(ayah.text, s, a)}﴾` : t('learn_quran_unavailable');
+  }).catch(() => { text.textContent = t('learn_quran_unavailable'); });
+  return h('li', { class: 'asst-result' }, text,
+    h('div', { class: 'asst-source' },
+      h('span', { class: 'small', text: `${surahName(s)} — ${t('ayah_label')} ${a}` }),
+      h('button', { class: 'btn btn-soft btn-small', type: 'button', text: t('asst_open_ayah', { ref: `${surahName(s)} ${a}` }), on: { click: () => actions.readSurah(s, a - 1) } })));
 }
 
-/** Tafsir view: one ayah, or the first ayahs of a surah, with Tafsir al-Muyassar from the verified source. */
-function tafsirBlock(lang, { surah, ayah }) {
-  const meta = getSurahMeta(surah);
-  const count = ayah ? 1 : Math.min(7, meta.ayahCount);
-  const first = ayah || 1;
-  const box = h('div', { class: 'asst-tafsir' },
-    h('p', { class: 'asst-help-title', text: ayah
-      ? tl(lang, 'asst_tafsir_title', { surah: surahLabel(surah, lang), ayah })
-      : tl(lang, 'asst_surah_title', { surah: surahLabel(surah, lang), type: tl(lang, `revelation_${meta.revelation}`), n: meta.ayahCount }) }));
-  const list = h('ol', { class: 'asst-results' }, h('li', { class: 'loading small', text: '…' }));
-  box.append(list);
-  if (!ayah && meta.ayahCount > count) box.append(h('p', { class: 'small muted', text: tl(lang, 'asst_tafsir_shown', { n: count }) }));
-  box.append(h('p', { class: 'small muted', text: tl(lang, 'asst_tafsir_note') }),
-    h('button', { class: 'btn btn-soft btn-small', type: 'button', text: tl(lang, 'asst_open_surah'), on: { click: () => openAyah(surah, first) } }));
-  (async () => {
-    const m = await loadEngine();
-    const data = await getSurah(surah);
-    const items = data.ayahs.filter((x) => x.numberInSurah >= first && x.numberInSurah < first + count);
-    const editions = lang === 'ar' ? ['ar.muyassar'] : ['ar.muyassar', TRANSLATION[lang]];
-    const rows = await Promise.all(items.map(async (x) => {
-      const ed = await getAyahEditions(m.globalAyahId(surah, x.numberInSurah), editions).catch(() => ({}));
-      return h('li', { class: 'asst-result' },
-        h('p', { class: 'asst-ayah', lang: 'ar', dir: 'rtl', text: `﴿${stripBasmala(x.text, surah, x.numberInSurah)}﴾ (${x.numberInSurah})` }),
-        ed['ar.muyassar'] ? h('p', { class: 'small asst-tafsir-text', lang: 'ar', dir: 'rtl' }, h('strong', { text: `${tl('ar', 'asst_tafsir_label')} ` }), ed['ar.muyassar']) : null,
-        lang !== 'ar' && ed[TRANSLATION[lang]] ? h('p', { class: 'small' }, h('span', { class: 'muted', text: `${tl(lang, 'asst_translation')} ` }), ed[TRANSLATION[lang]]) : null,
-        h('button', { class: 'cite-ref', type: 'button', text: tl(lang, 'asst_ayah_ref', { surah: surahLabel(surah, lang), ayah: x.numberInSurah }), on: { click: () => openAyah(surah, x.numberInSurah) } }));
-    }));
-    list.replaceChildren(...rows);
-  })().catch(() => list.replaceChildren(h('li', { class: 'small muted', text: tl(lang, 'asst_quran_unavailable') })));
-  return box;
+function kbBlock(results) {
+  const lang = getLang();
+  const { entry } = results[0];
+  const islamic = ISLAMIC_IDS.has(entry.id);
+  const answerText = entry.a[lang] ?? entry.a.en;
+  const refs = entry.refs || [];
+  const related = results.slice(1, 3).map((r) => r.entry);
+  return h('div', { class: 'asst-kb' },
+    h('p', { class: 'asst-help-title', text: pickLang(entry.q, lang) }),
+    !entry.a[lang] ? h('p', { class: 'small muted', text: t('asst_en_only') }) : null,
+    ...paragraphs(answerText),
+    entry.widget === 'shahada' ? shahadaCard() : null,
+    entry.level === 'difference' ? h('p', { class: 'asst-notice', attrs: { role: 'note' }, text: t('asst_level_difference') }) : null,
+    refs.length ? h('div', { class: 'asst-refs' },
+      h('p', { class: 'small strong', text: t('asst_refs') }),
+      h('ol', { class: 'asst-results' }, ...refs.map((r) => (r.quran ? quranRef(r.quran)
+        : h('li', { class: 'asst-result asst-hadith' }, h('span', { class: 'small', text: `📜 ${pickLang(r.hadith, lang === 'ar' ? 'ar' : 'en')}` })))))) : null,
+    entry.go ? h('button', { class: 'btn btn-primary btn-small', type: 'button', text: t('asst_go'), on: { click: () => runGo(entry.go) } }) : null,
+    related.length ? h('div', { class: 'asst-related' },
+      h('span', { class: 'small muted', text: t('asst_related') }),
+      ...related.map((r) => h('button', { class: 'chip-btn', type: 'button', text: pickLang(r.q, lang), on: { click: () => answer(pickLang(r.q, lang)) } })))
+      : null,
+    islamic ? h('p', { class: 'small muted asst-disclaimer', text: t('asst_islamic_note') }) : null);
 }
 
-function renderBlocks(reply) {
-  const lang = reply.lang;
-  const out = [];
-  let current = null; // the answer card (site help or Islamic answer)
-  const card = () => {
-    if (!current) {
-      const islamic = ['islamic', 'new_muslim'].includes(reply.intent);
-      current = h('div', { class: islamic ? 'asst-help asst-answer' : 'asst-help' });
-      out.push(current);
-    }
-    return current;
-  };
-  const place = (node) => (current ? current.append(node) : out.push(node));
-  for (const b of reply.blocks) {
-    switch (b.type) {
-      case 'talk': out.push(h('p', { class: 'asst-talk', text: b.text })); break;
-      case 'title': card().append(h('p', { class: 'asst-help-title' }, h('span', { attrs: { 'aria-hidden': 'true' }, text: b.icon || '💡' }), ` ${b.text}`)); break;
-      case 'text': place(h('p', { text: b.key ? tl(lang, b.key) : b.text })); break;
-      case 'steps': card().append(h(b.ordered ? 'ol' : 'ul', { class: 'asst-steps' }, ...b.items.map((x) => h('li', { text: x })))); break;
-      case 'notice': place(h('p', { class: `asst-notice${b.tone === 'info' ? ' asst-notice--info' : ''}`, attrs: { role: 'note' }, text: tl(lang, b.key) })); break;
-      case 'shahada': card().append(shahadaFigure(lang)); break;
-      case 'quran': card().append(quranFigure(lang, b)); break;
-      case 'hadith': card().append(hadithFigure(lang, b)); break;
-      case 'tafsir': out.push(tafsirBlock(lang, b)); break;
-      case 'action': card().append(h('button', { class: 'btn btn-primary btn-small', type: 'button', text: tl(lang, 'asst_go'), on: { click: () => runAction(b.action) } })); break;
-      case 'lesson': {
-        const lesson = findLesson(b.lessonId);
-        if (lesson) {
-          card().append(h('button', {
-            class: 'btn btn-soft btn-small', type: 'button',
-            text: tl(lang, 'asst_open_lesson_named', { lesson: `${lesson.icon || ''} ${lesson.title?.[lang] || lesson.title?.ar}`.trim() }),
-            on: { click: () => { closeDialog('assistantModal'); openLesson(b.lessonId); } },
-          }));
-        }
-        break;
-      }
-      case 'sources':
-        card().append(h('p', { class: 'small asst-sources' }, h('strong', { text: `${tl(lang, 'asst_sources')} ` }),
-          b.items.map((s) => (s.key ? tl(lang, s.key) : (s.label?.[lang] || s.label?.ar || ''))).filter(Boolean).join(' · ')));
-        break;
-      default: break;
-    }
-  }
-  return out;
+/** "Tell me more": other questions of the same category as the last answer. */
+function moreBlock(lastId) {
+  const last = entryById(lastId);
+  const lang = getLang();
+  const others = last ? ALL_ENTRIES.filter((e) => e.cat === last.cat && e.id !== last.id).slice(0, 6) : [];
+  if (!others.length) return h('p', { text: t('asst_no_more') });
+  return h('div', { class: 'asst-related' },
+    h('p', { text: t('asst_more_intro') }),
+    ...others.map((e) => h('button', { class: 'chip-btn', type: 'button', text: pickLang(e.q, lang), on: { click: () => answer(pickLang(e.q, lang)) } })));
+}
+
+function helpBlock(topics) {
+  const [main, ...more] = topics;
+  const mapped = entryById(HELP_TO_KB[main.id]);
+  if (mapped) return kbBlock([{ entry: mapped }, ...more.map((tp) => entryById(HELP_TO_KB[tp.id])).filter(Boolean).map((entry) => ({ entry }))]);
+  return h('div', { class: 'asst-help' },
+    h('p', { class: 'asst-help-title' }, h('span', { attrs: { 'aria-hidden': 'true' }, text: main.icon }), ` ${t(`help_${main.id}_q`)}`),
+    h('p', { text: t(`help_${main.id}`) }),
+    main.action ? h('button', { class: 'btn btn-primary btn-small', type: 'button', text: t('asst_go'), on: { click: () => runAction(main.action) } }) : null);
 }
 
 function sourceOf(p) {
@@ -232,7 +185,6 @@ function sourceOf(p) {
   };
 }
 
-/** Verbatim passages of the site's lessons and Hisn al-Muslim, each with its source (original behaviour). */
 function knowledgeBlock(results) {
   return h('div', { class: 'asst-knowledge' },
     h('p', { class: 'asst-help-title', text: t('asst_from_content') }),
@@ -247,7 +199,7 @@ function knowledgeBlock(results) {
         h('div', { class: 'asst-source' },
           h('span', { class: 'small', text: src.label }),
           src.button,
-          ref ? h('button', { class: 'btn btn-soft btn-small', type: 'button', text: t('asst_open_ayah', { ref: `${surahName(ref[0])} ${ref[1]}` }), on: { click: () => openAyah(ref[0], ref[1]) } }) : null));
+          ref ? h('button', { class: 'btn btn-soft btn-small', type: 'button', text: t('asst_open_ayah', { ref: `${surahName(ref[0])} ${ref[1]}` }), on: { click: () => { closeDialog('assistantModal'); actions.readSurah(ref[0], ref[1] - 1); } } }) : null));
     })));
 }
 
@@ -275,7 +227,7 @@ function quranSearchBlock(question) {
           h('p', { class: 'asst-excerpt asst-ayah', lang: 'ar', dir: 'rtl', text: `﴿${r.text}﴾` }),
           h('div', { class: 'asst-source' },
             h('span', { class: 'small', text: `${surahName(r.surah)} — ${t('ayah_label')} ${r.numberInSurah}` }),
-            h('button', { class: 'btn btn-soft btn-small', type: 'button', text: t('btn_open_surah'), on: { click: () => openAyah(r.surah, r.numberInSurah) } }))))));
+            h('button', { class: 'btn btn-soft btn-small', type: 'button', text: t('btn_open_surah'), on: { click: () => { closeDialog('assistantModal'); actions.readSurah(r.surah, r.numberInSurah - 1); } } }))))));
     } catch {
       box.replaceChildren(h('p', { class: 'small muted', text: t('asst_quran_error') }));
     }
@@ -285,81 +237,72 @@ function quranSearchBlock(question) {
   return box;
 }
 
-function chipsBlock(lang, followups) {
-  if (!followups.length) return null;
-  return h('div', { class: 'asst-related asst-followups', attrs: { role: 'group', 'aria-label': tl(lang, 'asst_suggest_more') } },
-    h('span', { class: 'small muted', text: tl(lang, 'asst_suggest_more') }),
-    ...followups.map((f) => {
-      const label = f.key ? tl(lang, f.key) : f.label;
-      return h('button', { class: 'chip-btn', type: 'button', text: label, on: { click: () => (f.id ? ask(label, { recordId: f.id }) : ask(label)) } });
-    }));
-}
-
-/** Turn an engine reply into the assistant's bubble. */
-function replyBubble(question, reply) {
-  const lang = reply.lang;
-  const parts = renderBlocks(reply);
-  let passages = [];
-  if (reply.passagesQuery) {
-    const limit = reply.recordId ? 2 : 4;
-    passages = searchKnowledge(getKnowledge(), reply.passagesQuery, limit);
-    if (!passages.length && reply.passagesQuery !== question) passages = searchKnowledge(getKnowledge(), question, limit);
-    if (passages.length) parts.push(knowledgeBlock(passages));
-  }
-  const nothing = !!reply.noAnswerFallback && !passages.length;
-  if (nothing) parts.push(h('p', { text: tl(lang, 'asst_no_answer') }));
-  if (reply.quranSearch && reply.noAnswerFallback) {
-    const quran = quranSearchBlock(reply.quranSearch);
+// ---------------------------------------------------------------------------------------- answering
+/** The original answer path (help topics, verified passages, Quran search) for questions the bases do not cover. */
+function fallbackParts(q) {
+  const topics = matchHelp(q);
+  const results = searchKnowledge(getKnowledge(), q, 4);
+  const parts = [];
+  if (topics.length) parts.push(helpBlock(topics));
+  if (results.length) parts.push(knowledgeBlock(results));
+  if (!topics.length && !results.length) parts.push(h('p', { text: t('asst_no_answer') }));
+  if (!topics.length) {
+    const quran = quranSearchBlock(q);
     if (quran) parts.push(quran);
   }
-  const religious = passages.length || ['islamic', 'new_muslim', 'ruling', 'unknown', 'tafsir'].includes(reply.intent);
-  if (religious) parts.push(h('p', { class: 'small muted asst-disclaimer', text: tl(lang, 'asst_disclaimer') }));
-  const chips = chipsBlock(lang, nothing ? SUGGESTIONS.map((key) => ({ key })) : reply.followups);
-  if (chips) parts.push(chips);
-  if (!parts.length) parts.push(h('p', { text: tl(lang, 'asst_no_answer') }));
-  const b = bubble('bot', lang, ...parts);
-  b.dataset.intent = reply.intent;
-  return b;
+  if (results.length || !topics.length) parts.push(h('p', { class: 'small muted asst-disclaimer', text: t('asst_disclaimer') }));
+  return parts;
 }
 
-let busy = Promise.resolve();
+export function answer(question) {
+  const q = String(question).trim().slice(0, 300);
+  if (!q) return;
+  el.log.append(bubble('user', h('p', { text: q })));
+  el.suggestWrap.hidden = true; // the suggestions make room for the conversation (they return with the intro)
 
-/** Ask a question (typed, a starter or a follow-up chip). Answers are shown in order. */
-function ask(question, { recordId = null } = {}) {
-  const q = String(question).replace(/\s+/g, ' ').trim().slice(0, 300);
-  if (!q) return busy;
-  el.log.append(h('div', { class: 'asst-msg asst-msg--user', attrs: { dir: 'auto' } }, h('p', { dir: 'auto', text: q })));
-  el.suggestWrap.hidden = true; // the starters make room for the conversation (they return with a new conversation)
-  const typing = h('div', { class: 'asst-msg asst-typing', attrs: { role: 'status', 'aria-label': t('asst_typing') } },
-    h('span', { attrs: { 'aria-hidden': 'true' } }), h('span', { attrs: { 'aria-hidden': 'true' } }), h('span', { attrs: { 'aria-hidden': 'true' } }));
-  el.log.append(typing);
-  busy = busy.then(async () => {
-    let b;
-    try {
-      const m = await loadEngine();
-      if (!ctx) ctx = m.newContext();
-      const reply = recordId ? m.respondRecord(recordId, ctx, { uiLang: getLang() }) : m.respond(q, ctx, { uiLang: getLang() });
-      b = replyBubble(q, reply);
-    } catch (err) {
-      console.error('[assistant]', err);
-      b = bubble('bot', getLang(), h('p', { text: t('asst_error') }));
-    }
-    typing.replaceWith(b);
-    while (el.log.children.length > MAX_LOG) el.log.firstElementChild.remove();
-    b.scrollIntoView?.({ block: 'nearest' });
-  });
-  return busy;
+  const r = respond(getIndex(), q, context);
+  const parts = [];
+  if (asksForRuling(q)) parts.push(h('p', { class: 'asst-notice', attrs: { role: 'note' }, text: t('asst_ruling_notice') }));
+  if (r.greeting) parts.push(h('p', { class: 'asst-smalltalk', text: t(`asst_st_${r.greeting}`) }));
+  // A weak knowledge-base match (one common word) defers to the site's verified lesson passages when they exist.
+  const passages = r.kind === 'answer' ? searchKnowledge(getKnowledge(), r.question || q, 4) : [];
+  const confident = r.kind === 'answer' && (r.entries[0].score >= CONFIDENT || r.followUp || !passages.length);
+  if (confident) {
+    if (r.followUp) parts.push(h('p', { class: 'small muted', text: t('asst_followup_note') }));
+    parts.push(kbBlock(r.entries));
+    if (ISLAMIC_IDS.has(r.entries[0].entry.id) && passages.length) parts.push(knowledgeBlock(passages.slice(0, 2)));
+    context = r.context;
+  } else if (r.kind === 'answer') {
+    parts.push(...fallbackParts(r.question || q));
+  } else if (r.kind === 'more') {
+    parts.push(moreBlock(context?.lastId));
+  } else if (r.kind === 'smalltalk') {
+    if (['salam', 'hello', 'morning', 'evening'].includes(r.greeting)) parts.push(h('p', { class: 'small muted', text: t('asst_st_offer') }));
+  } else {
+    parts.push(...fallbackParts(r.question || q));
+  }
+  const reply = bubble('bot', ...parts);
+  el.log.append(reply);
+  // Keep the newest exchange in view; trim very long conversations.
+  while (el.log.children.length > 40) el.log.firstElementChild.remove();
+  reply.scrollIntoView({ block: 'nearest' });
+}
+
+/** Ask a question from elsewhere in the site (e.g. a Quran Journey step): open the assistant and answer it. */
+export function askAssistant(question) {
+  openDialog('assistantModal');
+  if (!el.log.children.length) renderIntro();
+  answer(question);
 }
 
 function renderIntro() {
-  ctx = null; // a new conversation forgets the previous topic
-  if (engine) engine.then((m) => { if (!ctx) ctx = m.newContext(); }).catch(() => {});
-  el.log.replaceChildren(bubble('bot', getLang(),
-    h('p', { text: t('asst_welcome') }),
-    h('p', { class: 'small muted', text: t('asst_disclaimer') })));
+  context = null;
+  el.log.replaceChildren(bubble('bot',
+    h('p', { text: t('asst_welcome_v2') }),
+    h('p', { class: 'small muted', text: t('asst_disclaimer_v2') })));
   el.suggestWrap.hidden = false;
   el.suggestions.replaceChildren(...SUGGESTIONS.map((key) => h('button', {
-    class: 'chip-btn', type: 'button', text: t(key), on: { click: () => ask(t(key)) },
+    class: 'chip-btn', type: 'button', text: t(key), on: { click: () => answer(t(key)) },
   })));
 }
 
@@ -371,20 +314,15 @@ export function initAssistant(handlers) {
     input: document.getElementById('assistantInput'),
     suggestions: document.getElementById('assistantSuggestions'),
     suggestWrap: document.querySelector('#assistantModal .asst-suggest'),
-    reset: document.getElementById('assistantReset'),
   });
   if (!el.log) return;
   el.form.addEventListener('submit', (e) => {
     e.preventDefault();
     const q = el.input.value;
     el.input.value = '';
-    ask(q);
+    answer(q);
     el.input.focus();
   });
-  el.reset?.addEventListener('click', () => { renderIntro(); el.input.focus(); });
-  onDialogOpen('assistantModal', () => {
-    loadEngine().catch(() => {});
-    if (!el.log.children.length) renderIntro();
-  });
+  onDialogOpen('assistantModal', () => { if (!el.log.children.length) renderIntro(); });
   onLanguageChange(renderIntro);
 }

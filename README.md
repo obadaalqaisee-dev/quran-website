@@ -3,6 +3,11 @@
 **Live site:** <https://obadaalqaisee-dev.github.io/quran-website/>
 
 A bilingual (Arabic-first, also English, Spanish and French) Quran platform:
+- **organised into pages with a sidebar** (Home, Quran Journey, Assistant, the Holy Quran, Memorisation & learning,
+  Islamic education, Daily worship, Prayer & time, My dashboard): every page has its own link (`#/quran`, `#/prayer`…),
+  and the home page is a calm dashboard (dates, today's prayers and countdown, continue reading, shortcuts, daily content);
+- **«رحلتي مع القرآن» Quran Journey**: six guided learning paths (reading, memorisation, recitation, understanding,
+  wudu & prayer, basics of Islam) built on the site's tools, with progress, goals, achievements, history and gentle reminders;
 - read the Mushaf in Uthmani script, with Tafsir al-Muyassar and translations;
 - listen to 16 reciters, or to any single ayah;
 - memorise with speech recognition (التسميع): word-by-word feedback, six practice modes, a microphone check,
@@ -19,11 +24,9 @@ A bilingual (Arabic-first, also English, Spanish and French) Quran platform:
   planner, listening statistics, the suggested revision order, ayahs and words that need strengthening, and recitation accuracy;
 - **ayah notes and collections** (reflection, memorisation, review, Quranic supplications, or your own), a daily
   question from the site's own lessons, and a **backup/restore** file for everything stored on the device;
-- a **conversational assistant** («💬 المساعد») that greets naturally, keeps the topic across follow-up questions,
-  explains every feature (127 website questions), answers general questions about Islam with Quran references
-  loaded from the verified Mushaf and hadith cited by collection, and gives a careful, welcoming guide for people who
-  want to become Muslim — in Arabic (including dialect), English, Spanish and French. No AI model or API, nothing
-  typed leaves the page, works offline, issues no fatwas. See [docs/assistant.md](docs/assistant.md).
+- a **conversational site assistant** («💬 المساعد»): greetings and follow-up questions, 139 questions about the site,
+  introductory Islamic knowledge with Quran and hadith references, and a welcoming guide for people who want to embrace
+  Islam (no AI model, works offline, issues no fatwas).
 
 The site is a static frontend served by **GitHub Pages**. An optional **Python (FastAPI) backend** serves verified Quran data and privacy-preserving proxies. The site works fully without it.
 
@@ -38,6 +41,8 @@ The site is a static frontend served by **GitHub Pages**. An optional **Python (
 
 | Document | Contents |
 |---|---|
+| [docs/platform_transformation.md](docs/platform_transformation.md) | The platform transformation (2026-11-26): feature inventory and new locations, pages and sidebar, Quran Journey, assistant, tests, limitations |
+| [docs/assistant_questions.md](docs/assistant_questions.md) | Every question the assistant's knowledge bases answer |
 | [docs/innovation_phase.md](docs/innovation_phase.md) | The innovation phase (2026-11-25): research, evaluated ideas, what was built and why, privacy |
 | [docs/about_page.md](docs/about_page.md) | The «من أنا» page, its media (Al-Aqsa photo, nasheed) and autoplay behaviour; the rosary and prayer-learning reorganisation |
 | [docs/evolution_audit.md](docs/evolution_audit.md) | Audit before the platform evolution: test baseline, findings and resolutions, content policy |

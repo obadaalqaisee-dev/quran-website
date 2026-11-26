@@ -264,3 +264,94 @@ export const speechError = (page, code) => page.evaluate((c) => {
   rec.running = false;
   rec.onend?.();
 }, code);
+
+// ------------------------------------------------------------------ multi-page layout
+// Since the platform transformation, sections live on separate pages (index.html#/quran, #/prayer…). The older
+// suites were written for the single long page; autoReveal(page) makes them navigate first, like a visitor
+// choosing the page in the sidebar: before an action on a selector, the page that contains the element is shown
+// (via its route). Selectors inside modal dialogs, or not on any page, are left alone.
+const PAGE_OF_DIALOG = {
+  adhkarModal: 'adhkar', islamModal: 'islam', voiceTestModal: 'memorize', favoritesModal: 'favorites',
+  profileModal: 'profile', assistantModal: 'assistant', notesModal: 'notes', settingsModal: 'settings',
+};
+// Openers that were removed with the old top bar, drawer and dashboard tool grid map to their sidebar entries.
+async function translateOpener(page, selector) {
+  if (typeof selector !== 'string') return selector;
+  const m = /\[data-open="(\w+)"\]\s*$/.exec(selector);
+  if (!m) return selector;
+  if (await page.locator(selector).count().catch(() => 1)) return selector;
+  const id = m[1];
+  // On small screens the sidebar is an off-canvas menu: open it first.
+  await page.evaluate(() => {
+    if (getComputedStyle(document.getElementById('sidebar')).visibility === 'hidden') document.getElementById('sidebarToggle').click();
+  });
+  if (PAGE_OF_DIALOG[id]) return `.sidebar .side-link[data-route="${PAGE_OF_DIALOG[id]}"]`;
+  await page.evaluate((dialogId) => { // modal openers in a folded sidebar group: unfold it first
+    const link = document.querySelector(`.sidebar [data-open="${dialogId}"]`);
+    const list = link?.closest('.side-list');
+    if (list?.hidden) list.closest('.side-group').querySelector('.side-group-btn').click();
+  }, id);
+  return `.sidebar [data-open="${id}"]`;
+}
+
+export function autoReveal(page) {
+  if (process.env.E2E_FAST) page.setDefaultTimeout(8000);
+  const reveal = async (selector) => {
+    if (typeof selector !== 'string') return;
+    await page.evaluate((sel) => {
+      let el = null;
+      try { el = document.querySelector(sel); } catch { return; }
+      const target = el?.closest('.page');
+      if (target && target.hidden) { // replace (not push) the history entry, so the tests' back/forward steps are unchanged
+        history.replaceState(history.state, '', `#/${target.dataset.page === 'home' ? '' : target.dataset.page}`);
+        window.dispatchEvent(new HashChangeEvent('hashchange'));
+      }
+    }, selector).catch(() => {});
+  };
+  for (const name of ['click', 'dblclick', 'fill', 'check', 'uncheck', 'selectOption', 'press', 'focus', 'hover', 'tap', 'isVisible', 'textContent', 'innerText', 'type', 'dispatchEvent', 'setInputFiles']) {
+    const original = page[name].bind(page);
+    page[name] = async (selector, ...args) => {
+      const sel = ['click', 'dblclick', 'tap', 'focus', 'hover'].includes(name) ? await translateOpener(page, selector) : selector;
+      await reveal(sel);
+      return original(sel, ...args);
+    };
+  }
+  const originalWait = page.waitForSelector.bind(page);
+  page.waitForSelector = async (selector, options = {}) => {
+    if (options.state && options.state !== 'visible') return originalWait(selector, options);
+    await originalWait(selector, { ...options, state: 'attached' });
+    await reveal(selector);
+    return originalWait(selector, options);
+  };
+  const originalLocator = page.locator.bind(page);
+  const patchChain = (loc, selector) => {
+    for (const name of ['first', 'last', 'nth', 'locator', 'filter', 'getByText', 'getByRole']) {
+      const make = loc[name].bind(loc);
+      loc[name] = (...args) => {
+        const child = make(...args);
+        for (const action of ['click', 'fill', 'check', 'press', 'focus', 'isVisible', 'textContent', 'waitFor', 'scrollIntoViewIfNeeded', 'boundingBox']) {
+          const original = child[action].bind(child);
+          child[action] = async (...a) => { await reveal(selector); return original(...a); };
+        }
+        return patchChain(child, selector);
+      };
+    }
+    return loc;
+  };
+  page.locator = (selector, ...rest) => {
+    const loc = patchChain(originalLocator(selector, ...rest), selector);
+    for (const name of ['click', 'fill', 'check', 'uncheck', 'selectOption', 'press', 'focus', 'isVisible', 'textContent', 'innerText', 'scrollIntoViewIfNeeded', 'boundingBox', 'waitFor', 'allTextContents', 'screenshot']) {
+      const original = loc[name].bind(loc);
+      loc[name] = async (...args) => {
+        if (name === 'click' && rest.length === 0) {
+          const sel = await translateOpener(page, selector);
+          if (sel !== selector) { await reveal(sel); return originalLocator(sel).click(...args); }
+        }
+        await reveal(selector);
+        return original(...args);
+      };
+    }
+    return loc;
+  };
+  return page;
+}

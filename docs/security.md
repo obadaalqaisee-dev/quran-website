@@ -109,8 +109,3 @@ attributes. New surfaces and how they are handled:
   third-party call, and the optional Quran word search uses the existing Quran search endpoint. Typed questions are
   capped at 300 characters and rendered with `textContent` (an e2e test types markup and checks that it is shown as
   text). The CSP is unchanged.
-* **Conversational assistant (docs/assistant.md).** Still no AI model or third-party AI call. The conversation context
-  is kept in memory only and is cleared by «🧹 محادثة جديدة» or a reload. Replies are structured blocks validated
-  before rendering (invalid ayah references, unsourced hadith, unknown actions or non-local links are dropped), and
-  rendered with `textContent`. Prompt-injection phrasing gets a fixed reply. Quran text is never stored in the
-  knowledge base: it is loaded from the verified source by reference, and unit tests check every reference.

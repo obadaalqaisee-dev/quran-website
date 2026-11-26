@@ -75,7 +75,6 @@
   <link rel="modulepreload" href="assets/js/core/api.js">
   <link rel="modulepreload" href="assets/js/core/arabic.js">
   <link rel="modulepreload" href="assets/js/core/assistant.js">
-  <link rel="modulepreload" href="assets/js/core/assistant-engine.js">
   <link rel="modulepreload" href="assets/js/core/backup.js">
   <link rel="modulepreload" href="assets/js/core/challenge.js">
   <link rel="modulepreload" href="assets/js/core/dom.js">
@@ -102,10 +101,6 @@
   <link rel="modulepreload" href="assets/js/data/reciters.js">
   <link rel="modulepreload" href="assets/js/data/scholar-resources.js">
   <link rel="modulepreload" href="assets/js/data/surahs.js">
-  <link rel="modulepreload" href="assets/js/data/assistant/entities.js">
-  <link rel="modulepreload" href="assets/js/data/assistant/islamic-kb.js">
-  <link rel="modulepreload" href="assets/js/data/assistant/site-faq.js">
-  <link rel="modulepreload" href="assets/js/data/assistant/small-talk.js">
   <link rel="modulepreload" href="assets/js/data/translations-assistant.js">
   <link rel="modulepreload" href="assets/js/data/translations-ext.js">
   <link rel="modulepreload" href="assets/js/data/translations-insights.js">
@@ -131,6 +126,18 @@
   <link rel="modulepreload" href="assets/js/features/theme.js">
   <link rel="modulepreload" href="assets/js/features/voice-lab.js">
   <link rel="modulepreload" href="assets/js/features/wird.js">
+  <link rel="modulepreload" href="assets/js/core/routes.js">
+  <link rel="modulepreload" href="assets/js/core/router.js">
+  <link rel="modulepreload" href="assets/js/core/conversation.js">
+  <link rel="modulepreload" href="assets/js/core/journey.js">
+  <link rel="modulepreload" href="assets/js/core/reminders.js">
+  <link rel="modulepreload" href="assets/js/features/sidebar.js">
+  <link rel="modulepreload" href="assets/js/features/home.js">
+  <link rel="modulepreload" href="assets/js/features/journey.js">
+  <link rel="modulepreload" href="assets/js/data/assistant-kb.js">
+  <link rel="modulepreload" href="assets/js/data/islamic-kb.js">
+  <link rel="modulepreload" href="assets/js/data/journey-paths.js">
+  <link rel="modulepreload" href="assets/js/data/translations-platform.js">
   <link rel="modulepreload" href="assets/js/main.js">
   <script src="assets/js/analytics.js" async></script>
   <script type="module" src="assets/js/main.js"></script>
@@ -143,15 +150,17 @@
     <p>القرآن الكريم</p>
   </div>
   <a class="skip-link" href="#main" data-i18n="skip_to_content">تخطَّ إلى المحتوى</a>
-
-  <!-- ================= Header & navigation ================= -->
+  <!-- ================= Header (top bar) ================= -->
   <header class="site-header" id="siteHeader">
-    <div class="container header-bar">
-      <button class="icon-btn menu-btn" type="button" data-open="sideMenu" aria-controls="sideMenu" data-i18n-aria-label="menu_open" aria-label="فتح القائمة">
+    <div class="header-bar">
+      <button class="icon-btn menu-btn" id="sidebarToggle" type="button" data-open="sideMenu" aria-controls="sidebar" aria-expanded="false" data-i18n-aria-label="menu_open" aria-label="فتح القائمة">
         <span aria-hidden="true">☰</span>
       </button>
-      <a href="#home" class="logo" data-i18n="logo_text">القرآن <span>الكريم</span></a>
+      <a href="#/" class="logo" data-i18n="logo_text">القرآن <span>الكريم</span></a>
       <div class="header-tools">
+        <button class="icon-btn" type="button" data-open="islamicSearchModal" data-i18n-aria-label="dash_btn_search" aria-label="البحث الإسلامي" data-i18n-title="dash_btn_search" title="البحث الإسلامي">
+          <span aria-hidden="true">🔎</span>
+        </button>
         <label class="lang-wrap">
           <span class="lang-icon" aria-hidden="true">🌐</span>
           <span class="visually-hidden" data-i18n="lang_label">اللغة</span>
@@ -165,48 +174,103 @@
         <button id="themeToggle" class="icon-btn theme-toggle" type="button" aria-pressed="false" data-i18n-aria-label="theme_toggle" aria-label="تبديل الوضع الليلي" data-i18n-title="theme_toggle" title="تبديل الوضع الليلي">
           <span aria-hidden="true" class="theme-icon">🌙</span>
         </button>
-        <button class="icon-btn" type="button" data-open="settingsModal" data-i18n-aria-label="settings_title" aria-label="الإعدادات" data-i18n-title="settings_title" title="الإعدادات">
+        <a class="icon-btn" href="#/settings" data-i18n-aria-label="settings_title" aria-label="الإعدادات" data-i18n-title="settings_title" title="الإعدادات">
           <span aria-hidden="true">⚙️</span>
-        </button>
+        </a>
       </div>
     </div>
-    <nav class="main-nav" data-i18n-aria-label="main_nav" aria-label="التنقل الرئيسي">
-      <ul class="container nav-links">
-        <li><a href="#surahs" data-i18n="nav_surahs">السور</a></li>
-        <li><a href="#prayerSection" data-i18n="nav_prayer">مواقيت الصلاة</a></li>
-        <li><button type="button" class="nav-btn" data-open="adhkarModal" data-i18n="nav_adhkar">📿 حصن المسلم</button></li>
-        <li><button type="button" class="nav-btn" data-open="islamModal" data-i18n="nav_islam">🕌 الإسلام</button></li>
-        <li><button type="button" class="nav-btn" data-open="ayahSearchModal" data-i18n="nav_ayah_search">🔍 بحث آيات</button></li>
-        <li><button type="button" class="nav-btn nav-btn--accent" data-open="voiceTestModal" data-i18n="nav_voice_test">🎙️ التسميع</button></li>
-        <li><a href="#learnSection" class="nav-link--accent" data-i18n="nav_learn_prayer">🕋 تعلم الصلاة الصحيحة</a></li>
-        <li><a href="#academySection" data-i18n="nav_academy">🎓 الأكاديمية</a></li>
-        <li><a href="about.html" class="nav-link--about" data-i18n="nav_about">🕊️ من أنا</a></li>
-      </ul>
-    </nav>
   </header>
 
-  <!-- ================= Side menu (drawer) ================= -->
-  <dialog class="drawer" id="sideMenu" aria-labelledby="sideMenuTitle">
-    <div class="drawer-header">
-      <h2 class="drawer-title" id="sideMenuTitle" data-i18n="side_menu_title">القائمة</h2>
-      <button class="icon-btn close-btn" type="button" data-close data-i18n-aria-label="close" aria-label="إغلاق"><span aria-hidden="true">✖</span></button>
-    </div>
-    <ul class="drawer-links">
-      <li><button type="button" data-open="favoritesModal"><span class="ico" aria-hidden="true">⭐</span> <span data-i18n="side_favorites">المفضلة</span></button></li>
-      <li><button type="button" data-open="profileModal"><span class="ico" aria-hidden="true">👤</span> <span data-i18n="side_profile">حسابي</span></button></li>
-      <li><button type="button" data-open="loginModal"><span class="ico" aria-hidden="true">👤</span> <span data-i18n="side_login">تسجيل دخول</span></button></li>
-      <li><button type="button" data-open="donateModal"><span class="ico" aria-hidden="true">💖</span> <span data-i18n="side_donate">تبرع</span></button></li>
-      <li><button type="button" data-open="contactModal"><span class="ico" aria-hidden="true">✉️</span> <span data-i18n="side_contact">تواصل معنا</span></button></li>
-      <li><button type="button" data-open="settingsModal"><span class="ico" aria-hidden="true">⚙️</span> <span data-i18n="side_settings">الإعدادات</span></button></li>
-      <li><button type="button" data-open="notesModal"><span class="ico" aria-hidden="true">📝</span> <span data-i18n="notes_tool">ملاحظاتي</span></button></li>
-      <li><button type="button" data-open="assistantModal"><span class="ico" aria-hidden="true">💬</span> <span data-i18n="asst_open">المساعد</span></button></li>
-      <li><a href="about.html" class="drawer-link"><span class="ico" aria-hidden="true">🕊️</span> <span data-i18n="side_about">من أنا</span></a></li>
-    </ul>
-  </dialog>
+  <div class="app-shell" id="appShell">
+    <!-- ================= Sidebar: every feature of the site, grouped (core/routes.js lists the pages) ================= -->
+    <aside class="sidebar" id="sidebar" data-i18n-aria-label="main_nav" aria-label="التنقل الرئيسي">
+      <div class="sidebar-head">
+        <span class="sidebar-title" data-i18n="side_menu_title">القائمة</span>
+        <button class="icon-btn sidebar-collapse" id="sidebarCollapse" type="button" aria-pressed="false" data-i18n-aria-label="sb_collapse" aria-label="طي القائمة" data-i18n-title="sb_collapse" title="طي القائمة"><span aria-hidden="true">⇤</span></button>
+        <button class="icon-btn sidebar-close" id="sidebarClose" type="button" data-i18n-aria-label="close" aria-label="إغلاق"><span aria-hidden="true">✖</span></button>
+      </div>
+      <nav class="side-nav" data-i18n-aria-label="main_nav" aria-label="التنقل الرئيسي">
+        <ul class="side-list">
+          <li><a class="side-link" href="#/" data-route="home"><span class="side-ico" aria-hidden="true">🏠</span><span class="side-label" data-i18n="sb_home">الرئيسية</span></a></li>
+          <li><a class="side-link" href="#/journey" data-route="journey"><span class="side-ico" aria-hidden="true">🧭</span><span class="side-label" data-i18n="sb_journey">رحلتي مع القرآن</span></a></li>
+          <li><a class="side-link" href="#/assistant" data-route="assistant"><span class="side-ico" aria-hidden="true">💬</span><span class="side-label" data-i18n="sb_assistant">المساعد</span></a></li>
+        </ul>
 
+        <div class="side-group" data-group="quran">
+          <button type="button" class="side-group-btn" aria-expanded="true" aria-controls="sgQuran"><span class="side-label" data-i18n="sbg_quran">القرآن الكريم</span><span class="chev" aria-hidden="true"></span></button>
+          <ul class="side-list" id="sgQuran">
+            <li><a class="side-link" href="#/quran" data-route="quran"><span class="side-ico" aria-hidden="true">📖</span><span class="side-label" data-i18n="sb_quran">المصحف وفهرس السور</span></a></li>
+            <li><a class="side-link" href="#/read" data-route="read"><span class="side-ico" aria-hidden="true">🔖</span><span class="side-label" data-i18n="sb_continue">متابعة القراءة</span></a></li>
+            <li><a class="side-link" href="#/tafsir" data-route="tafsir"><span class="side-ico" aria-hidden="true">📚</span><span class="side-label" data-i18n="sb_tafsir">التفسير والترجمات</span></a></li>
+            <li><a class="side-link" href="#/audio" data-route="audio"><span class="side-ico" aria-hidden="true">🎧</span><span class="side-label" data-i18n="sb_audio">التلاوات الصوتية</span></a></li>
+            <li><button type="button" class="side-link" data-open="ayahSearchModal"><span class="side-ico" aria-hidden="true">🔍</span><span class="side-label" data-i18n="sb_ayah_search">البحث في الآيات</span></button></li>
+            <li><a class="side-link" href="#/favorites" data-route="favorites"><span class="side-ico" aria-hidden="true">⭐</span><span class="side-label" data-i18n="side_favorites">المفضلة</span></a></li>
+          </ul>
+        </div>
+
+        <div class="side-group" data-group="memo">
+          <button type="button" class="side-group-btn" aria-expanded="true" aria-controls="sgMemo"><span class="side-label" data-i18n="sbg_memo">الحفظ والتعلم</span><span class="chev" aria-hidden="true"></span></button>
+          <ul class="side-list" id="sgMemo">
+            <li><a class="side-link" href="#/memorize" data-route="memorize"><span class="side-ico" aria-hidden="true">🎙️</span><span class="side-label" data-i18n="sb_memorize">التسميع والحفظ</span></a></li>
+            <li><a class="side-link" href="#/memorize/plan" data-route="memorize/plan"><span class="side-ico" aria-hidden="true">🔄</span><span class="side-label" data-i18n="sb_revision">خطتي ومراجعاتي</span></a></li>
+          </ul>
+        </div>
+
+        <div class="side-group" data-group="learn">
+          <button type="button" class="side-group-btn" aria-expanded="true" aria-controls="sgLearn"><span class="side-label" data-i18n="sbg_learn">التعليم الإسلامي</span><span class="chev" aria-hidden="true"></span></button>
+          <ul class="side-list" id="sgLearn">
+            <li><a class="side-link" href="#/learn-prayer" data-route="learn-prayer"><span class="side-ico" aria-hidden="true">🕋</span><span class="side-label" data-i18n="sb_learn_prayer">تعلم الصلاة الصحيحة</span></a></li>
+            <li><a class="side-link" href="#/learn-prayer/wudu" data-route="learn-prayer/wudu"><span class="side-ico" aria-hidden="true">💧</span><span class="side-label" data-i18n="sb_wudu">تعلم الوضوء</span></a></li>
+            <li><a class="side-link" href="#/academy" data-route="academy"><span class="side-ico" aria-hidden="true">🎓</span><span class="side-label" data-i18n="sb_academy">الأكاديمية الإسلامية</span></a></li>
+            <li><a class="side-link" href="#/islam" data-route="islam"><span class="side-ico" aria-hidden="true">🕌</span><span class="side-label" data-i18n="sb_islam">رسالة الإسلام</span></a></li>
+            <li><button type="button" class="side-link" data-open="islamicSearchModal"><span class="side-ico" aria-hidden="true">🔎</span><span class="side-label" data-i18n="dash_btn_search">البحث الإسلامي</span></button></li>
+          </ul>
+        </div>
+
+        <div class="side-group" data-group="worship">
+          <button type="button" class="side-group-btn" aria-expanded="true" aria-controls="sgWorship"><span class="side-label" data-i18n="sbg_worship">العبادات اليومية</span><span class="chev" aria-hidden="true"></span></button>
+          <ul class="side-list" id="sgWorship">
+            <li><a class="side-link" href="#/adhkar" data-route="adhkar"><span class="side-ico" aria-hidden="true">📿</span><span class="side-label" data-i18n="sb_adhkar">الأذكار وحصن المسلم</span></a></li>
+            <li><a class="side-link" href="#/tasbih" data-route="tasbih"><span class="side-ico" aria-hidden="true">🧮</span><span class="side-label" data-i18n="sb_tasbih">المسبحة الإلكترونية</span></a></li>
+            <li><a class="side-link" href="#/journey/reminders" data-route="journey/reminders"><span class="side-ico" aria-hidden="true">⏰</span><span class="side-label" data-i18n="sb_reminders">التذكيرات اليومية</span></a></li>
+          </ul>
+        </div>
+
+        <div class="side-group" data-group="time">
+          <button type="button" class="side-group-btn" aria-expanded="true" aria-controls="sgTime"><span class="side-label" data-i18n="sbg_time">الصلاة والوقت</span><span class="chev" aria-hidden="true"></span></button>
+          <ul class="side-list" id="sgTime">
+            <li><a class="side-link" href="#/prayer" data-route="prayer"><span class="side-ico" aria-hidden="true">🕰️</span><span class="side-label" data-i18n="sb_prayer">مواقيت الصلاة والتقويم الهجري</span></a></li>
+          </ul>
+        </div>
+
+        <div class="side-group" data-group="me">
+          <button type="button" class="side-group-btn" aria-expanded="true" aria-controls="sgMe"><span class="side-label" data-i18n="sbg_me">لوحتي الشخصية</span><span class="chev" aria-hidden="true"></span></button>
+          <ul class="side-list" id="sgMe">
+            <li><a class="side-link" href="#/progress" data-route="progress"><span class="side-ico" aria-hidden="true">📊</span><span class="side-label" data-i18n="sb_progress">تقدمي والورد اليومي</span></a></li>
+            <li><a class="side-link" href="#/notes" data-route="notes"><span class="side-ico" aria-hidden="true">📝</span><span class="side-label" data-i18n="notes_tool">ملاحظاتي</span></a></li>
+            <li><a class="side-link" href="#/profile" data-route="profile"><span class="side-ico" aria-hidden="true">👤</span><span class="side-label" data-i18n="side_profile">حسابي</span></a></li>
+            <li><a class="side-link" href="#/settings" data-route="settings"><span class="side-ico" aria-hidden="true">⚙️</span><span class="side-label" data-i18n="side_settings">الإعدادات</span></a></li>
+          </ul>
+        </div>
+
+        <div class="side-group" data-group="more">
+          <button type="button" class="side-group-btn" aria-expanded="false" aria-controls="sgMore"><span class="side-label" data-i18n="sbg_more">المزيد</span><span class="chev" aria-hidden="true"></span></button>
+          <ul class="side-list" id="sgMore" hidden>
+            <li><a class="side-link" href="about.html"><span class="side-ico" aria-hidden="true">🕊️</span><span class="side-label" data-i18n="side_about">من أنا</span></a></li>
+            <li><button type="button" class="side-link" data-open="contactModal"><span class="side-ico" aria-hidden="true">✉️</span><span class="side-label" data-i18n="side_contact">تواصل معنا</span></button></li>
+            <li><button type="button" class="side-link" data-open="donateModal"><span class="side-ico" aria-hidden="true">💖</span><span class="side-label" data-i18n="side_donate">تبرع</span></button></li>
+            <li><button type="button" class="side-link" data-open="loginModal"><span class="side-ico" aria-hidden="true">🔑</span><span class="side-label" data-i18n="side_login">تسجيل دخول</span></button></li>
+          </ul>
+        </div>
+      </nav>
+    </aside>
+    <div class="sidebar-backdrop" id="sidebarBackdrop" hidden></div>
+    <div class="app-content">
   <main id="main" tabindex="-1">
-    <!-- ================= Hero ================= -->
-    <section class="hero" id="home" aria-labelledby="heroTitle">
+    <div id="topSentinel" class="top-sentinel" aria-hidden="true"></div>
+    <!-- ================= Page: home ================= -->
+    <section class="page page--home" id="page-home" data-page="home" data-i18n-aria-label="sb_home" aria-label="الرئيسية">
+      <section class="hero hero--home" id="home" aria-labelledby="heroTitle">
       <!-- Original vector artwork (scripts/generate_artwork.mjs): local, works offline, 3 KB. -->
       <img class="hero-bg" alt="" fetchpriority="high" decoding="async" width="1600" height="1000" src="assets/img/backdrop.svg">
       <div class="hero-content container">
@@ -219,7 +283,140 @@
         </div>
       </div>
     </section>
+      <div class="home-dates container" aria-live="off">
+        <p class="home-greeting" data-i18n="home_greeting">السلام عليكم ورحمة الله وبركاته</p>
+        <p class="home-date"><span id="homeDate"></span> <span class="dot" aria-hidden="true">·</span> <strong id="homeHijri" class="hijri-date"></strong></p>
+      </div>
 
+      <div class="container home-grid">
+        <!-- Prayer times (the most prominent component) -->
+        <section class="card home-card home-prayer" aria-labelledby="homePrayerTitle">
+          <header class="home-card-head">
+            <h2 class="home-card-title" id="homePrayerTitle" data-i18n="home_prayer_title">🕌 مواقيت الصلاة اليوم</h2>
+            <a class="link-btn small" href="#/prayer" data-i18n="home_prayer_all">كل المواقيت ←</a>
+          </header>
+          <article class="card next-prayer-card" aria-live="off">
+              <span class="badge" data-i18n="dash_next_prayer">🕌 الصلاة القادمة</span>
+              <h2 class="next-prayer-name" id="nextPrayerName" data-i18n="dash_calc">جاري الحساب...</h2>
+              <p class="countdown" id="prayerCountdown" dir="ltr">--:--:--</p>
+              <p class="next-prayer-time" id="nextPrayerTime" dir="ltr">--:--</p>
+            </article>
+          <ol class="home-prayer-list" id="homePrayerList" aria-live="off"></ol>
+          <p class="home-card-foot">
+            <button class="btn btn-soft btn-small" type="button" data-notify-btn data-i18n="profile_notify_btn">تفعيل الإشعارات</button>
+            <a class="btn btn-ghost-soft btn-small" href="#/settings" data-i18n="home_prayer_settings">إعدادات التنبيه</a>
+          </p>
+        </section>
+
+        <!-- Quran access -->
+        <section class="card home-card home-quran" aria-labelledby="homeQuranTitle">
+          <header class="home-card-head">
+            <h2 class="home-card-title" id="homeQuranTitle" data-i18n="home_quran_title">📖 القرآن الكريم</h2>
+            <a class="link-btn small" href="#/quran" data-i18n="home_quran_index">فهرس السور ←</a>
+          </header>
+          <div id="homeContinue" class="home-continue"></div>
+          <form class="home-open" id="homeOpenForm">
+            <label class="visually-hidden" for="homeSurahSelect" data-i18n="home_choose_surah">اختر سورة</label>
+            <select id="homeSurahSelect" class="reciter-select reciter-select--compact"></select>
+            <button class="btn btn-primary btn-small" type="submit" data-i18n="home_open_surah">افتح السورة</button>
+          </form>
+          <div class="home-recent">
+            <h3 class="small muted" data-i18n="home_recent_title">آخر ما قرأت</h3>
+            <ul class="chips" id="homeRecent"></ul>
+          </div>
+        </section>
+      </div>
+
+      <!-- Essential quick actions (every other tool is in the sidebar) -->
+      <nav class="container quick-actions" data-i18n-aria-label="home_quick_title" aria-label="اختصارات">
+        <a class="quick-action" href="#/quran"><span aria-hidden="true">📖</span><span data-i18n="qa_quran">قراءة القرآن</span></a>
+        <a class="quick-action" href="#/audio"><span aria-hidden="true">🎧</span><span data-i18n="qa_audio">الاستماع</span></a>
+        <a class="quick-action" href="#/memorize"><span aria-hidden="true">🎙️</span><span data-i18n="qa_memorize">الحفظ والتسميع</span></a>
+        <a class="quick-action" href="#/adhkar"><span aria-hidden="true">📿</span><span data-i18n="qa_adhkar">الأذكار</span></a>
+        <a class="quick-action" href="#/journey"><span aria-hidden="true">🧭</span><span data-i18n="qa_journey">رحلتي مع القرآن</span></a>
+        <a class="quick-action" href="#/assistant"><span aria-hidden="true">💬</span><span data-i18n="qa_assistant">المساعد</span></a>
+      </nav>
+
+      <!-- Personal progress: the current Quran Journey path (rendered by features/journey.js) -->
+      <div class="container">
+        <section class="card home-card home-journey" id="homeJourney" aria-labelledby="homeJourneyTitle">
+          <h2 class="home-card-title" id="homeJourneyTitle" data-i18n="home_journey_title">🧭 رحلتي مع القرآن</h2>
+          <div id="homeJourneyBody"></div>
+        </section>
+      </div>
+
+      <!-- Daily Islamic content -->
+      <section class="container home-daily" aria-labelledby="homeDailyTitle">
+        <h2 class="sub-title" id="homeDailyTitle" data-i18n="companion_title">☀️ رفيقك اليومي</h2>
+        <div id="companionGrid" class="companion-grid"></div>
+      </section>
+    </section>
+
+    <!-- ================= Page: journey ================= -->
+    <section class="page" id="page-journey" data-page="journey" data-i18n-aria-label="sb_journey" aria-label="journey" hidden>
+      <header class="page-header container">
+        <h2 class="page-title"><span aria-hidden="true">🧭</span> <span data-i18n="jr_title">رحلتي مع القرآن</span></h2>
+        <p class="page-sub" data-i18n="jr_sub">مسارات تعليمية مرتبة تربط أدوات الموقع خطوةً بخطوة. اختر مسارًا، وتابع من حيث توقفت.</p>
+      </header>
+      <div class="container journey-page">
+        <section class="card journey-overview" id="journeyOverview" aria-live="polite"></section>
+        <div id="journeyPaths" class="journey-paths"></div>
+        <section class="card journey-detail" id="journeyDetail" hidden tabindex="-1"></section>
+        <div class="journey-side">
+          <section class="card" id="journeyGoals" aria-labelledby="journeyGoalsTitle">
+            <h2 class="card-title" id="journeyGoalsTitle" data-i18n="jr_goals_title">🎯 أهدافي</h2>
+            <form id="journeyGoalsForm" class="journey-goals">
+              <label><span data-i18n="jr_goal_daily">خطوات يوميًا</span>
+                <select id="jrDailyGoal" class="reciter-select reciter-select--compact"><option>1</option><option>2</option><option>3</option><option>5</option></select></label>
+              <label><span data-i18n="jr_goal_weekly">خطوات أسبوعيًا</span>
+                <select id="jrWeeklyGoal" class="reciter-select reciter-select--compact"><option>3</option><option>5</option><option>7</option><option>10</option><option>14</option></select></label>
+            </form>
+            <div id="journeyGoalStatus"></div>
+          </section>
+          <section class="card" id="journeyReminders" aria-labelledby="journeyRemindersTitle" tabindex="-1">
+            <h2 class="card-title" id="journeyRemindersTitle" data-i18n="jr_rem_title">⏰ التذكيرات</h2>
+            <p class="small muted" data-i18n="jr_rem_note">تذكير لطيف مرة واحدة في اليوم في الوقت الذي تختاره، ما دام الموقع مفتوحًا أو مثبتًا ونشطًا. لا يُرسل شيء إلى أي خادم.</p>
+            <div id="reminderList" class="reminder-list"></div>
+          </section>
+          <section class="card" id="journeyAchievements" aria-labelledby="journeyAchTitle">
+            <h2 class="card-title" id="journeyAchTitle" data-i18n="jr_ach_title">🏅 إنجازاتي</h2>
+            <ul id="achievementList" class="achievement-list"></ul>
+          </section>
+          <section class="card" id="journeyHistory" aria-labelledby="journeyHistTitle">
+            <h2 class="card-title" id="journeyHistTitle" data-i18n="jr_hist_title">🕓 سجل التعلم</h2>
+            <ol id="historyList" class="history-list"></ol>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= Page: assistant ================= -->
+    <section class="page" id="page-assistant" data-page="assistant" data-i18n-aria-label="sb_assistant" aria-label="assistant" hidden>
+      <header class="page-header container">
+        <h2 class="page-title"><span aria-hidden="true">💬</span> <span data-i18n="pg_assistant_title">المساعد</span></h2>
+        <p class="page-sub" data-i18n="pg_assistant_sub">اسأل عن استخدام الموقع أو عن أساسيات الإسلام، وستجد الإجابة مع مصدرها.</p>
+      </header>
+      <div class="container page-embed">
+      <!-- Site assistant: site help + answers from the verified content (no AI model, no network for answers) -->
+      <dialog id="assistantModal" data-page-dialog class="modal dialog--page modal--wide assistant" aria-labelledby="assistantTitle">
+        <button class="icon-btn close-btn" type="button" data-close data-i18n-aria-label="close" aria-label="إغلاق"><span aria-hidden="true">✖</span></button>
+        <h2 class="modal-title" id="assistantTitle" data-i18n="asst_title">💬 مساعد الموقع</h2>
+        <div id="assistantLog" class="asst-log" role="log" aria-live="polite"></div>
+        <div class="asst-suggest" role="group" aria-labelledby="assistantSuggestTitle">
+          <span class="small muted" id="assistantSuggestTitle" data-i18n="asst_suggestions">أسئلة مقترحة</span>
+          <div id="assistantSuggestions" class="asst-chips"></div>
+        </div>
+        <form id="assistantForm" class="asst-form">
+          <label class="visually-hidden" for="assistantInput" data-i18n="asst_input_label">اكتب سؤالك</label>
+          <input type="search" id="assistantInput" maxlength="300" autocomplete="off" enterkeyhint="send" placeholder="مثال: كيف أسمّع سورة؟ أو ما هي شروط الصلاة؟" data-i18n-placeholder="asst_placeholder">
+          <button class="btn btn-primary" type="submit" data-i18n="asst_send">اسأل</button>
+        </form>
+      </dialog>
+      </div>
+    </section>
+
+    <!-- ================= Page: quran ================= -->
+    <section class="page" id="page-quran" data-page="quran" data-i18n-aria-label="sb_quran" aria-label="quran" hidden>
     <!-- ================= Stats ================= -->
     <div class="container">
       <ul class="stats">
@@ -229,112 +426,6 @@
         <li class="stat-card"><strong data-i18n="stat_4_num">أوقات</strong><span data-i18n="stat_4_txt">الصلاة</span></li>
       </ul>
     </div>
-
-    <!-- ================= Dashboard ================= -->
-    <section class="section section--tight" id="dashboardSection" aria-label="Dashboard">
-      <div class="container dashboard-grid">
-        <article class="card next-prayer-card" aria-live="off">
-          <span class="badge" data-i18n="dash_next_prayer">🕌 الصلاة القادمة</span>
-          <h2 class="next-prayer-name" id="nextPrayerName" data-i18n="dash_calc">جاري الحساب...</h2>
-          <p class="countdown" id="prayerCountdown" dir="ltr">--:--:--</p>
-          <p class="next-prayer-time" id="nextPrayerTime" dir="ltr">--:--</p>
-        </article>
-        <article class="card wird-card">
-          <h2 class="card-title" data-i18n="dash_wird_title">📖 وردك اليومي</h2>
-          <p id="wirdSummary" aria-live="polite">0 من 4 مكتمل</p>
-          <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="wirdProgress" aria-labelledby="wirdSummary">
-            <span id="wirdProgressBar"></span>
-          </div>
-          <div class="wird-items">
-            <label class="wird-item"><input type="checkbox" data-wird="quran"> <span data-i18n="dash_wird_1">📖 القرآن</span></label>
-            <label class="wird-item"><input type="checkbox" data-wird="morning"> <span data-i18n="dash_wird_2">☀️ أذكار الصباح</span></label>
-            <label class="wird-item"><input type="checkbox" data-wird="evening"> <span data-i18n="dash_wird_3">🌙 أذكار المساء</span></label>
-            <label class="wird-item"><input type="checkbox" data-wird="prayer"> <span data-i18n="dash_wird_4">🕌 المحافظة على الصلاة</span></label>
-          </div>
-        </article>
-      </div>
-      <div class="container tool-grid">
-        <button type="button" class="tool-card" data-open="favoritesModal"><span class="tool-icon" aria-hidden="true">⭐</span><strong data-i18n="dash_btn_fav">المفضلة</strong><small data-i18n="dash_btn_fav_sub">السور المحفوظة</small></button>
-        <button type="button" class="tool-card" data-open="islamicSearchModal"><span class="tool-icon" aria-hidden="true">🔎</span><strong data-i18n="dash_btn_search">البحث الإسلامي</strong><small data-i18n="dash_btn_search_sub">آيات وأذكار ومحتوى الموقع</small></button>
-        <button type="button" class="tool-card" data-open="profileModal"><span class="tool-icon" aria-hidden="true">👤</span><strong data-i18n="dash_btn_profile">حسابي</strong><small data-i18n="dash_btn_profile_sub">حفظ تقدمك على هذا الجهاز</small></button>
-        <button type="button" class="tool-card" data-open="settingsModal"><span class="tool-icon" aria-hidden="true">⚙️</span><strong data-i18n="settings_title">الإعدادات</strong><small data-i18n="settings_sub">الخط، القارئ، الأهداف، التنبيهات</small></button>
-        <button type="button" class="tool-card" data-open="assistantModal"><span class="tool-icon" aria-hidden="true">💬</span><strong data-i18n="asst_open">المساعد</strong><small data-i18n="asst_tool_sub">اسأل عن الموقع أو عن الإسلام</small></button>
-        <button type="button" class="tool-card" data-open="notesModal"><span class="tool-icon" aria-hidden="true">📝</span><strong data-i18n="notes_tool">ملاحظاتي</strong><small data-i18n="notes_tool_sub">آيات صنّفتها وكتبت عنها</small></button>
-      </div>
-      <div class="container journey">
-        <h2 class="sub-title" data-i18n="journey_title">🌿 رحلتي اليومية</h2>
-        <div id="journeyGrid" class="journey-grid" aria-live="polite"></div>
-        <h2 class="sub-title" data-i18n="companion_title">☀️ رفيقك اليومي</h2>
-        <div id="companionGrid" class="companion-grid"></div>
-        <h2 class="sub-title" id="insightsTitle" data-i18n="insights_title">📊 بصيرة: تحليل تقدمك</h2>
-        <p class="small muted insights-intro" data-i18n="insights_intro">تُحسب هذه الأرقام من نشاطك المحفوظ على هذا الجهاز فقط، ولا تُرسل إلى أي خادم.</p>
-        <div id="insightsGrid" class="insights-grid" aria-labelledby="insightsTitle"></div>
-      </div>
-    </section>
-
-    <!-- ================= Prayer times ================= -->
-    <section class="section" id="prayerSection" aria-labelledby="prayerTitle">
-      <div class="container">
-        <header class="section-title">
-          <h2 id="prayerTitle" data-i18n="prayer_title">مواقيت الصلاة</h2>
-          <p>
-            <span id="prayerLocation" data-i18n="prayer_subtitle">جاري تحديد موقعك لضبط المواقيت... 📍</span><br>
-            <strong id="hijriDateDisplay" class="hijri-date"></strong>
-          </p>
-        </header>
-        <div class="prayer-grid" id="prayerGrid" aria-live="polite">
-          <div class="loading" data-i18n="loading_prayers">جاري جلب مواقيت الصلاة...</div>
-        </div>
-        <p class="center"><button type="button" class="btn btn-soft btn-small" id="prayerLocateBtn" hidden data-i18n="prayer_retry_location">استخدام موقعي 📍</button></p>
-      </div>
-    </section>
-
-
-    <!-- ================= Learning academy ================= -->
-    <section class="section section--academy" id="academySection" aria-labelledby="academyTitle">
-      <div class="container">
-        <header class="section-title">
-          <span class="eyebrow" data-i18n="academy_eyebrow">تعلّم بخطوات منظمة</span>
-          <h2 id="academyTitle" data-i18n="academy_title">🎓 الأكاديمية التعليمية الإسلامية</h2>
-          <p data-i18n="academy_subtitle">دورات قصيرة لها أهداف واضحة ودروس مرتبة واختبارات، ويُحفظ تقدمك على هذا الجهاز.</p>
-        </header>
-        <div id="courseGrid" class="course-grid"></div>
-
-        <!-- Learn the correct prayer: the prayer track of the academy (moved here; ids unchanged) -->
-    <section class="academy-track" id="learnSection" aria-labelledby="learnSectionTitle">
-      <div class="track-body">
-        <header class="track-header">
-          <span class="eyebrow" data-i18n="learn_eyebrow">منهج تعليمي متدرج</span>
-          <h3 class="track-title" id="learnSectionTitle" data-i18n="learn_title">🕋 تعلم الصلاة الصحيحة</h3>
-          <p data-i18n="learn_subtitle">ثمانية عشر درسًا من الطهارة إلى سجود السهو، برسوم توضيحية لكل خطوة، واختبارات قصيرة لتقييم الفهم.</p>
-        </header>
-        <div class="learn-progress card">
-          <p id="learnProgressText" class="strong"></p>
-          <div class="progress" id="learnProgress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-labelledby="learnProgressText"><span id="learnProgressBar"></span></div>
-        </div>
-
-        <p class="center learn-start"><button type="button" class="btn btn-primary" data-action="lesson" data-id="prophet-prayer" data-i18n="learn_start_prophet">🕌 ابدأ هنا: صفة صلاة النبي ﷺ (بأربع لغات)</button></p>
-
-        <h4 class="sub-title" data-i18n="learn_tutorial_title">صفة الصلاة بالرسم خطوة بخطوة</h4>
-        <div id="postureTutorial" class="posture-tutorial"></div>
-
-        <h4 class="sub-title" data-i18n="learn_modules_title">دروس المنهج</h4>
-        <div id="lessonGrid" class="lesson-grid"></div>
-
-        <h4 class="sub-title" data-i18n="learn_scholars_title">العلماء والمصادر</h4>
-        <p class="muted" data-i18n="learn_scholars_desc">روابط إلى المواقع الرسمية ودروس العلماء. حالة كل رابط مبيّنة بجانبه، ولا يعني ذكر عالم هنا أنه يزكّي هذا الموقع.</p>
-        <div id="scholarGrid" class="scholar-grid"></div>
-        <div class="card verify-card">
-          <h5 class="card-title" data-i18n="learn_verify_title">🔍 للتحقق من الأحاديث ودرجتها</h5>
-          <ul id="verifyTools" class="resource-list resource-list--inline"></ul>
-        </div>
-        <p class="note" data-i18n="learn_disclaimer">هذا المحتوى تعليمي مُلخّص، ويبيّن مواضع الخلاف المشهورة بين المذاهب. لا يصدر الموقع فتاوى، ولا يغني عن سؤال أهل العلم والتعلم على يد معلم.</p>
-      </div>
-    </section>
-        <p class="note" data-i18n="academy_disclaimer">إتمام الدورات تقدّم شخصي للمراجعة الذاتية، وليس إجازة أو شهادة شرعية، ولا يؤهل للتدريس.</p>
-      </div>
-    </section>
-
     <!-- ================= Surahs ================= -->
     <section class="section" id="surahs" aria-labelledby="surahsTitle">
       <div class="container">
@@ -354,71 +445,6 @@
         <p class="empty-state" id="surahEmpty" hidden data-i18n="surah_filter_empty">لا توجد سورة مطابقة.</p>
       </div>
     </section>
-
-    <!-- ================= Audio player ================= -->
-    <section class="section" id="audio" aria-labelledby="playerTitle">
-      <div class="container">
-        <header class="section-title">
-          <h2 data-i18n="audio_title">استمع إلى القرآن الكريم</h2>
-          <p data-i18n="audio_subtitle">التلاوة يتم تحميلها مباشرة من الإنترنت</p>
-        </header>
-        <div class="player">
-          <h3 class="player-title" id="playerTitle" data-i18n="player_title">اختر سورة</h3>
-          <p class="player-subtitle" id="playerSubtitle" data-i18n="player_subtitle" aria-live="polite">اختر أي سورة من القائمة بالأعلى للاستماع</p>
-          <div class="player-controls-row">
-            <label class="field">
-              <span class="field-label" data-i18n="reciter_label">القارئ</span>
-              <select id="reciterSelect" class="reciter-select"></select>
-            </label>
-            <label class="field field--small">
-              <span class="field-label" data-i18n="player_speed">سرعة التلاوة</span>
-              <select id="speedSelect" class="reciter-select">
-                <option value="0.5">0.5×</option>
-                <option value="0.75">0.75×</option>
-                <option value="1" selected>1×</option>
-                <option value="1.25">1.25×</option>
-                <option value="1.5">1.5×</option>
-                <option value="1.75">1.75×</option>
-                <option value="2">2×</option>
-              </select>
-            </label>
-            <label class="field field--small">
-              <span class="field-label" data-i18n="player_sleep">مؤقت الإيقاف ⏲️</span>
-              <select id="sleepTimer" class="reciter-select">
-                <option value="off" data-i18n="player_sleep_off">بدون</option>
-                <option value="5" data-i18n="player_sleep_5">5 دقائق</option>
-                <option value="15" data-i18n="player_sleep_15">15 دقيقة</option>
-                <option value="30" data-i18n="player_sleep_30">30 دقيقة</option>
-                <option value="60" data-i18n="player_sleep_60">ساعة</option>
-                <option value="end" data-i18n="player_sleep_end">نهاية السورة</option>
-              </select>
-            </label>
-          </div>
-          <p class="player-sleep small" id="sleepStatus" aria-live="polite"></p>
-          <audio id="audioPlayer" controls preload="none"></audio>
-          <div class="player-buttons">
-            <button class="player-button" type="button" id="prevSurahBtn" data-i18n="btn_prev">السابق</button>
-            <button class="player-button" type="button" id="loopSurahBtn" aria-pressed="false" data-i18n="btn_loop_off">تكرار السورة: إيقاف 🔁</button>
-            <button class="player-button" type="button" id="nextSurahBtn" data-i18n="btn_next">التالي</button>
-          </div>
-          <div class="player-extra">
-            <button class="player-button" type="button" id="playerRetry" hidden data-i18n="player_retry">🔄 إعادة المحاولة</button>
-            <a class="player-button" id="playerDownload" href="#audio" target="_blank" rel="noopener noreferrer" download hidden data-i18n="player_download">⬇️ فتح / تنزيل التلاوة</a>
-          </div>
-          <details class="player-queue">
-            <summary data-i18n="player_queue_title">📃 قائمة التشغيل التالية</summary>
-            <div class="plan-inline">
-              <label class="visually-hidden" for="queueSelect" data-i18n="player_queue_choose">أضف سورة إلى القائمة...</label>
-              <select id="queueSelect" class="reciter-select reciter-select--compact"></select>
-              <button type="button" class="player-button" id="queueAdd" data-i18n="player_queue_add">إضافة</button>
-            </div>
-            <ul class="chips" id="queueList"></ul>
-            <p class="small" id="queueEmpty" data-i18n="player_queue_empty">القائمة فارغة؛ عند انتهاء السورة يُشغَّل ما بعدها تلقائيًا.</p>
-          </details>
-        </div>
-      </div>
-    </section>
-
     <!-- ================= Reading & tafsir ================= -->
     <section class="section" id="readingSection" aria-labelledby="readingTitle" hidden>
       <div class="container">
@@ -518,7 +544,550 @@
         </article>
       </div>
     </section>
+    </section>
 
+    <!-- ================= Page: tafsir ================= -->
+    <section class="page" id="page-tafsir" data-page="tafsir" data-i18n-aria-label="sb_tafsir" aria-label="tafsir" hidden>
+      <header class="page-header container">
+        <h2 class="page-title"><span aria-hidden="true">📚</span> <span data-i18n="pg_tafsir_title">التفسير والترجمات</span></h2>
+        <p class="page-sub" data-i18n="pg_tafsir_sub">اضغط على أي آية في المصحف لترى التفسير الميسر وترجمة معانيها.</p>
+      </header>
+      <div class="container tafsir-page">
+        <div class="tafsir-cards">
+          <article class="card">
+            <h2 class="card-title" data-i18n="tafsir_how_title">كيف أقرأ التفسير؟</h2>
+            <ol class="tafsir-steps">
+              <li data-i18n="tafsir_how_1">افتح السورة من القائمة أدناه أو من فهرس السور.</li>
+              <li data-i18n="tafsir_how_2">اضغط على الآية (أو اخترها بلوحة المفاتيح ثم Enter): تُتلى الآية ويظهر تحتها التفسير والترجمة.</li>
+              <li data-i18n="tafsir_how_3">من «الإعدادات» يمكنك إظهار التفسير في كل اللغات واختيار الترجمة.</li>
+            </ol>
+            <form class="home-open" id="tafsirOpenForm">
+              <label class="visually-hidden" for="tafsirSurahSelect" data-i18n="home_choose_surah">اختر سورة</label>
+              <select id="tafsirSurahSelect" class="reciter-select reciter-select--compact"></select>
+              <button class="btn btn-primary btn-small" type="submit" data-i18n="tafsir_open">افتح مع التفسير</button>
+            </form>
+          </article>
+          <article class="card">
+            <h2 class="card-title" data-i18n="tafsir_sources_title">المصادر المتاحة</h2>
+            <ul class="tafsir-sources">
+              <li><strong data-i18n="tafsir_src_muyassar">التفسير الميسر</strong> — <span data-i18n="tafsir_src_muyassar_d">نخبة من العلماء، مجمع الملك فهد (بالعربية).</span></li>
+              <li><strong>Sahih International</strong> — <span data-i18n="tafsir_src_en">ترجمة معاني القرآن إلى الإنجليزية.</span></li>
+              <li><strong>Julio Cortés</strong> — <span data-i18n="tafsir_src_es">ترجمة معاني القرآن إلى الإسبانية.</span></li>
+              <li><strong>Muhammad Hamidullah</strong> — <span data-i18n="tafsir_src_fr">ترجمة معاني القرآن إلى الفرنسية.</span></li>
+            </ul>
+            <p class="small muted" data-i18n="tafsir_note">الترجمة بيان لمعاني القرآن، وليست قرآنًا. النص القرآني يُعرض دائمًا بالرسم العثماني من مصدر موثّق.</p>
+          </article>
+          <article class="card">
+            <h2 class="card-title" data-i18n="tafsir_more_title">أدوات مرتبطة</h2>
+            <div class="tafsir-actions">
+              <button class="btn btn-soft btn-small" type="button" data-open="islamicSearchModal" data-i18n="tafsir_search">🔎 البحث في التفسير والأذكار</button>
+              <a class="btn btn-soft btn-small" href="#/settings" data-i18n="tafsir_settings">⚙️ خيارات التفسير والترجمة</a>
+              <a class="btn btn-soft btn-small" href="#/notes" data-i18n="tafsir_notes">📝 ملاحظاتي على الآيات</a>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= Page: audio ================= -->
+    <section class="page" id="page-audio" data-page="audio" data-i18n-aria-label="sb_audio" aria-label="audio" hidden>
+    <!-- ================= Audio player ================= -->
+    <section class="section" id="audio" aria-labelledby="playerTitle">
+      <div class="container">
+        <header class="section-title">
+          <h2 data-i18n="audio_title">استمع إلى القرآن الكريم</h2>
+          <p data-i18n="audio_subtitle">التلاوة يتم تحميلها مباشرة من الإنترنت</p>
+        </header>
+        <div class="player">
+          <h3 class="player-title" id="playerTitle" data-i18n="player_title">اختر سورة</h3>
+          <p class="player-subtitle" id="playerSubtitle" data-i18n="player_subtitle" aria-live="polite">اختر أي سورة من القائمة بالأعلى للاستماع</p>
+          <div class="player-controls-row">
+            <label class="field">
+              <span class="field-label" data-i18n="reciter_label">القارئ</span>
+              <select id="reciterSelect" class="reciter-select"></select>
+            </label>
+            <label class="field field--small">
+              <span class="field-label" data-i18n="player_speed">سرعة التلاوة</span>
+              <select id="speedSelect" class="reciter-select">
+                <option value="0.5">0.5×</option>
+                <option value="0.75">0.75×</option>
+                <option value="1" selected>1×</option>
+                <option value="1.25">1.25×</option>
+                <option value="1.5">1.5×</option>
+                <option value="1.75">1.75×</option>
+                <option value="2">2×</option>
+              </select>
+            </label>
+            <label class="field field--small">
+              <span class="field-label" data-i18n="player_sleep">مؤقت الإيقاف ⏲️</span>
+              <select id="sleepTimer" class="reciter-select">
+                <option value="off" data-i18n="player_sleep_off">بدون</option>
+                <option value="5" data-i18n="player_sleep_5">5 دقائق</option>
+                <option value="15" data-i18n="player_sleep_15">15 دقيقة</option>
+                <option value="30" data-i18n="player_sleep_30">30 دقيقة</option>
+                <option value="60" data-i18n="player_sleep_60">ساعة</option>
+                <option value="end" data-i18n="player_sleep_end">نهاية السورة</option>
+              </select>
+            </label>
+          </div>
+          <p class="player-sleep small" id="sleepStatus" aria-live="polite"></p>
+          <audio id="audioPlayer" controls preload="none"></audio>
+          <div class="player-buttons">
+            <button class="player-button" type="button" id="prevSurahBtn" data-i18n="btn_prev">السابق</button>
+            <button class="player-button" type="button" id="loopSurahBtn" aria-pressed="false" data-i18n="btn_loop_off">تكرار السورة: إيقاف 🔁</button>
+            <button class="player-button" type="button" id="nextSurahBtn" data-i18n="btn_next">التالي</button>
+          </div>
+          <div class="player-extra">
+            <button class="player-button" type="button" id="playerRetry" hidden data-i18n="player_retry">🔄 إعادة المحاولة</button>
+            <a class="player-button" id="playerDownload" href="#audio" target="_blank" rel="noopener noreferrer" download hidden data-i18n="player_download">⬇️ فتح / تنزيل التلاوة</a>
+          </div>
+          <details class="player-queue">
+            <summary data-i18n="player_queue_title">📃 قائمة التشغيل التالية</summary>
+            <div class="plan-inline">
+              <label class="visually-hidden" for="queueSelect" data-i18n="player_queue_choose">أضف سورة إلى القائمة...</label>
+              <select id="queueSelect" class="reciter-select reciter-select--compact"></select>
+              <button type="button" class="player-button" id="queueAdd" data-i18n="player_queue_add">إضافة</button>
+            </div>
+            <ul class="chips" id="queueList"></ul>
+            <p class="small" id="queueEmpty" data-i18n="player_queue_empty">القائمة فارغة؛ عند انتهاء السورة يُشغَّل ما بعدها تلقائيًا.</p>
+          </details>
+        </div>
+      </div>
+    </section>
+    </section>
+
+    <!-- ================= Page: favorites ================= -->
+    <section class="page" id="page-favorites" data-page="favorites" data-i18n-aria-label="side_favorites" aria-label="favorites" hidden>
+      <header class="page-header container">
+        <h2 class="page-title"><span aria-hidden="true">⭐</span> <span data-i18n="side_favorites">المفضلة</span></h2>
+      </header>
+      <div class="container page-embed">
+      <!-- Favourites -->
+      <dialog id="favoritesModal" data-page-dialog class="modal dialog--page" aria-labelledby="favoritesTitle">
+        <button class="icon-btn close-btn" type="button" data-close data-i18n-aria-label="close" aria-label="إغلاق"><span aria-hidden="true">✖</span></button>
+        <h2 class="modal-title" id="favoritesTitle" data-i18n="side_favorites">⭐ السور المفضلة</h2>
+        <div id="favoritesList" class="favorites-list"></div>
+      </dialog>
+      </div>
+    </section>
+
+    <!-- ================= Page: memorize ================= -->
+    <section class="page" id="page-memorize" data-page="memorize" data-i18n-aria-label="sb_memorize" aria-label="memorize" hidden>
+      <header class="page-header container">
+        <h2 class="page-title"><span aria-hidden="true">🎙️</span> <span data-i18n="pg_memorize_title">الحفظ والتسميع</span></h2>
+        <p class="page-sub" data-i18n="pg_memorize_sub">سمّع حفظك بالميكروفون، وتابع خطتك ومراجعاتك وأخطاءك.</p>
+      </header>
+      <div class="container page-embed">
+      <!-- Memorisation lab -->
+      <dialog id="voiceTestModal" data-page-dialog class="modal dialog--page modal--wide lab" aria-labelledby="voiceTitle">
+        <button class="icon-btn close-btn" type="button" data-close data-i18n-aria-label="close" aria-label="إغلاق"><span aria-hidden="true">✖</span></button>
+        <h2 class="modal-title" id="voiceTitle" data-i18n="nav_voice_test">مختبر الحفظ والتسميع</h2>
+        <p class="muted center" data-i18n="voice_desc">اختر السورة، اضغط المايك، وابدأ. الآية الصحيحة ستكتب أمامك لتتابع.</p>
+        <div class="tabs" role="tablist" data-i18n-aria-label="lab_tabs" aria-label="أقسام مختبر الحفظ">
+          <button class="tab-btn" role="tab" type="button" id="labTabRecite" data-lab-tab="recite" aria-controls="labPaneRecite" aria-selected="true" data-i18n="lab_tab_recite">🎙️ التسميع</button>
+          <button class="tab-btn" role="tab" type="button" id="labTabPlan" data-lab-tab="plan" aria-controls="labPanePlan" aria-selected="false" tabindex="-1" data-i18n="lab_tab_plan">📈 خطتي وتقدمي</button>
+        </div>
+
+        <div id="labPaneRecite" role="tabpanel" aria-labelledby="labTabRecite">
+          <div class="lab-setup">
+            <div class="center">
+              <label class="visually-hidden" for="voiceSurahSelect" data-i18n="voice_select">اختر السورة للتسميع...</label>
+              <select id="voiceSurahSelect" class="reciter-select"><option value="" data-i18n="voice_select">اختر السورة للتسميع...</option></select>
+            </div>
+            <div class="lab-options">
+              <label class="field field--inline">
+                <span class="field-label" data-i18n="lab_mode_label">طريقة التسميع</span>
+                <select id="labMode" class="reciter-select reciter-select--compact"></select>
+              </label>
+              <div class="lab-range" id="labRangeWrap" hidden>
+                <label class="field field--inline"><span class="field-label" data-i18n="lab_from">من الآية</span><select id="labFrom" class="reciter-select reciter-select--compact"></select></label>
+                <label class="field field--inline"><span class="field-label" data-i18n="lab_to">إلى الآية</span><select id="labTo" class="reciter-select reciter-select--compact"></select></label>
+              </div>
+              <label class="field field--inline" id="labRepeatWrap" hidden>
+                <span class="field-label" data-i18n="lab_repeat_label">عدد مرات التكرار</span>
+                <select id="labRepeat" class="reciter-select reciter-select--compact">
+                  <option value="2">2</option><option value="3" selected>3</option><option value="5">5</option><option value="7">7</option><option value="10">10</option>
+                </select>
+              </label>
+            </div>
+            <p id="labModeHint" class="small muted center"></p>
+          </div>
+
+          <div class="mic-panel">
+            <button type="button" class="btn btn-soft btn-small" id="micTestBtn" aria-pressed="false" data-i18n="lab_mic_test">🎚️ اختبار المايك</button>
+            <div class="mic-level" aria-hidden="true"><span id="micLevelFill"></span></div>
+            <label class="field field--inline" id="micDeviceWrap" hidden>
+              <span class="field-label" data-i18n="lab_mic_device">الميكروفون</span>
+              <select id="micDevice" class="reciter-select reciter-select--compact"></select>
+            </label>
+            <p id="micStatus" class="mic-status small" role="status"></p>
+          </div>
+
+          <button class="mic-btn" type="button" id="micBtn" aria-pressed="false" data-i18n-aria-label="voice_mic_label" aria-label="بدء أو إيقاف الاستماع"><span aria-hidden="true">🎙️</span></button>
+          <p id="voiceResultText" class="muted center" aria-live="polite" data-i18n="voice_idle">جاهز للاستماع...</p>
+          <p id="voiceFeedback" class="center voice-feedback" aria-live="assertive"></p>
+          <p id="voiceProgress" class="center small muted"></p>
+          <div class="progress progress--thin" id="labBar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-i18n-aria-label="lab_progress_label" aria-label="التقدم في السورة" hidden><span id="labBarFill"></span></div>
+
+          <section class="lab-live" id="labLive" hidden data-i18n-aria-label="lab_live_label" aria-label="الآية الحالية">
+            <p class="lab-position small" id="labPosition" aria-live="polite"></p>
+            <p class="lab-words" id="labWords" lang="ar" dir="rtl"></p>
+            <p class="lab-notes small" id="labNotes" aria-live="polite"></p>
+            <div class="lab-actions">
+              <button type="button" class="btn btn-soft btn-small" id="labRetry" data-i18n="lab_retry">🔁 أعد المحاولة</button>
+              <button type="button" class="btn btn-soft btn-small" id="labHint" data-i18n="lab_hint">💡 الكلمة التالية</button>
+              <button type="button" class="btn btn-soft btn-small" id="labPeek" aria-pressed="false" hidden data-i18n="lab_peek">👁️ إظهار الآية</button>
+              <button type="button" class="btn btn-soft btn-small" id="labListen" data-i18n="lab_listen">🔊 استمع للآية</button>
+              <button type="button" class="btn btn-soft btn-small" id="labSkip" data-i18n="lab_skip">⏭ تخطَّ الآية</button>
+              <button type="button" class="btn btn-primary btn-small" id="labNext" hidden data-i18n="lab_next">الآية التالية ←</button>
+            </div>
+          </section>
+          <p class="lab-summary" id="labSummary" role="status" hidden></p>
+          <div id="recitedAyahsContainer" class="quran-text recited" lang="ar" dir="rtl" hidden></div>
+          <p class="note" data-i18n="lab_limitation">تنبيه: يعتمد المختبر على خاصية التعرف على الكلام في المتصفح، وهي تُعيد كلمات مكتوبة فقط؛ لذلك يقارن المختبر كلمات تلاوتك بنص الآية، ولا يستطيع الحكم على أحكام التجويد أو مخارج الحروف أو الحركات. لا يغني ذلك عن القراءة على معلم متقن.</p>
+        </div>
+
+        <div id="labPanePlan" role="tabpanel" aria-labelledby="labTabPlan" hidden>
+          <div class="mini-stats mini-stats--4" id="planStats"></div>
+          <div class="plan-grid">
+            <section class="plan-card">
+              <h3 data-i18n="plan_title">🎯 خطة الحفظ</h3>
+              <form id="planTargetForm" class="plan-inline">
+                <label for="planTarget" data-i18n="plan_target_label">الهدف اليومي (عدد الآيات)</label>
+                <input type="number" id="planTarget" min="1" max="200" inputmode="numeric">
+                <button type="submit" class="btn btn-soft btn-small" data-i18n="plan_save">حفظ</button>
+              </form>
+              <div class="plan-inline">
+                <label class="visually-hidden" for="planAddSelect" data-i18n="plan_add_placeholder">أضف سورة إلى خطتك...</label>
+                <select id="planAddSelect" class="reciter-select reciter-select--compact"></select>
+                <button type="button" class="btn btn-soft btn-small" id="planAddBtn" data-i18n="plan_add">إضافة</button>
+              </div>
+              <ul class="plan-list" id="planList"></ul>
+            </section>
+            <section class="plan-card">
+              <h3 data-i18n="revision_title">🔄 جدول المراجعة</h3>
+              <p class="small muted" data-i18n="revision_explain">كل سورة أتممت تسميعها (أو حددتها كمحفوظة) تُجدول لمراجعتها بعد 1 ثم 3 ثم 7 ثم 14 ثم 30 ثم 60 يومًا.</p>
+              <ul class="plan-list" id="revisionDue"></ul>
+              <h4 class="small" data-i18n="revision_upcoming">المراجعات القادمة</h4>
+              <ul class="plan-list" id="revisionUpcoming"></ul>
+            </section>
+            <section class="plan-card">
+              <h3 data-i18n="memorized_title">📚 سور حفظتها من قبل</h3>
+              <div class="plan-inline">
+                <label class="visually-hidden" for="memorizedAddSelect" data-i18n="memorized_add_placeholder">اختر سورة تحفظها...</label>
+                <select id="memorizedAddSelect" class="reciter-select reciter-select--compact"></select>
+                <button type="button" class="btn btn-soft btn-small" id="memorizedAddBtn" data-i18n="memorized_add">تحديد كمحفوظة</button>
+              </div>
+              <ul class="chips" id="memorizedList"></ul>
+            </section>
+            <section class="plan-card">
+              <h3 data-i18n="mistakes_title">📝 سجل الأخطاء</h3>
+              <ul class="mistake-list" id="mistakeList" tabindex="0" data-i18n-aria-label="mistakes_title" aria-label="سجل الأخطاء"></ul>
+            </section>
+          </div>
+        </div>
+      </dialog>
+      </div>
+    </section>
+
+    <!-- ================= Page: learn-prayer ================= -->
+    <section class="page" id="page-learn-prayer" data-page="learn-prayer" data-i18n-aria-label="sb_learn_prayer" aria-label="learn-prayer" hidden>
+    <div class="container">
+    <section class="section academy-track academy-track--page" id="learnSection" aria-labelledby="learnSectionTitle">
+      <div class="track-body">
+        <header class="track-header">
+          <span class="eyebrow" data-i18n="learn_eyebrow">منهج تعليمي متدرج</span>
+          <h3 class="track-title" id="learnSectionTitle" data-i18n="learn_title">🕋 تعلم الصلاة الصحيحة</h3>
+          <p data-i18n="learn_subtitle">ثمانية عشر درسًا من الطهارة إلى سجود السهو، برسوم توضيحية لكل خطوة، واختبارات قصيرة لتقييم الفهم.</p>
+        </header>
+        <div class="learn-progress card">
+          <p id="learnProgressText" class="strong"></p>
+          <div class="progress" id="learnProgress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-labelledby="learnProgressText"><span id="learnProgressBar"></span></div>
+        </div>
+
+        <p class="center learn-start"><button type="button" class="btn btn-primary" data-action="lesson" data-id="prophet-prayer" data-i18n="learn_start_prophet">🕌 ابدأ هنا: صفة صلاة النبي ﷺ (بأربع لغات)</button></p>
+
+        <h4 class="sub-title" data-i18n="learn_tutorial_title">صفة الصلاة بالرسم خطوة بخطوة</h4>
+        <div id="postureTutorial" class="posture-tutorial"></div>
+
+        <h4 class="sub-title" data-i18n="learn_modules_title">دروس المنهج</h4>
+        <div id="lessonGrid" class="lesson-grid"></div>
+
+        <h4 class="sub-title" data-i18n="learn_scholars_title">العلماء والمصادر</h4>
+        <p class="muted" data-i18n="learn_scholars_desc">روابط إلى المواقع الرسمية ودروس العلماء. حالة كل رابط مبيّنة بجانبه، ولا يعني ذكر عالم هنا أنه يزكّي هذا الموقع.</p>
+        <div id="scholarGrid" class="scholar-grid"></div>
+        <div class="card verify-card">
+          <h5 class="card-title" data-i18n="learn_verify_title">🔍 للتحقق من الأحاديث ودرجتها</h5>
+          <ul id="verifyTools" class="resource-list resource-list--inline"></ul>
+        </div>
+        <p class="note" data-i18n="learn_disclaimer">هذا المحتوى تعليمي مُلخّص، ويبيّن مواضع الخلاف المشهورة بين المذاهب. لا يصدر الموقع فتاوى، ولا يغني عن سؤال أهل العلم والتعلم على يد معلم.</p>
+      </div>
+    </section>
+    </div>
+    </section>
+
+    <!-- ================= Page: academy ================= -->
+    <section class="page" id="page-academy" data-page="academy" data-i18n-aria-label="sb_academy" aria-label="academy" hidden>
+    <!-- ================= Learning academy ================= -->
+    <section class="section section--academy" id="academySection" aria-labelledby="academyTitle">
+      <div class="container">
+        <header class="section-title">
+          <span class="eyebrow" data-i18n="academy_eyebrow">تعلّم بخطوات منظمة</span>
+          <h2 id="academyTitle" data-i18n="academy_title">🎓 الأكاديمية التعليمية الإسلامية</h2>
+          <p data-i18n="academy_subtitle">دورات قصيرة لها أهداف واضحة ودروس مرتبة واختبارات، ويُحفظ تقدمك على هذا الجهاز.</p>
+        </header>
+        <div id="courseGrid" class="course-grid"></div>
+        <aside class="card academy-link">
+          <p><strong data-i18n="academy_prayer_link_title">🕋 تعلم الصلاة الصحيحة</strong> — <span data-i18n="academy_prayer_link_desc">منهج الصلاة (18 درسًا) له صفحة خاصة الآن.</span></p>
+          <a class="btn btn-soft btn-small" href="#/learn-prayer" data-i18n="academy_prayer_link_btn">افتح منهج الصلاة</a>
+        </aside>
+        <p class="note" data-i18n="academy_disclaimer">إتمام الدورات تقدّم شخصي للمراجعة الذاتية، وليس إجازة أو شهادة شرعية، ولا يؤهل للتدريس.</p>
+      </div>
+    </section>
+    </section>
+
+    <!-- ================= Page: islam ================= -->
+    <section class="page" id="page-islam" data-page="islam" data-i18n-aria-label="sb_islam" aria-label="islam" hidden>
+      <header class="page-header container">
+        <h2 class="page-title"><span aria-hidden="true">🕌</span> <span data-i18n="pg_islam_title">رسالة الإسلام</span></h2>
+        <p class="page-sub" data-i18n="pg_islam_sub">تعريف مختصر بالإسلام وأركانه ومصادره.</p>
+      </header>
+      <div class="container page-embed">
+      <!-- Message of Islam -->
+      <dialog id="islamModal" data-page-dialog class="modal dialog--page modal--wide" aria-labelledby="islamTitle">
+        <button class="icon-btn close-btn" type="button" data-close data-i18n-aria-label="close" aria-label="إغلاق"><span aria-hidden="true">✖</span></button>
+        <h2 class="modal-title" id="islamTitle" data-i18n="modal_islam_title">رسالة الإسلام</h2>
+        <div class="islam-content prose">
+          <h3 data-i18n="islam_sec1_title">التوحيد والدين الصافي</h3>
+          <p data-i18n="islam_sec1_desc">الإسلام هو دين الفطرة والتوحيد الخالص. هو الاستسلام لله وحده بالتوحيد، والانقياد له بالطاعة، والبراءة من الشرك وأهله. يدعو الإسلام إلى إفراد الله بالعبادة دون وسيط، فهو الخالق والرازق والمدبر لكل شيء. إنه دين يوازن بين الروح والجسد، ويدعو للعدل، والرحمة، وحسن الخلق مع جميع البشر.</p>
+          <h3 data-i18n="islam_sec2_title">الإسلام بريء من الإرهاب</h3>
+          <p data-i18n="islam_sec2_desc">نحذر بشدة من مخططات الجماعات الإرهابية التي تختطف اسم الدين لتحقيق أجندات سياسية ودموية. الإسلام يحرم قتل النفس بغير حق ويعتبره من أكبر الكبائر ﴿مَن قَتَلَ نَفْسًا بِغَيْرِ نَفْسٍ أَوْ فَسَادٍ فِي الْأَرْضِ فَكَأَنَّمَا قَتَلَ النَّاسَ جَمِيعًا﴾. كما نحذر من مخططات بعض وسائل الإعلام الغربية التي تتعمد تشويه صورة الإسلام وربطه بالإرهاب لنشر (الإسلاموفوبيا). هذه ادعاءات مغلوطة تماماً؛ فالإرهاب لا دين له، والإسلام هو أكبر عدو له.</p>
+          <h3 data-i18n="islam_sec3_title">دعوة إلى النور</h3>
+          <p data-i18n="islam_sec3_desc">ندعو كل باحث عن الحق، والطمأنينة، والسلام الداخلي، أن يقرأ القرآن الكريم بتجرد وبعقل مفتوح. الإسلام ليس حكراً على عرق أو قومية، بل هو رسالة الله العالمية لكل إنسان. انضم إلى هذا الدين العظيم الذي كرم الإنسان، وحفظ حقوقه، وأنار بصيرته للطريق الصحيح في الدنيا والآخرة.</p>
+        </div>
+      </dialog>
+      </div>
+    </section>
+
+    <!-- ================= Page: adhkar ================= -->
+    <section class="page" id="page-adhkar" data-page="adhkar" data-i18n-aria-label="sb_adhkar" aria-label="adhkar" hidden>
+      <header class="page-header container">
+        <h2 class="page-title"><span aria-hidden="true">📿</span> <span data-i18n="pg_adhkar_title">الأذكار وحصن المسلم</span></h2>
+        <p class="page-sub" data-i18n="pg_adhkar_sub">أذكار الصباح والمساء والنوم وبعد الصلاة، والمسبحة الإلكترونية.</p>
+      </header>
+      <div class="container page-embed">
+      <!-- Hisn al-Muslim -->
+      <dialog id="adhkarModal" data-page-dialog class="modal dialog--page modal--wide" aria-labelledby="adhkarTitle">
+        <button class="icon-btn close-btn" type="button" data-close data-i18n-aria-label="close" aria-label="إغلاق"><span aria-hidden="true">✖</span></button>
+        <h2 class="modal-title" id="adhkarTitle" data-i18n="modal_adhkar_title">حصن المسلم</h2>
+        <div class="tabs" role="tablist" aria-labelledby="adhkarTitle">
+          <button class="tab-btn" role="tab" type="button" id="tab_morning" data-adhkar="morning" aria-selected="true" data-i18n="tab_morning">الصباح ☀️</button>
+          <button class="tab-btn" role="tab" type="button" id="tab_evening" data-adhkar="evening" aria-selected="false" data-i18n="tab_evening">المساء 🌙</button>
+          <button class="tab-btn" role="tab" type="button" id="tab_sleep" data-adhkar="sleep" aria-selected="false" data-i18n="tab_sleep">النوم 🛏️</button>
+          <button class="tab-btn" role="tab" type="button" id="tab_prayer" data-adhkar="prayer" aria-selected="false" data-i18n="tab_prayer">بعد الصلاة 🕌</button>
+          <button class="tab-btn" role="tab" type="button" id="tab_daily" data-adhkar="daily" aria-selected="false" data-i18n="tab_daily">متنوعة 🤲</button>
+          <button class="tab-btn" role="tab" type="button" id="tab_tasbeeh" data-adhkar="tasbeeh" aria-selected="false" aria-controls="tasbeehPanel" data-i18n="nav_rosary">📿 المسبحة</button>
+        </div>
+        <div class="adhkar-grid" id="adhkarGrid" role="tabpanel" aria-live="polite"></div>
+        <p class="center" id="adhkarResetRow"><button type="button" class="btn btn-soft btn-small" id="adhkarReset" data-i18n="adhkar_reset">إعادة العد 🔄</button></p>
+
+        <!-- Electronic rosary (moved here from its own dialog; same controls, ids and saved count) -->
+        <div id="tasbeehPanel" class="tasbeeh-panel center" role="tabpanel" aria-labelledby="tab_tasbeeh" hidden>
+          <h3 class="tasbeeh-title" data-i18n="tasbeeh_title">📿 المسبحة الإلكترونية</h3>
+          <p class="muted" data-i18n="rosary_hint">اضغط على الدائرة للتسبيح</p>
+          <div class="tasbeeh-options">
+            <div class="chips tasbeeh-phrases" id="tasbeehPhrases" role="group" data-i18n-aria-label="tasbeeh_phrase_label" aria-label="الذكر"></div>
+            <label class="field field--inline">
+              <span class="field-label" data-i18n="tasbeeh_target_label">الهدف</span>
+              <select id="tasbeehTarget" class="reciter-select reciter-select--compact">
+                <option value="0" data-i18n="tasbeeh_target_free">بدون هدف</option>
+                <option value="33">33</option>
+                <option value="100">100</option>
+              </select>
+            </label>
+          </div>
+          <p class="tasbeeh-phrase" id="tasbeehPhrase" lang="ar" dir="rtl" aria-live="polite"></p>
+          <button type="button" class="rosary-circle" id="rosaryCounter" data-i18n-aria-label="rosary_count_label" aria-label="عدد التسبيحات" aria-live="polite">0</button>
+          <p class="small muted" id="tasbeehProgress" aria-live="polite"></p>
+          <button type="button" class="btn btn-soft" id="rosaryReset" data-i18n="rosary_reset">تصفير العداد 🔄</button>
+        </div>
+      </dialog>
+      </div>
+    </section>
+
+    <!-- ================= Page: prayer ================= -->
+    <section class="page" id="page-prayer" data-page="prayer" data-i18n-aria-label="sb_prayer" aria-label="prayer" hidden>
+    <!-- ================= Prayer times ================= -->
+    <section class="section" id="prayerSection" aria-labelledby="prayerTitle">
+      <div class="container">
+        <header class="section-title">
+          <h2 id="prayerTitle" data-i18n="prayer_title">مواقيت الصلاة</h2>
+          <p>
+            <span id="prayerLocation" data-i18n="prayer_subtitle">جاري تحديد موقعك لضبط المواقيت... 📍</span><br>
+            <strong id="hijriDateDisplay" class="hijri-date"></strong>
+          </p>
+        </header>
+        <div class="prayer-grid" id="prayerGrid" aria-live="polite">
+          <div class="loading" data-i18n="loading_prayers">جاري جلب مواقيت الصلاة...</div>
+        </div>
+                <div class="prayer-tools">
+          <button class="btn btn-soft btn-small" type="button" data-notify-btn data-i18n="profile_notify_btn">تفعيل الإشعارات</button>
+          <a class="btn btn-ghost-soft btn-small" href="#/settings" data-i18n="home_prayer_settings">إعدادات التنبيه</a>
+        </div>
+        <p class="small muted center" data-i18n="prayer_method_note">تُحسب المواقيت لموقعك عبر خدمة aladhan.com، وتُستعمل مواقيت عمّان (الأردن) إذا لم يُسمح بتحديد الموقع.</p>
+        <p class="center"><button type="button" class="btn btn-soft btn-small" id="prayerLocateBtn" hidden data-i18n="prayer_retry_location">استخدام موقعي 📍</button></p>
+      </div>
+    </section>
+    </section>
+
+    <!-- ================= Page: progress ================= -->
+    <section class="page" id="page-progress" data-page="progress" data-i18n-aria-label="sb_progress" aria-label="progress" hidden>
+      <header class="page-header container">
+        <h2 class="page-title"><span aria-hidden="true">📊</span> <span data-i18n="pg_progress_title">تقدمي الشخصي</span></h2>
+        <p class="page-sub" data-i18n="pg_progress_sub">وردك اليومي ورحلتك وتحليل تقدمك — من بياناتك على هذا الجهاز فقط.</p>
+      </header>
+      <section class="section section--tight" id="dashboardSection" aria-labelledby="progressDailyTitle">
+        <div class="container progress-top">
+          <article class="card wird-card">
+                    <h2 class="card-title" data-i18n="dash_wird_title">📖 وردك اليومي</h2>
+                    <p id="wirdSummary" aria-live="polite">0 من 4 مكتمل</p>
+                    <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="wirdProgress" aria-labelledby="wirdSummary">
+                      <span id="wirdProgressBar"></span>
+                    </div>
+                    <div class="wird-items">
+                      <label class="wird-item"><input type="checkbox" data-wird="quran"> <span data-i18n="dash_wird_1">📖 القرآن</span></label>
+                      <label class="wird-item"><input type="checkbox" data-wird="morning"> <span data-i18n="dash_wird_2">☀️ أذكار الصباح</span></label>
+                      <label class="wird-item"><input type="checkbox" data-wird="evening"> <span data-i18n="dash_wird_3">🌙 أذكار المساء</span></label>
+                      <label class="wird-item"><input type="checkbox" data-wird="prayer"> <span data-i18n="dash_wird_4">🕌 المحافظة على الصلاة</span></label>
+                    </div>
+                  </article>
+        </div>
+        <div class="container journey">
+          <h2 class="sub-title" id="progressDailyTitle" data-i18n="journey_title">🌿 رحلتي اليومية</h2>
+        <div id="journeyGrid" class="journey-grid" aria-live="polite"></div>
+          <h2 class="sub-title" id="insightsTitle" data-i18n="insights_title">📊 بصيرة: تحليل تقدمك</h2>
+        <p class="small muted insights-intro" data-i18n="insights_intro">تُحسب هذه الأرقام من نشاطك المحفوظ على هذا الجهاز فقط، ولا تُرسل إلى أي خادم.</p>
+        <div id="insightsGrid" class="insights-grid" aria-labelledby="insightsTitle"></div>
+        </div>
+      </section>
+    </section>
+
+    <!-- ================= Page: notes ================= -->
+    <section class="page" id="page-notes" data-page="notes" data-i18n-aria-label="notes_tool" aria-label="notes" hidden>
+      <header class="page-header container">
+        <h2 class="page-title"><span aria-hidden="true">📝</span> <span data-i18n="notes_tool">ملاحظاتي</span></h2>
+      </header>
+      <div class="container page-embed">
+      <!-- Ayah notes and collections -->
+      <dialog id="notesModal" data-page-dialog class="modal dialog--page modal--wide" aria-labelledby="notesTitle">
+        <button class="icon-btn close-btn" type="button" data-close data-i18n-aria-label="close" aria-label="إغلاق"><span aria-hidden="true">✖</span></button>
+        <h2 class="modal-title" id="notesTitle" data-i18n="notes_title">📝 ملاحظاتي ومجموعاتي</h2>
+        <p class="small muted" data-i18n="notes_intro">اضغط على أي آية في وضع القراءة ثم «📝 ملاحظة وتصنيف» لتضيفها إلى مجموعة وتكتب ملاحظتك. تبقى الملاحظات على هذا الجهاز.</p>
+        <div class="notes-toolbar">
+          <label class="field field--inline"><span class="field-label" data-i18n="notes_filter">المجموعة</span>
+            <select id="notesFilter" class="reciter-select reciter-select--compact"></select></label>
+          <label class="field field--inline"><span class="field-label" data-i18n="notes_search">بحث في الملاحظات</span>
+            <input type="search" id="notesSearch" maxlength="60" enterkeyhint="search"></label>
+          <button class="btn btn-soft btn-small" type="button" id="notesExport" data-i18n="notes_export">⬇ تصدير كنص</button>
+        </div>
+        <ul id="notesList" class="notes-list" aria-live="polite"></ul>
+        <form id="notesNewCollection" class="notes-new">
+          <label class="field-label" for="notesNewCollectionName" data-i18n="notes_new_collection_label">إنشاء مجموعة جديدة</label>
+          <div class="note-form-row">
+            <input id="notesNewCollectionName" maxlength="40" required>
+            <button class="btn btn-soft btn-small" type="submit" data-i18n="notes_create">إنشاء</button>
+          </div>
+        </form>
+      </dialog>
+      </div>
+    </section>
+
+    <!-- ================= Page: profile ================= -->
+    <section class="page" id="page-profile" data-page="profile" data-i18n-aria-label="side_profile" aria-label="profile" hidden>
+      <header class="page-header container">
+        <h2 class="page-title"><span aria-hidden="true">👤</span> <span data-i18n="side_profile">حسابي</span></h2>
+      </header>
+      <div class="container page-embed">
+      <!-- Local profile -->
+      <dialog id="profileModal" data-page-dialog class="modal dialog--page" aria-labelledby="profileTitle">
+        <button class="icon-btn close-btn" type="button" data-close data-i18n-aria-label="close" aria-label="إغلاق"><span aria-hidden="true">✖</span></button>
+        <h2 class="modal-title" id="profileTitle" data-i18n="profile_title">👤 حسابي على هذا الجهاز</h2>
+        <form id="profileForm" class="profile-grid">
+          <label class="visually-hidden" for="profileName" data-i18n="placeholder_profile_name">اسمك</label>
+          <input id="profileName" maxlength="60" autocomplete="name" placeholder="اسمك" data-i18n-placeholder="placeholder_profile_name">
+          <label class="visually-hidden" for="profileGoal" data-i18n="placeholder_profile_goal">هدفك (مثال: حفظ جزء عم)</label>
+          <input id="profileGoal" maxlength="120" placeholder="هدفك (مثال: حفظ جزء عم)" data-i18n-placeholder="placeholder_profile_goal">
+          <div class="profile-actions">
+            <button class="btn btn-primary" type="submit" data-i18n="profile_save">حفظ الملف</button>
+            <button class="btn btn-soft" type="button" id="resetLocalData" data-i18n="profile_reset">إعادة ضبط بياناتي</button>
+          </div>
+        </form>
+        <div class="mini-stats">
+          <div class="mini-stat"><strong id="profileWirdStat">0%</strong><span data-i18n="profile_stat1">إنجاز الورد اليومي</span></div>
+          <div class="mini-stat"><strong id="profileFavStat">0</strong><span data-i18n="profile_stat2">سور مفضلة</span></div>
+        </div>
+        <div class="settings-row">
+          <span data-i18n="profile_notify">🔔 تنبيه قبل الصلاة</span>
+          <button class="btn btn-soft btn-small" type="button" id="notifyBtn" data-i18n="profile_notify_btn">تفعيل الإشعارات</button>
+        </div>
+        <section class="backup-box" aria-labelledby="backupTitle">
+          <h3 class="backup-title" id="backupTitle" data-i18n="backup_title">💾 نسخة احتياطية لبياناتك</h3>
+          <p class="small muted" data-i18n="backup_desc">تقدمك محفوظ في هذا المتصفح فقط. احفظه في ملف لتنقله إلى جهاز آخر أو تستعيده بعد مسح بيانات المتصفح. لا يُرفع الملف إلى أي مكان.</p>
+          <div class="profile-actions">
+            <button class="btn btn-soft btn-small" type="button" id="backupExport" data-i18n="backup_export">⬇ حفظ نسخة احتياطية</button>
+            <label class="btn btn-soft btn-small file-btn"><span data-i18n="backup_import">⬆ استعادة من ملف</span><input type="file" id="backupImport" accept="application/json,.json" class="visually-hidden"></label>
+          </div>
+          <p class="small" id="backupStatus" role="status"></p>
+        </section>
+      </dialog>
+      </div>
+    </section>
+
+    <!-- ================= Page: settings ================= -->
+    <section class="page" id="page-settings" data-page="settings" data-i18n-aria-label="settings_title" aria-label="settings" hidden>
+      <header class="page-header container">
+        <h2 class="page-title"><span aria-hidden="true">⚙️</span> <span data-i18n="settings_title">الإعدادات</span></h2>
+      </header>
+      <div class="container page-embed">
+      <!-- Settings -->
+      <dialog id="settingsModal" data-page-dialog class="modal dialog--page" aria-labelledby="settingsTitle">
+        <button class="icon-btn close-btn" type="button" data-close data-i18n-aria-label="close" aria-label="إغلاق"><span aria-hidden="true">✖</span></button>
+        <h2 class="modal-title" id="settingsTitle" data-i18n="settings_heading">⚙️ الإعدادات</h2>
+        <div class="settings-grid">
+          <fieldset class="settings-group">
+            <legend data-i18n="settings_reading">📖 القراءة</legend>
+            <label class="settings-field" for="setFont"><span data-i18n="settings_font">حجم خط المصحف</span> <output id="setFontValue" for="setFont"></output></label>
+            <input type="range" id="setFont" min="1.2" max="3.2" step="0.1">
+            <label class="settings-field" for="setReadingTheme" data-i18n="reader_theme">مظهر القراءة</label>
+            <select id="setReadingTheme" class="reciter-select reciter-select--compact"></select>
+            <label class="settings-field" for="setTranslation" data-i18n="settings_translation">الترجمة المعروضة مع الواجهة العربية</label>
+            <select id="setTranslation" class="reciter-select reciter-select--compact"></select>
+            <label class="toggle"><input type="checkbox" id="setTafsir"> <span data-i18n="settings_tafsir">إظهار التفسير الميسر مع كل اللغات</span></label>
+            <p class="small muted" data-i18n="settings_tafsir_note">التفسير المتاح هو «التفسير الميسر» بالعربية.</p>
+          </fieldset>
+          <fieldset class="settings-group">
+            <legend data-i18n="settings_audio">🎧 الاستماع</legend>
+            <label class="settings-field" for="setReciter" data-i18n="settings_reciter">القارئ المفضل</label>
+            <select id="setReciter" class="reciter-select reciter-select--compact"></select>
+          </fieldset>
+          <fieldset class="settings-group">
+            <legend data-i18n="settings_goals">🎯 الأهداف</legend>
+            <label class="settings-field" for="setDailyGoal" data-i18n="settings_daily_goal">هدف القراءة اليومي (آيات)</label>
+            <input type="number" id="setDailyGoal" min="1" max="1000" inputmode="numeric">
+            <label class="settings-field" for="setMemoGoal" data-i18n="settings_memo_goal">هدف الحفظ اليومي (آيات)</label>
+            <input type="number" id="setMemoGoal" min="1" max="200" inputmode="numeric">
+          </fieldset>
+          <fieldset class="settings-group">
+            <legend data-i18n="settings_notifications">🔔 التنبيهات</legend>
+            <label class="settings-field" for="setNotifyBefore" data-i18n="settings_notify_before">التنبيه قبل الصلاة بـ</label>
+            <select id="setNotifyBefore" class="reciter-select reciter-select--compact"></select>
+            <button class="btn btn-soft btn-small" type="button" id="setNotifyBtn" data-i18n="profile_notify_btn">تفعيل الإشعارات</button>
+            <p class="small muted" data-i18n="settings_notify_note">تصل التنبيهات ما دام الموقع مفتوحًا في المتصفح أو مثبتًا كتطبيق ونشطًا.</p>
+          </fieldset>
+        </div>
+      </dialog>
+      </div>
+    </section>
   </main>
 
   <!-- ================= Footer ================= -->
@@ -538,6 +1107,8 @@
       <p>© 2026 جميع الحقوق محفوظة</p>
     </div>
   </footer>
+    </div>
+  </div>
 
   <!-- ================= Persistent mini player ================= -->
   <div class="mini-player" id="miniPlayer" hidden>
@@ -554,7 +1125,6 @@
   <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
   <button id="assistantFab" class="assistant-fab" type="button" data-open="assistantModal" data-i18n-aria-label="asst_open_label" aria-label="افتح مساعد الموقع" data-i18n-title="asst_open_label" title="افتح مساعد الموقع"><span aria-hidden="true">💬</span> <span class="assistant-fab-label" data-i18n="asst_open">المساعد</span></button>
   <button id="topButton" class="top-button" type="button" data-i18n-aria-label="back_to_top" aria-label="العودة إلى الأعلى" hidden><span aria-hidden="true">↑</span></button>
-
   <!-- ======================================================================
        Dialogs
        ====================================================================== -->
@@ -591,59 +1161,6 @@
     </div>
   </dialog>
 
-
-  <!-- Hisn al-Muslim -->
-  <dialog id="adhkarModal" class="modal modal--wide" aria-labelledby="adhkarTitle">
-    <button class="icon-btn close-btn" type="button" data-close data-i18n-aria-label="close" aria-label="إغلاق"><span aria-hidden="true">✖</span></button>
-    <h2 class="modal-title" id="adhkarTitle" data-i18n="modal_adhkar_title">حصن المسلم</h2>
-    <div class="tabs" role="tablist" aria-labelledby="adhkarTitle">
-      <button class="tab-btn" role="tab" type="button" id="tab_morning" data-adhkar="morning" aria-selected="true" data-i18n="tab_morning">الصباح ☀️</button>
-      <button class="tab-btn" role="tab" type="button" id="tab_evening" data-adhkar="evening" aria-selected="false" data-i18n="tab_evening">المساء 🌙</button>
-      <button class="tab-btn" role="tab" type="button" id="tab_sleep" data-adhkar="sleep" aria-selected="false" data-i18n="tab_sleep">النوم 🛏️</button>
-      <button class="tab-btn" role="tab" type="button" id="tab_prayer" data-adhkar="prayer" aria-selected="false" data-i18n="tab_prayer">بعد الصلاة 🕌</button>
-      <button class="tab-btn" role="tab" type="button" id="tab_daily" data-adhkar="daily" aria-selected="false" data-i18n="tab_daily">متنوعة 🤲</button>
-      <button class="tab-btn" role="tab" type="button" id="tab_tasbeeh" data-adhkar="tasbeeh" aria-selected="false" aria-controls="tasbeehPanel" data-i18n="nav_rosary">📿 المسبحة</button>
-    </div>
-    <div class="adhkar-grid" id="adhkarGrid" role="tabpanel" aria-live="polite"></div>
-    <p class="center" id="adhkarResetRow"><button type="button" class="btn btn-soft btn-small" id="adhkarReset" data-i18n="adhkar_reset">إعادة العد 🔄</button></p>
-
-    <!-- Electronic rosary (moved here from its own dialog; same controls, ids and saved count) -->
-    <div id="tasbeehPanel" class="tasbeeh-panel center" role="tabpanel" aria-labelledby="tab_tasbeeh" hidden>
-      <h3 class="tasbeeh-title" data-i18n="tasbeeh_title">📿 المسبحة الإلكترونية</h3>
-      <p class="muted" data-i18n="rosary_hint">اضغط على الدائرة للتسبيح</p>
-      <div class="tasbeeh-options">
-        <div class="chips tasbeeh-phrases" id="tasbeehPhrases" role="group" data-i18n-aria-label="tasbeeh_phrase_label" aria-label="الذكر"></div>
-        <label class="field field--inline">
-          <span class="field-label" data-i18n="tasbeeh_target_label">الهدف</span>
-          <select id="tasbeehTarget" class="reciter-select reciter-select--compact">
-            <option value="0" data-i18n="tasbeeh_target_free">بدون هدف</option>
-            <option value="33">33</option>
-            <option value="100">100</option>
-          </select>
-        </label>
-      </div>
-      <p class="tasbeeh-phrase" id="tasbeehPhrase" lang="ar" dir="rtl" aria-live="polite"></p>
-      <button type="button" class="rosary-circle" id="rosaryCounter" data-i18n-aria-label="rosary_count_label" aria-label="عدد التسبيحات" aria-live="polite">0</button>
-      <p class="small muted" id="tasbeehProgress" aria-live="polite"></p>
-      <button type="button" class="btn btn-soft" id="rosaryReset" data-i18n="rosary_reset">تصفير العداد 🔄</button>
-    </div>
-  </dialog>
-
-  <!-- Message of Islam -->
-  <dialog id="islamModal" class="modal modal--wide" aria-labelledby="islamTitle">
-    <button class="icon-btn close-btn" type="button" data-close data-i18n-aria-label="close" aria-label="إغلاق"><span aria-hidden="true">✖</span></button>
-    <h2 class="modal-title" id="islamTitle" data-i18n="modal_islam_title">رسالة الإسلام</h2>
-    <div class="islam-content prose">
-      <h3 data-i18n="islam_sec1_title">التوحيد والدين الصافي</h3>
-      <p data-i18n="islam_sec1_desc">الإسلام هو دين الفطرة والتوحيد الخالص. هو الاستسلام لله وحده بالتوحيد، والانقياد له بالطاعة، والبراءة من الشرك وأهله. يدعو الإسلام إلى إفراد الله بالعبادة دون وسيط، فهو الخالق والرازق والمدبر لكل شيء. إنه دين يوازن بين الروح والجسد، ويدعو للعدل، والرحمة، وحسن الخلق مع جميع البشر.</p>
-      <h3 data-i18n="islam_sec2_title">الإسلام بريء من الإرهاب</h3>
-      <p data-i18n="islam_sec2_desc">نحذر بشدة من مخططات الجماعات الإرهابية التي تختطف اسم الدين لتحقيق أجندات سياسية ودموية. الإسلام يحرم قتل النفس بغير حق ويعتبره من أكبر الكبائر ﴿مَن قَتَلَ نَفْسًا بِغَيْرِ نَفْسٍ أَوْ فَسَادٍ فِي الْأَرْضِ فَكَأَنَّمَا قَتَلَ النَّاسَ جَمِيعًا﴾. كما نحذر من مخططات بعض وسائل الإعلام الغربية التي تتعمد تشويه صورة الإسلام وربطه بالإرهاب لنشر (الإسلاموفوبيا). هذه ادعاءات مغلوطة تماماً؛ فالإرهاب لا دين له، والإسلام هو أكبر عدو له.</p>
-      <h3 data-i18n="islam_sec3_title">دعوة إلى النور</h3>
-      <p data-i18n="islam_sec3_desc">ندعو كل باحث عن الحق، والطمأنينة، والسلام الداخلي، أن يقرأ القرآن الكريم بتجرد وبعقل مفتوح. الإسلام ليس حكراً على عرق أو قومية، بل هو رسالة الله العالمية لكل إنسان. انضم إلى هذا الدين العظيم الذي كرم الإنسان، وحفظ حقوقه، وأنار بصيرته للطريق الصحيح في الدنيا والآخرة.</p>
-    </div>
-  </dialog>
-
-
   <!-- Ayah search -->
   <dialog id="ayahSearchModal" class="modal" aria-labelledby="ayahSearchTitle">
     <button class="icon-btn close-btn" type="button" data-close data-i18n-aria-label="close" aria-label="إغلاق"><span aria-hidden="true">✖</span></button>
@@ -657,123 +1174,6 @@
     <div id="ayahSearchResults" class="search-results"></div>
   </dialog>
 
-  <!-- Memorisation lab -->
-  <dialog id="voiceTestModal" class="modal modal--wide lab" aria-labelledby="voiceTitle">
-    <button class="icon-btn close-btn" type="button" data-close data-i18n-aria-label="close" aria-label="إغلاق"><span aria-hidden="true">✖</span></button>
-    <h2 class="modal-title" id="voiceTitle" data-i18n="nav_voice_test">مختبر الحفظ والتسميع</h2>
-    <p class="muted center" data-i18n="voice_desc">اختر السورة، اضغط المايك، وابدأ. الآية الصحيحة ستكتب أمامك لتتابع.</p>
-    <div class="tabs" role="tablist" data-i18n-aria-label="lab_tabs" aria-label="أقسام مختبر الحفظ">
-      <button class="tab-btn" role="tab" type="button" id="labTabRecite" data-lab-tab="recite" aria-controls="labPaneRecite" aria-selected="true" data-i18n="lab_tab_recite">🎙️ التسميع</button>
-      <button class="tab-btn" role="tab" type="button" id="labTabPlan" data-lab-tab="plan" aria-controls="labPanePlan" aria-selected="false" tabindex="-1" data-i18n="lab_tab_plan">📈 خطتي وتقدمي</button>
-    </div>
-
-    <div id="labPaneRecite" role="tabpanel" aria-labelledby="labTabRecite">
-      <div class="lab-setup">
-        <div class="center">
-          <label class="visually-hidden" for="voiceSurahSelect" data-i18n="voice_select">اختر السورة للتسميع...</label>
-          <select id="voiceSurahSelect" class="reciter-select"><option value="" data-i18n="voice_select">اختر السورة للتسميع...</option></select>
-        </div>
-        <div class="lab-options">
-          <label class="field field--inline">
-            <span class="field-label" data-i18n="lab_mode_label">طريقة التسميع</span>
-            <select id="labMode" class="reciter-select reciter-select--compact"></select>
-          </label>
-          <div class="lab-range" id="labRangeWrap" hidden>
-            <label class="field field--inline"><span class="field-label" data-i18n="lab_from">من الآية</span><select id="labFrom" class="reciter-select reciter-select--compact"></select></label>
-            <label class="field field--inline"><span class="field-label" data-i18n="lab_to">إلى الآية</span><select id="labTo" class="reciter-select reciter-select--compact"></select></label>
-          </div>
-          <label class="field field--inline" id="labRepeatWrap" hidden>
-            <span class="field-label" data-i18n="lab_repeat_label">عدد مرات التكرار</span>
-            <select id="labRepeat" class="reciter-select reciter-select--compact">
-              <option value="2">2</option><option value="3" selected>3</option><option value="5">5</option><option value="7">7</option><option value="10">10</option>
-            </select>
-          </label>
-        </div>
-        <p id="labModeHint" class="small muted center"></p>
-      </div>
-
-      <div class="mic-panel">
-        <button type="button" class="btn btn-soft btn-small" id="micTestBtn" aria-pressed="false" data-i18n="lab_mic_test">🎚️ اختبار المايك</button>
-        <div class="mic-level" aria-hidden="true"><span id="micLevelFill"></span></div>
-        <label class="field field--inline" id="micDeviceWrap" hidden>
-          <span class="field-label" data-i18n="lab_mic_device">الميكروفون</span>
-          <select id="micDevice" class="reciter-select reciter-select--compact"></select>
-        </label>
-        <p id="micStatus" class="mic-status small" role="status"></p>
-      </div>
-
-      <button class="mic-btn" type="button" id="micBtn" aria-pressed="false" data-i18n-aria-label="voice_mic_label" aria-label="بدء أو إيقاف الاستماع"><span aria-hidden="true">🎙️</span></button>
-      <p id="voiceResultText" class="muted center" aria-live="polite" data-i18n="voice_idle">جاهز للاستماع...</p>
-      <p id="voiceFeedback" class="center voice-feedback" aria-live="assertive"></p>
-      <p id="voiceProgress" class="center small muted"></p>
-      <div class="progress progress--thin" id="labBar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-i18n-aria-label="lab_progress_label" aria-label="التقدم في السورة" hidden><span id="labBarFill"></span></div>
-
-      <section class="lab-live" id="labLive" hidden data-i18n-aria-label="lab_live_label" aria-label="الآية الحالية">
-        <p class="lab-position small" id="labPosition" aria-live="polite"></p>
-        <p class="lab-words" id="labWords" lang="ar" dir="rtl"></p>
-        <p class="lab-notes small" id="labNotes" aria-live="polite"></p>
-        <div class="lab-actions">
-          <button type="button" class="btn btn-soft btn-small" id="labRetry" data-i18n="lab_retry">🔁 أعد المحاولة</button>
-          <button type="button" class="btn btn-soft btn-small" id="labHint" data-i18n="lab_hint">💡 الكلمة التالية</button>
-          <button type="button" class="btn btn-soft btn-small" id="labPeek" aria-pressed="false" hidden data-i18n="lab_peek">👁️ إظهار الآية</button>
-          <button type="button" class="btn btn-soft btn-small" id="labListen" data-i18n="lab_listen">🔊 استمع للآية</button>
-          <button type="button" class="btn btn-soft btn-small" id="labSkip" data-i18n="lab_skip">⏭ تخطَّ الآية</button>
-          <button type="button" class="btn btn-primary btn-small" id="labNext" hidden data-i18n="lab_next">الآية التالية ←</button>
-        </div>
-      </section>
-      <p class="lab-summary" id="labSummary" role="status" hidden></p>
-      <div id="recitedAyahsContainer" class="quran-text recited" lang="ar" dir="rtl" hidden></div>
-      <p class="note" data-i18n="lab_limitation">تنبيه: يعتمد المختبر على خاصية التعرف على الكلام في المتصفح، وهي تُعيد كلمات مكتوبة فقط؛ لذلك يقارن المختبر كلمات تلاوتك بنص الآية، ولا يستطيع الحكم على أحكام التجويد أو مخارج الحروف أو الحركات. لا يغني ذلك عن القراءة على معلم متقن.</p>
-    </div>
-
-    <div id="labPanePlan" role="tabpanel" aria-labelledby="labTabPlan" hidden>
-      <div class="mini-stats mini-stats--4" id="planStats"></div>
-      <div class="plan-grid">
-        <section class="plan-card">
-          <h3 data-i18n="plan_title">🎯 خطة الحفظ</h3>
-          <form id="planTargetForm" class="plan-inline">
-            <label for="planTarget" data-i18n="plan_target_label">الهدف اليومي (عدد الآيات)</label>
-            <input type="number" id="planTarget" min="1" max="200" inputmode="numeric">
-            <button type="submit" class="btn btn-soft btn-small" data-i18n="plan_save">حفظ</button>
-          </form>
-          <div class="plan-inline">
-            <label class="visually-hidden" for="planAddSelect" data-i18n="plan_add_placeholder">أضف سورة إلى خطتك...</label>
-            <select id="planAddSelect" class="reciter-select reciter-select--compact"></select>
-            <button type="button" class="btn btn-soft btn-small" id="planAddBtn" data-i18n="plan_add">إضافة</button>
-          </div>
-          <ul class="plan-list" id="planList"></ul>
-        </section>
-        <section class="plan-card">
-          <h3 data-i18n="revision_title">🔄 جدول المراجعة</h3>
-          <p class="small muted" data-i18n="revision_explain">كل سورة أتممت تسميعها (أو حددتها كمحفوظة) تُجدول لمراجعتها بعد 1 ثم 3 ثم 7 ثم 14 ثم 30 ثم 60 يومًا.</p>
-          <ul class="plan-list" id="revisionDue"></ul>
-          <h4 class="small" data-i18n="revision_upcoming">المراجعات القادمة</h4>
-          <ul class="plan-list" id="revisionUpcoming"></ul>
-        </section>
-        <section class="plan-card">
-          <h3 data-i18n="memorized_title">📚 سور حفظتها من قبل</h3>
-          <div class="plan-inline">
-            <label class="visually-hidden" for="memorizedAddSelect" data-i18n="memorized_add_placeholder">اختر سورة تحفظها...</label>
-            <select id="memorizedAddSelect" class="reciter-select reciter-select--compact"></select>
-            <button type="button" class="btn btn-soft btn-small" id="memorizedAddBtn" data-i18n="memorized_add">تحديد كمحفوظة</button>
-          </div>
-          <ul class="chips" id="memorizedList"></ul>
-        </section>
-        <section class="plan-card">
-          <h3 data-i18n="mistakes_title">📝 سجل الأخطاء</h3>
-          <ul class="mistake-list" id="mistakeList" tabindex="0" data-i18n-aria-label="mistakes_title" aria-label="سجل الأخطاء"></ul>
-        </section>
-      </div>
-    </div>
-  </dialog>
-
-  <!-- Favourites -->
-  <dialog id="favoritesModal" class="modal" aria-labelledby="favoritesTitle">
-    <button class="icon-btn close-btn" type="button" data-close data-i18n-aria-label="close" aria-label="إغلاق"><span aria-hidden="true">✖</span></button>
-    <h2 class="modal-title" id="favoritesTitle" data-i18n="side_favorites">⭐ السور المفضلة</h2>
-    <div id="favoritesList" class="favorites-list"></div>
-  </dialog>
-
   <!-- Islamic search -->
   <dialog id="islamicSearchModal" class="modal" aria-labelledby="islamicSearchTitle">
     <button class="icon-btn close-btn" type="button" data-close data-i18n-aria-label="close" aria-label="إغلاق"><span aria-hidden="true">✖</span></button>
@@ -785,117 +1185,6 @@
     </form>
     <div id="islamicSearchResults" class="search-results" aria-live="polite"></div>
     <p class="note" data-i18n="search_note">البحث يعتمد على المحتوى المتاح داخل الموقع والبيانات التي تم تحميلها، ولا يصدر فتاوى أو أحكامًا من تلقاء نفسه.</p>
-  </dialog>
-
-  <!-- Local profile -->
-  <dialog id="profileModal" class="modal" aria-labelledby="profileTitle">
-    <button class="icon-btn close-btn" type="button" data-close data-i18n-aria-label="close" aria-label="إغلاق"><span aria-hidden="true">✖</span></button>
-    <h2 class="modal-title" id="profileTitle" data-i18n="profile_title">👤 حسابي على هذا الجهاز</h2>
-    <form id="profileForm" class="profile-grid">
-      <label class="visually-hidden" for="profileName" data-i18n="placeholder_profile_name">اسمك</label>
-      <input id="profileName" maxlength="60" autocomplete="name" placeholder="اسمك" data-i18n-placeholder="placeholder_profile_name">
-      <label class="visually-hidden" for="profileGoal" data-i18n="placeholder_profile_goal">هدفك (مثال: حفظ جزء عم)</label>
-      <input id="profileGoal" maxlength="120" placeholder="هدفك (مثال: حفظ جزء عم)" data-i18n-placeholder="placeholder_profile_goal">
-      <div class="profile-actions">
-        <button class="btn btn-primary" type="submit" data-i18n="profile_save">حفظ الملف</button>
-        <button class="btn btn-soft" type="button" id="resetLocalData" data-i18n="profile_reset">إعادة ضبط بياناتي</button>
-      </div>
-    </form>
-    <div class="mini-stats">
-      <div class="mini-stat"><strong id="profileWirdStat">0%</strong><span data-i18n="profile_stat1">إنجاز الورد اليومي</span></div>
-      <div class="mini-stat"><strong id="profileFavStat">0</strong><span data-i18n="profile_stat2">سور مفضلة</span></div>
-    </div>
-    <div class="settings-row">
-      <span data-i18n="profile_notify">🔔 تنبيه قبل الصلاة</span>
-      <button class="btn btn-soft btn-small" type="button" id="notifyBtn" data-i18n="profile_notify_btn">تفعيل الإشعارات</button>
-    </div>
-    <section class="backup-box" aria-labelledby="backupTitle">
-      <h3 class="backup-title" id="backupTitle" data-i18n="backup_title">💾 نسخة احتياطية لبياناتك</h3>
-      <p class="small muted" data-i18n="backup_desc">تقدمك محفوظ في هذا المتصفح فقط. احفظه في ملف لتنقله إلى جهاز آخر أو تستعيده بعد مسح بيانات المتصفح. لا يُرفع الملف إلى أي مكان.</p>
-      <div class="profile-actions">
-        <button class="btn btn-soft btn-small" type="button" id="backupExport" data-i18n="backup_export">⬇ حفظ نسخة احتياطية</button>
-        <label class="btn btn-soft btn-small file-btn"><span data-i18n="backup_import">⬆ استعادة من ملف</span><input type="file" id="backupImport" accept="application/json,.json" class="visually-hidden"></label>
-      </div>
-      <p class="small" id="backupStatus" role="status"></p>
-    </section>
-  </dialog>
-
-  <!-- Site assistant: a conversational guide to the site and to Islam, answering only from reviewed content
-       with its sources (no AI model, no API, nothing typed is sent or stored). -->
-  <dialog id="assistantModal" class="modal modal--wide assistant" aria-labelledby="assistantTitle">
-    <button class="icon-btn close-btn" type="button" data-close data-i18n-aria-label="close" aria-label="إغلاق"><span aria-hidden="true">✖</span></button>
-    <h2 class="modal-title" id="assistantTitle" data-i18n="asst_title">💬 مساعد الموقع</h2>
-    <div id="assistantLog" class="asst-log" role="log" aria-live="polite"></div>
-    <div class="asst-suggest" role="group" aria-labelledby="assistantSuggestTitle">
-      <span class="small muted" id="assistantSuggestTitle" data-i18n="asst_suggestions">أسئلة مقترحة</span>
-      <div id="assistantSuggestions" class="asst-chips"></div>
-    </div>
-    <form id="assistantForm" class="asst-form">
-      <label class="visually-hidden" for="assistantInput" data-i18n="asst_input_label">اكتب سؤالك</label>
-      <input type="search" id="assistantInput" maxlength="300" autocomplete="off" enterkeyhint="send" dir="auto" placeholder="اكتب رسالتك… مثل: كيف أبدأ بحفظ القرآن؟" data-i18n-placeholder="asst_placeholder">
-      <button class="btn btn-primary" type="submit" data-i18n="asst_send">اسأل</button>
-    </form>
-    <div class="asst-tools"><button type="button" id="assistantReset" class="link-btn small" data-i18n="asst_reset">🧹 محادثة جديدة</button></div>
-  </dialog>
-
-  <!-- Ayah notes and collections -->
-  <dialog id="notesModal" class="modal modal--wide" aria-labelledby="notesTitle">
-    <button class="icon-btn close-btn" type="button" data-close data-i18n-aria-label="close" aria-label="إغلاق"><span aria-hidden="true">✖</span></button>
-    <h2 class="modal-title" id="notesTitle" data-i18n="notes_title">📝 ملاحظاتي ومجموعاتي</h2>
-    <p class="small muted" data-i18n="notes_intro">اضغط على أي آية في وضع القراءة ثم «📝 ملاحظة وتصنيف» لتضيفها إلى مجموعة وتكتب ملاحظتك. تبقى الملاحظات على هذا الجهاز.</p>
-    <div class="notes-toolbar">
-      <label class="field field--inline"><span class="field-label" data-i18n="notes_filter">المجموعة</span>
-        <select id="notesFilter" class="reciter-select reciter-select--compact"></select></label>
-      <label class="field field--inline"><span class="field-label" data-i18n="notes_search">بحث في الملاحظات</span>
-        <input type="search" id="notesSearch" maxlength="60" enterkeyhint="search"></label>
-      <button class="btn btn-soft btn-small" type="button" id="notesExport" data-i18n="notes_export">⬇ تصدير كنص</button>
-    </div>
-    <ul id="notesList" class="notes-list" aria-live="polite"></ul>
-    <form id="notesNewCollection" class="notes-new">
-      <label class="field-label" for="notesNewCollectionName" data-i18n="notes_new_collection_label">إنشاء مجموعة جديدة</label>
-      <div class="note-form-row">
-        <input id="notesNewCollectionName" maxlength="40" required>
-        <button class="btn btn-soft btn-small" type="submit" data-i18n="notes_create">إنشاء</button>
-      </div>
-    </form>
-  </dialog>
-
-  <!-- Settings -->
-  <dialog id="settingsModal" class="modal" aria-labelledby="settingsTitle">
-    <button class="icon-btn close-btn" type="button" data-close data-i18n-aria-label="close" aria-label="إغلاق"><span aria-hidden="true">✖</span></button>
-    <h2 class="modal-title" id="settingsTitle" data-i18n="settings_heading">⚙️ الإعدادات</h2>
-    <div class="settings-grid">
-      <fieldset class="settings-group">
-        <legend data-i18n="settings_reading">📖 القراءة</legend>
-        <label class="settings-field" for="setFont"><span data-i18n="settings_font">حجم خط المصحف</span> <output id="setFontValue" for="setFont"></output></label>
-        <input type="range" id="setFont" min="1.2" max="3.2" step="0.1">
-        <label class="settings-field" for="setReadingTheme" data-i18n="reader_theme">مظهر القراءة</label>
-        <select id="setReadingTheme" class="reciter-select reciter-select--compact"></select>
-        <label class="settings-field" for="setTranslation" data-i18n="settings_translation">الترجمة المعروضة مع الواجهة العربية</label>
-        <select id="setTranslation" class="reciter-select reciter-select--compact"></select>
-        <label class="toggle"><input type="checkbox" id="setTafsir"> <span data-i18n="settings_tafsir">إظهار التفسير الميسر مع كل اللغات</span></label>
-        <p class="small muted" data-i18n="settings_tafsir_note">التفسير المتاح هو «التفسير الميسر» بالعربية.</p>
-      </fieldset>
-      <fieldset class="settings-group">
-        <legend data-i18n="settings_audio">🎧 الاستماع</legend>
-        <label class="settings-field" for="setReciter" data-i18n="settings_reciter">القارئ المفضل</label>
-        <select id="setReciter" class="reciter-select reciter-select--compact"></select>
-      </fieldset>
-      <fieldset class="settings-group">
-        <legend data-i18n="settings_goals">🎯 الأهداف</legend>
-        <label class="settings-field" for="setDailyGoal" data-i18n="settings_daily_goal">هدف القراءة اليومي (آيات)</label>
-        <input type="number" id="setDailyGoal" min="1" max="1000" inputmode="numeric">
-        <label class="settings-field" for="setMemoGoal" data-i18n="settings_memo_goal">هدف الحفظ اليومي (آيات)</label>
-        <input type="number" id="setMemoGoal" min="1" max="200" inputmode="numeric">
-      </fieldset>
-      <fieldset class="settings-group">
-        <legend data-i18n="settings_notifications">🔔 التنبيهات</legend>
-        <label class="settings-field" for="setNotifyBefore" data-i18n="settings_notify_before">التنبيه قبل الصلاة بـ</label>
-        <select id="setNotifyBefore" class="reciter-select reciter-select--compact"></select>
-        <button class="btn btn-soft btn-small" type="button" id="setNotifyBtn" data-i18n="profile_notify_btn">تفعيل الإشعارات</button>
-        <p class="small muted" data-i18n="settings_notify_note">تصل التنبيهات ما دام الموقع مفتوحًا في المتصفح أو مثبتًا كتطبيق ونشطًا.</p>
-      </fieldset>
-    </div>
   </dialog>
 
   <!-- Lesson (prayer curriculum and academy) -->
