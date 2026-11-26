@@ -12,7 +12,7 @@ import { createRequire } from 'node:module';
 import { join } from 'node:path';
 import { after, before, describe, test } from 'node:test';
 
-import { AYAHS, REPO, chromium, collectErrors, mockUpstream, startPagesServer } from './helpers.mjs';
+import { AYAHS, REPO, chromium, autoReveal, collectErrors, mockUpstream, startPagesServer } from './helpers.mjs';
 
 const require = createRequire(import.meta.url);
 const AXE = readFileSync(require.resolve('axe-core/axe.min.js'), 'utf8');
@@ -30,7 +30,7 @@ after(async () => { await allowAutoplay?.close(); await blockAutoplay?.close(); 
 async function open(browser, { path = 'about.html', viewport = { width: 1366, height: 900 }, colorScheme = 'light', bypassCSP = false } = {}) {
   const context = await browser.newContext({ viewport, colorScheme, bypassCSP, locale: 'ar', reducedMotion: 'reduce' });
   await mockUpstream(context);
-  const page = await context.newPage();
+  const page = autoReveal(await context.newPage());
   const errors = collectErrors(page);
   await page.goto(site.url + path);
   return { context, page, errors };
@@ -45,8 +45,9 @@ describe('«من أنا» page', () => {
     const s = await open(allowAutoplay, { path: '' });
     const { page } = s;
     await page.waitForSelector('#surahGrid .surah-card');
-    assert.equal(await page.textContent('.nav-links a[href="about.html"]'), '🕊️ من أنا');
-    await page.click('.nav-links a[href="about.html"]');
+    await page.click('.side-group[data-group="more"] .side-group-btn');
+    assert.equal((await page.textContent('.sidebar a[href="about.html"]')).trim(), '🕊️من أنا');
+    await page.click('.sidebar a[href="about.html"]');
     await page.waitForURL(/about\.html$/);
     assert.equal(await page.locator('dialog[open]').count(), 0, 'not a modal');
     assert.equal(await page.title(), 'من أنا | القرآن الكريم - The Noble Quran');
@@ -57,10 +58,12 @@ describe('«من أنا» page', () => {
     await page.goForward();
     await page.waitForURL(/about\.html$/);
     await page.waitForSelector('#aboutTitle');
-    // Also reachable from the side menu.
+    // Also reachable from the mobile menu.
+    await page.setViewportSize({ width: 390, height: 800 });
     await page.goto(site.url);
     await page.click('.menu-btn');
-    await page.locator('#sideMenu a[href="about.html"]').click();
+    if (await page.getAttribute('.side-group[data-group="more"] .side-group-btn', 'aria-expanded') !== 'true') await page.click('.side-group[data-group="more"] .side-group-btn');
+    await page.locator('.sidebar a[href="about.html"]').click();
     await page.waitForURL(/about\.html$/);
     await close(s);
   });
@@ -240,7 +243,7 @@ describe('rosary in Hisn al-Muslim; prayer learning in the academy', () => {
     const context = await allowAutoplay.newContext({ locale: 'ar', reducedMotion: 'reduce' });
     await mockUpstream(context);
     await context.addInitScript(() => { if (!sessionStorage.getItem('seeded')) { localStorage.setItem('rosaryCount', '41'); sessionStorage.setItem('seeded', '1'); } });
-    const page = await context.newPage();
+    const page = autoReveal(await context.newPage());
     const errors = collectErrors(page);
     await page.goto(site.url);
     await page.waitForSelector('#surahGrid .surah-card');
@@ -278,7 +281,7 @@ describe('rosary in Hisn al-Muslim; prayer learning in the academy', () => {
   test('axe: Hisn al-Muslim on the rosary tab', async () => {
     const context = await allowAutoplay.newContext({ bypassCSP: true, reducedMotion: 'reduce' });
     await mockUpstream(context);
-    const page = await context.newPage();
+    const page = autoReveal(await context.newPage());
     await page.goto(site.url);
     await page.waitForSelector('#surahGrid .surah-card');
     await page.click('.nav-links [data-open="adhkarModal"]');
@@ -292,7 +295,7 @@ describe('rosary in Hisn al-Muslim; prayer learning in the academy', () => {
   test('the old side-menu entry is gone; its 4-language lesson is in the academy with the diagrams and video', async () => {
     const context = await allowAutoplay.newContext({ locale: 'ar', reducedMotion: 'reduce' });
     await mockUpstream(context);
-    const page = await context.newPage();
+    const page = autoReveal(await context.newPage());
     const errors = collectErrors(page);
     await page.goto(site.url);
     await page.waitForSelector('#surahGrid .surah-card');

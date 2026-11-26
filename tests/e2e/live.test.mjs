@@ -11,7 +11,7 @@
 import assert from 'node:assert/strict';
 import { after, before, test } from 'node:test';
 
-import { RECITERS, chromium } from './helpers.mjs';
+import { RECITERS, chromium , autoReveal } from './helpers.mjs';
 
 const URL_UNDER_TEST = process.env.LIVE_URL;
 let browser;
@@ -31,7 +31,7 @@ after(async () => { await browser?.close(); });
 
 test('live deployment: page, surahs, reciters, reading with tafsir, real audio, prayer times', { skip: !URL_UNDER_TEST, timeout: 120000 }, async () => {
   const context = await browser.newContext({ ignoreHTTPSErrors: !!MAP_TO, geolocation: { latitude: 31.9539, longitude: 35.9106 }, permissions: ['geolocation'] });
-  const page = await context.newPage();
+  const page = autoReveal(await context.newPage());
   const errors = [];
   const requests = [];
   page.on('pageerror', (e) => errors.push(e.message));

@@ -6,7 +6,7 @@ import assert from 'node:assert/strict';
 import { after, before, describe, test } from 'node:test';
 
 import {
-  ADHKAR, AYAHS, EDITIONS, FAKE_NOTIFICATIONS, FAKE_SPEECH, RECITERS, chromium, collectErrors, mockUpstream, sleep, startPagesServer,
+  ADHKAR, AYAHS, EDITIONS, FAKE_NOTIFICATIONS, FAKE_SPEECH, RECITERS, chromium, autoReveal, collectErrors, mockUpstream, sleep, startPagesServer,
 } from './helpers.mjs';
 
 let browser;
@@ -29,7 +29,7 @@ async function open({ viewport = { width: 1366, height: 900 }, geolocation = nul
   const calls = await mockUpstream(context, upstream);
   for (const script of init) await context.addInitScript(script);
   if (storage) await context.addInitScript((s) => { for (const [k, v] of Object.entries(s)) localStorage.setItem(k, v); }, storage);
-  const page = await context.newPage();
+  const page = autoReveal(await context.newPage());
   const errors = collectErrors(page);
   await page.goto(site.url);
   await page.waitForSelector('#surahGrid .surah-card');
@@ -58,64 +58,68 @@ describe('page structure', () => {
     await close(s);
   });
 
-  test('every navigation item is present and works', async () => {
+  test('every original navigation item is reachable from the sidebar and works', async () => {
     const s = await open();
     const { page } = s;
-    const nav = await page.locator('.nav-links > li').allTextContents();
-    const norm = (t) => t.replace(/\uFE0F/g, '').trim(); // the original ar string is «🎙 التسميع» (no variation selector)
-    for (const label of ['السور', 'مواقيت الصلاة', '📿 حصن المسلم', '🕌 الإسلام', '🔍 بحث آيات', '🎙 التسميع']) {
-      assert.ok(nav.some((t) => norm(t) === label), `nav item ${label}`);
+    // The original top-bar items (السور، مواقيت الصلاة، حصن المسلم، الإسلام، بحث آيات، التسميع) are sidebar entries now.
+    const routes = { quran: 'quran', prayer: 'prayer', adhkar: 'adhkar', islam: 'islam', memorize: 'memorize' };
+    for (const [route, pageName] of Object.entries(routes)) {
+      await page.click(`.side-link[data-route="${route}"]`);
+      assert.equal(await page.evaluate(() => document.documentElement.dataset.page), pageName, route);
     }
-    // «📿 المسبحة» was moved, at the owners' request, from the nav bar into Hisn al-Muslim (its own tab).
-    assert.ok(!nav.some((t) => norm(t) === '📿 المسبحة'), 'the rosary is no longer a separate nav item');
+    // «📿 المسبحة» stays a tab of Hisn al-Muslim, and also has its own sidebar entry.
     assert.equal(await page.textContent('#adhkarModal #tab_tasbeeh'), '📿 المسبحة');
-    const dialogs = { adhkarModal: 'adhkarModal', islamModal: 'islamModal', ayahSearchModal: 'ayahSearchModal', voiceTestModal: 'voiceTestModal' };
-    for (const [label, id] of Object.entries(dialogs)) {
-      await page.locator(`.nav-links [data-open="${label}"]`).click();
-      assert.ok(await page.locator(`#${id}`).evaluate((d) => d.open), `${label} opens ${id}`);
-      await page.keyboard.press('Escape');
-      assert.ok(!(await page.locator(`#${id}`).evaluate((d) => d.open)), `${id} closes on Escape`);
+    await page.click('.side-link[data-route="tasbih"]');
+    assert.ok(await page.isVisible('#tasbeehPanel'));
+    // Dialogs that became pages are open while their page is shown, and close when it is left.
+    for (const [id, route] of [['adhkarModal', 'adhkar'], ['islamModal', 'islam'], ['voiceTestModal', 'memorize']]) {
+      await page.click(`.side-link[data-route="${route}"]`);
+      assert.ok(await page.locator(`#${id}`).evaluate((d) => d.open), `${id} shown`);
+      await page.click('.side-link[data-route="home"]');
+      assert.ok(!(await page.locator(`#${id}`).evaluate((d) => d.open)), `${id} closed on leaving`);
     }
-    await page.locator('.nav-links a[href="#surahs"]').click();
-    await page.locator('.nav-links a[href="#prayerSection"]').click();
+    // Ayah search stays a modal dialog.
+    await page.click('.side-link[data-open="ayahSearchModal"]');
+    assert.ok(await page.locator('#ayahSearchModal').evaluate((d) => d.open));
+    await page.keyboard.press('Escape');
+    assert.ok(!(await page.locator('#ayahSearchModal').evaluate((d) => d.open)), 'closes on Escape');
+    // Original in-page links still work.
     await page.locator('.hero a[href="#surahs"]').click();
+    assert.equal(await page.evaluate(() => document.documentElement.dataset.page), 'quran');
+    await page.goBack();
     await page.locator('.hero a[href="#audio"]').click();
-    assert.equal(await page.locator('.logo').getAttribute('href'), '#home');
+    assert.equal(await page.evaluate(() => document.documentElement.dataset.page), 'audio');
+    assert.equal(await page.locator('.logo').getAttribute('href'), '#/');
     await close(s);
   });
 
-  test('side menu: all six items open their dialogs; dialogs close by button, Escape and backdrop', async () => {
+  test('menu items: favourites, profile, login, donate, contact; modals close by button, Escape and backdrop', async () => {
     const s = await open();
     const { page } = s;
-    // «تعلم الصلاة» was removed from the side menu at the owners' request; its content is in the academy (checked below).
-    assert.equal(await page.locator('#sideMenu').getByText('تعلم الصلاة', { exact: true }).count(), 0);
     assert.equal(await page.locator('#learnPrayerModal').count(), 0);
-    const items = { 'المفضلة': 'favoritesModal', 'حسابي': 'profileModal', 'تسجيل دخول': 'loginModal', 'تبرع': 'donateModal', 'تواصل معنا': 'contactModal' };
-    for (const [label, id] of Object.entries(items)) {
-      await page.click('.menu-btn');
-      assert.ok(await page.locator('#sideMenu').evaluate((d) => d.open));
-      await page.locator('#sideMenu').getByText(label, { exact: true }).click();
-      assert.ok(await page.locator(`#${id}`).evaluate((d) => d.open), `${label} → ${id}`);
-      assert.ok(!(await page.locator('#sideMenu').evaluate((d) => d.open)), 'drawer closes');
+    await page.click('.side-link[data-route="favorites"]');
+    assert.ok(await page.locator('#favoritesModal').evaluate((d) => d.open));
+    await page.click('.side-link[data-route="profile"]');
+    assert.ok(await page.locator('#profileModal').evaluate((d) => d.open));
+    await page.click('.side-group[data-group="more"] .side-group-btn');
+    for (const id of ['loginModal', 'donateModal', 'contactModal']) {
+      await page.click(`.side-link[data-open="${id}"]`);
+      assert.ok(await page.locator(`#${id}`).evaluate((d) => d.open), id);
       await page.locator(`#${id} .close-btn`).click();
       assert.ok(!(await page.locator(`#${id}`).evaluate((d) => d.open)), `${id} closes by button`);
     }
-    // Backdrop click
-    await page.click('.menu-btn');
-    await page.click('[data-open="donateModal"]');
-    await page.mouse.click(5, 5);
+    await page.click('.side-link[data-open="donateModal"]');
+    await page.mouse.click(5, 300);
     assert.ok(!(await page.locator('#donateModal').evaluate((d) => d.open)), 'backdrop closes');
-    // Static content preserved
-    // The former «تعلم الصلاة» dialog's content (5 steps, same strings; the video) is now the academy lesson «صفة صلاة النبي ﷺ».
+    // The former «تعلم الصلاة» dialog's content is the lesson «صفة صلاة النبي ﷺ».
     await page.locator('#learnSection [data-id="prophet-prayer"]').click();
     assert.equal(await page.locator('#lessonModal .prayer-step').count(), 5);
     assert.equal(await page.locator('#lessonModal a[href="https://www.youtube.com/watch?v=W-jX2kY0vR8"]').count(), 1);
     await page.keyboard.press('Escape');
     assert.equal(await page.locator('#contactModal a[href="mailto:obadanajeeb155@gmail.com"]').count(), 1);
     assert.equal(await page.locator('#islamModal .islam-content h3').count(), 3);
-    // Login → "open my profile" swaps dialogs
-    await page.click('.menu-btn');
-    await page.locator('#sideMenu').getByText('تسجيل دخول', { exact: true }).click();
+    // Login → "open my profile" goes to the profile page and closes the login dialog.
+    await page.click('.side-link[data-open="loginModal"]');
     await page.locator('#loginModal .btn-primary').click();
     assert.ok(await page.locator('#profileModal').evaluate((d) => d.open));
     assert.ok(!(await page.locator('#loginModal').evaluate((d) => d.open)));
@@ -408,7 +412,7 @@ describe('prayer times and dashboard', () => {
     const context = await browser.newContext({ viewport: { width: 1366, height: 900 }, locale: 'ar' });
     await mockUpstream(context, { timings: () => ({ Fajr: '05:36', Sunrise: '07:08', Dhuhr: '12:22', Asr: '15:16', Sunset: '17:35', Maghrib: '17:35', Isha: '19:05' }) });
     await context.addInitScript(FAKE_NOTIFICATIONS);
-    const page = await context.newPage();
+    const page = autoReveal(await context.newPage());
     if (!page.clock) { await context.close(); return; } // Playwright without clock control
     await page.clock.install({ time: new Date(2026, 10, 19, 12, 18, 30) });
     const errors = collectErrors(page);

@@ -1263,3 +1263,11 @@ dialog.dialog--page > .modal-title { display: none; }
   .reading-box { box-shadow: none; border: 0; }
 }
 :root[data-page="assistant"] .assistant-fab { display: none; }
+/* Floating controls stay clear of the desktop sidebar */
+@media (min-width: 1024px) {
+  .top-button { inset-inline-start: calc(var(--sidebar-w) + 20px); }
+  :root.sidebar-collapsed .top-button { inset-inline-start: calc(var(--sidebar-w-collapsed) + 20px); }
+}
+/* The back-to-top button appears once this (invisible) sentinel at the top of the page is scrolled past. */
+main#main { position: relative; }
+.top-sentinel { position: absolute; top: 0; inset-inline-start: 0; width: 1px; height: 700px; pointer-events: none; }

@@ -79,7 +79,7 @@ function renderContinue() {
   el.continue.replaceChildren(valid
     ? h('button', {
       class: 'btn btn-primary home-continue-btn', type: 'button',
-      text: `🔖 ${t('bookmark_resume', { surah: surahName(Number(bookmark.surahNum)), ayah: bookmark.ayahNumInSurah })}`,
+      text: `${t('bookmark_resume', { surah: surahName(Number(bookmark.surahNum)), ayah: bookmark.ayahNumInSurah })}`,
       on: { click: () => actions.readSurah(Number(bookmark.surahNum), Number(bookmark.ayahIndex)) },
     })
     : h('p', { class: 'small muted', text: t('home_no_bookmark') }));

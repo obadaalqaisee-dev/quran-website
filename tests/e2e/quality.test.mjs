@@ -8,7 +8,7 @@ import { createRequire } from 'node:module';
 import { join } from 'node:path';
 import { after, before, describe, test } from 'node:test';
 
-import { REPO, chromium, collectErrors, mockUpstream, startPagesServer } from './helpers.mjs';
+import { REPO, chromium, autoReveal, collectErrors, mockUpstream, startPagesServer } from './helpers.mjs';
 
 const require = createRequire(import.meta.url);
 const AXE = readFileSync(require.resolve('axe-core/axe.min.js'), 'utf8');
@@ -30,7 +30,7 @@ async function open(options = {}) {
   // bypassCSP only matters for injecting axe-core (an inline script, which the site's CSP rightly blocks).
   const context = await browser.newContext({ viewport: { width: 1366, height: 900 }, bypassCSP: true, ...options });
   await mockUpstream(context);
-  const page = await context.newPage();
+  const page = autoReveal(await context.newPage());
   const errors = collectErrors(page);
   await page.goto(site.url);
   await page.waitForSelector('#surahGrid .surah-card');

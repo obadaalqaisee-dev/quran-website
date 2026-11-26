@@ -8,7 +8,7 @@ import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { after, before, describe, test } from 'node:test';
 
-import { chromium, collectErrors, mockUpstream, startPagesServer } from './helpers.mjs';
+import { chromium, autoReveal, collectErrors, mockUpstream, startPagesServer } from './helpers.mjs';
 
 const require = createRequire(import.meta.url);
 const AXE = readFileSync(require.resolve('axe-core/axe.min.js'), 'utf8');
@@ -36,7 +36,7 @@ async function open({ storage = null, viewport = { width: 1366, height: 900 }, c
   const context = await browser.newContext({ viewport, locale, colorScheme, reducedMotion: 'reduce', acceptDownloads, bypassCSP });
   await mockUpstream(context);
   if (storage) await context.addInitScript((s) => { if (!sessionStorage.getItem('__seeded')) { for (const [k, v] of Object.entries(s)) localStorage.setItem(k, v); sessionStorage.setItem('__seeded', '1'); } }, storage);
-  const page = await context.newPage();
+  const page = autoReveal(await context.newPage());
   const errors = collectErrors(page);
   await page.goto(site.url);
   await page.waitForSelector('#surahGrid .surah-card');

@@ -8,7 +8,7 @@ import { createRequire } from 'node:module';
 import { after, before, describe, test } from 'node:test';
 
 import {
-  AYAHS, EDITIONS, FAKE_SPEECH, chromium, collectErrors, fakeMedia, mockUpstream, speechError, startPagesServer,
+  AYAHS, EDITIONS, FAKE_SPEECH, chromium, autoReveal, collectErrors, fakeMedia, mockUpstream, speechError, startPagesServer,
 } from './helpers.mjs';
 
 const require = createRequire(import.meta.url);
@@ -26,7 +26,7 @@ async function open({ init = [], storage = null, viewport = { width: 1366, heigh
   const calls = await mockUpstream(context, upstream);
   for (const script of init) await context.addInitScript(script);
   if (storage) await context.addInitScript((s) => { if (!sessionStorage.getItem('__seeded')) { for (const [k, v] of Object.entries(s)) localStorage.setItem(k, v); sessionStorage.setItem('__seeded', '1'); } }, storage);
-  const page = await context.newPage();
+  const page = autoReveal(await context.newPage());
   const errors = collectErrors(page);
   await page.goto(site.url);
   await page.waitForSelector('#surahGrid .surah-card');
@@ -46,22 +46,16 @@ async function axe(page, include) {
 
 // ===================================================================== navigation preserved + added
 describe('navigation', () => {
-  test('all original nav items remain, and the two new ones scroll to their sections', async () => {
+  test('all original nav items remain in the sidebar; prayer learning and the academy have their pages', async () => {
     const s = await open();
     const { page } = s;
-    const nav = (await page.locator('.nav-links > li').allTextContents()).map((t) => t.replace(/️/g, '').trim());
-    for (const label of ['السور', 'مواقيت الصلاة', '📿 حصن المسلم', '🕌 الإسلام', '🔍 بحث آيات', '🎙 التسميع', '🕋 تعلم الصلاة الصحيحة', '🎓 الأكاديمية', '🕊 من أنا']) {
-      assert.ok(nav.includes(label), label);
+    const labels = (await page.locator('.side-link .side-label').allTextContents()).map((t) => t.trim());
+    for (const label of ['المصحف وفهرس السور', 'مواقيت الصلاة والتقويم الهجري', 'الأذكار وحصن المسلم', 'رسالة الإسلام', 'البحث في الآيات', 'التسميع والحفظ', 'تعلم الصلاة الصحيحة', 'الأكاديمية الإسلامية', 'من أنا', 'المفضلة', 'حسابي', 'تسجيل دخول', 'تبرع', 'تواصل معنا', 'الإعدادات', 'ملاحظاتي', 'المساعد']) {
+      assert.ok(labels.includes(label), label);
     }
-    await page.click('.nav-links a[href="#learnSection"]');
-    await page.waitForFunction(() => Math.abs(document.getElementById('learnSection').getBoundingClientRect().top) < 200);
-    // Original six items − «تعلم الصلاة» (moved to the academy) + settings + «من أنا» + «ملاحظاتي» and
-    // «المساعد» (innovation phase).
-    assert.equal(await page.locator('#sideMenu .drawer-links li').count(), 9);
-    assert.equal(await page.locator('#sideMenu [data-open="notesModal"]').count(), 1);
-    assert.equal(await page.locator('#sideMenu [data-open="assistantModal"]').count(), 1);
-    await page.click('.menu-btn');
-    await page.locator('#sideMenu').getByText('الإعدادات', { exact: true }).click();
+    await page.click('.side-link[data-route="learn-prayer"]');
+    assert.ok(await page.isVisible('#learnSection'));
+    await page.click('.side-link[data-route="settings"]');
     assert.ok(await page.locator('#settingsModal').evaluate((d) => d.open));
     await close(s);
   });

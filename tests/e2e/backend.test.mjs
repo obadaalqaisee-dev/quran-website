@@ -12,7 +12,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { after, before, describe, test } from 'node:test';
 
-import { EDITIONS, REPO, chromium, collectErrors, defaultTimings, mockUpstream, startBackend, startPagesServer } from './helpers.mjs';
+import { EDITIONS, REPO, chromium, autoReveal, collectErrors, defaultTimings, mockUpstream, startBackend, startPagesServer } from './helpers.mjs';
 
 let browser;
 let site;
@@ -67,7 +67,7 @@ async function openPagesWithApi(apiUrl, { blockPublicQuranApi = false } = {}) {
   }));
   const apiCalls = [];
   context.on('request', (r) => { if (r.url().startsWith(apiUrl)) apiCalls.push(r.url()); });
-  const page = await context.newPage();
+  const page = autoReveal(await context.newPage());
   const errors = collectErrors(page);
   await page.goto(site.url);
   await page.waitForSelector('#surahGrid .surah-card');
@@ -104,7 +104,7 @@ describe('GitHub Pages frontend + separate backend (production topology)', () =>
         await mockUpstream(context);
         const html = indexFor(api);
         await context.route(`${site.url}`, (route) => route.fulfill({ status: 200, contentType: 'text/html; charset=utf-8', body: html }));
-        const page = await context.newPage();
+        const page = autoReveal(await context.newPage());
         await page.goto(site.url);
         await page.click('#surahGrid [data-action="read"][data-surah="1"]');
         await page.waitForFunction(() => document.querySelectorAll('#readingText .ayah-span').length === 7);
@@ -121,7 +121,7 @@ describe('same-origin backend (local development: uvicorn serves the site too)',
     const context = await browser.newContext();
     await mockUpstream(context);
     await context.route(/https:\/\/api\.alquran\.cloud\/.*/, (route) => route.abort());
-    const page = await context.newPage();
+    const page = autoReveal(await context.newPage());
     const errors = collectErrors(page);
     const response = await page.goto(`${backend.url}/`);
     const headers = response.headers();
@@ -141,7 +141,7 @@ describe('same-origin backend (local development: uvicorn serves the site too)',
     const probe = await fetch(`${backend.url}/api/v1/prayer-times?city=Amman&country=Jordan`).catch(() => null);
     if (!probe || probe.status !== 200) { t.skip('Aladhan not reachable from this environment'); return; }
     const context = await browser.newContext({ geolocation: { latitude: 21.4225, longitude: 39.8262 }, permissions: ['geolocation'] });
-    const page = await context.newPage();
+    const page = autoReveal(await context.newPage());
     const calls = [];
     page.on('request', (r) => calls.push(r.url()));
     await page.goto(`${backend.url}/`);
