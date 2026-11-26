@@ -36,7 +36,7 @@ function pageElement(name) {
  * Show a page. `scroll`: 'top' (normal navigation), 'keep' (revealing an element the caller scrolls to).
  * Returns true when the page exists.
  */
-function showPage(name, { scroll = 'top', focus = false } = {}) {
+function showPage(name, { scroll = 'top', focus = false, refresh = false } = {}) {
   const target = pageElement(name) || pageElement('home');
   if (!target) return false;
   const changed = current !== target.dataset.page;
@@ -46,7 +46,7 @@ function showPage(name, { scroll = 'top', focus = false } = {}) {
     page.classList.toggle('is-active', active);
   }
   for (const dialog of $$('dialog[data-page-dialog]')) {
-    if (target.contains(dialog)) activatePageDialog(dialog);
+    if (target.contains(dialog)) activatePageDialog(dialog, { refresh });
     else deactivatePageDialog(dialog);
   }
   current = target.dataset.page;
@@ -70,9 +70,9 @@ function notify(parsed) {
   }
 }
 
-function apply({ initial = false } = {}) {
+function apply({ initial = false, again = false } = {}) {
   const hash = location.hash;
-  if (hash === lastHash && !initial) return;
+  if (hash === lastHash && !initial && !again) return;
   lastHash = hash;
   const parsed = parseHash(hash);
   closeModalDialogs();
@@ -85,7 +85,7 @@ function apply({ initial = false } = {}) {
     notify({ page: current, route: current, param: null, path: current, anchor: parsed.anchor });
     return;
   }
-  showPage(parsed.page, { scroll: 'top', focus: !initial });
+  showPage(parsed.page, { scroll: 'top', focus: !initial, refresh: again });
   const action = actions.get(parsed.route) || (parsed.param ? actions.get(parsed.page) : null);
   if (action) {
     try { action(parsed.param, parsed); } catch (err) { console.error('[router] action failed', err); }
@@ -97,8 +97,7 @@ function apply({ initial = false } = {}) {
 export function navigate(path = '') {
   const hash = hashFor(path);
   if (location.hash === hash || (hash === '#/' && !location.hash)) {
-    lastHash = null; // same route again: re-run its action (e.g. open another surah)
-    apply();
+    apply({ again: true }); // same route again: re-run its action and refresh the page (e.g. the lab's plan)
     return;
   }
   history.pushState(null, '', hash);
@@ -126,5 +125,11 @@ export function initRouter() {
   started = true;
   window.addEventListener('hashchange', () => apply());
   window.addEventListener('popstate', () => apply());
+  // Choosing the link of the page already shown refreshes it (a hash link to the same hash fires no event).
+  document.addEventListener('click', (event) => {
+    const link = event.target.closest?.('a[href^="#/"]');
+    if (!link || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey) return;
+    if (link.getAttribute('href') === location.hash) { event.preventDefault(); apply({ again: true }); }
+  });
   apply({ initial: true });
 }

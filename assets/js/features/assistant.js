@@ -35,6 +35,7 @@ let knowledge = null;
 let kbIndex = null;
 let context = null; // conversation context: { lastId, subject, turns }
 
+const CONFIDENT = 6; // knowledge-base score from which an answer is used even when lesson passages also match
 const SUGGESTIONS = ['asst_s1', 'asst_s2', 'asst_s7', 'asst_s3', 'asst_s8', 'asst_s4', 'asst_s5', 'asst_s6'];
 const byLang = (key) => Object.fromEntries(LANGUAGES.map((l) => [l, translations[l][key] ?? translations.ar[key]]));
 const ISLAMIC_IDS = new Set(ISLAMIC_KB.map((e) => e.id));
@@ -263,10 +264,16 @@ export function answer(question) {
   const parts = [];
   if (asksForRuling(q)) parts.push(h('p', { class: 'asst-notice', attrs: { role: 'note' }, text: t('asst_ruling_notice') }));
   if (r.greeting) parts.push(h('p', { class: 'asst-smalltalk', text: t(`asst_st_${r.greeting}`) }));
-  if (r.kind === 'answer') {
+  // A weak knowledge-base match (one common word) defers to the site's verified lesson passages when they exist.
+  const passages = r.kind === 'answer' ? searchKnowledge(getKnowledge(), r.question || q, 4) : [];
+  const confident = r.kind === 'answer' && (r.entries[0].score >= CONFIDENT || r.followUp || !passages.length);
+  if (confident) {
     if (r.followUp) parts.push(h('p', { class: 'small muted', text: t('asst_followup_note') }));
     parts.push(kbBlock(r.entries));
+    if (ISLAMIC_IDS.has(r.entries[0].entry.id) && passages.length) parts.push(knowledgeBlock(passages.slice(0, 2)));
     context = r.context;
+  } else if (r.kind === 'answer') {
+    parts.push(...fallbackParts(r.question || q));
   } else if (r.kind === 'more') {
     parts.push(moreBlock(context?.lastId));
   } else if (r.kind === 'smalltalk') {

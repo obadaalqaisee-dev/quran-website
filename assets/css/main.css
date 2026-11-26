@@ -1271,3 +1271,7 @@ dialog.dialog--page > .modal-title { display: none; }
 /* The back-to-top button appears once this (invisible) sentinel at the top of the page is scrolled past. */
 main#main { position: relative; }
 .top-sentinel { position: absolute; top: 0; inset-inline-start: 0; width: 1px; height: 700px; pointer-events: none; }
+/* Touch targets in the sidebar: at least 44 px */
+.sidebar .icon-btn { min-width: 44px; height: 44px; }
+.side-group-btn { min-height: 44px; }
+.side-link { min-height: 44px; }

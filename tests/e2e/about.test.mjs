@@ -54,7 +54,7 @@ describe('«من أنا» page', () => {
     assert.equal(await text(page, 'h1'), 'من أنا');
     await page.goBack();
     await page.waitForSelector('#surahGrid .surah-card');
-    assert.match(page.url(), /quran-website\/$/);
+    assert.match(page.url(), /quran-website\/(#\/quran)?$/);
     await page.goForward();
     await page.waitForURL(/about\.html$/);
     await page.waitForSelector('#aboutTitle');
@@ -300,7 +300,7 @@ describe('rosary in Hisn al-Muslim; prayer learning in the academy', () => {
     await page.goto(site.url);
     await page.waitForSelector('#surahGrid .surah-card');
     assert.equal(await page.locator('[data-open="learnPrayerModal"]').count(), 0);
-    assert.equal(await page.locator('#academySection #learnSection #lessonGrid .lesson-card').count(), 18, 'the prayer curriculum is inside the academy');
+    assert.equal(await page.locator('#learnSection #lessonGrid .lesson-card').count(), 18, 'the prayer curriculum has its own page, linked from the academy');
     await page.click('#learnSection [data-id="prophet-prayer"]');
     assert.equal(await text(page, '#lessonTitle'), '🕌 صفة صلاة النبي ﷺ');
     const steps = await page.locator('#lessonBody .prayer-step h3').allTextContents();

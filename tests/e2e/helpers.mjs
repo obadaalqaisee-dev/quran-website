@@ -281,6 +281,10 @@ async function translateOpener(page, selector) {
   if (!m) return selector;
   if (await page.locator(selector).count().catch(() => 1)) return selector;
   const id = m[1];
+  // On small screens the sidebar is an off-canvas menu: open it first.
+  await page.evaluate(() => {
+    if (getComputedStyle(document.getElementById('sidebar')).visibility === 'hidden') document.getElementById('sidebarToggle').click();
+  });
   if (PAGE_OF_DIALOG[id]) return `.sidebar .side-link[data-route="${PAGE_OF_DIALOG[id]}"]`;
   await page.evaluate((dialogId) => { // modal openers in a folded sidebar group: unfold it first
     const link = document.querySelector(`.sidebar [data-open="${dialogId}"]`);
@@ -291,13 +295,17 @@ async function translateOpener(page, selector) {
 }
 
 export function autoReveal(page) {
+  if (process.env.E2E_FAST) page.setDefaultTimeout(8000);
   const reveal = async (selector) => {
     if (typeof selector !== 'string') return;
     await page.evaluate((sel) => {
       let el = null;
       try { el = document.querySelector(sel); } catch { return; }
       const target = el?.closest('.page');
-      if (target && target.hidden) location.hash = `#/${target.dataset.page === 'home' ? '' : target.dataset.page}`;
+      if (target && target.hidden) { // replace (not push) the history entry, so the tests' back/forward steps are unchanged
+        history.replaceState(history.state, '', `#/${target.dataset.page === 'home' ? '' : target.dataset.page}`);
+        window.dispatchEvent(new HashChangeEvent('hashchange'));
+      }
     }, selector).catch(() => {});
   };
   for (const name of ['click', 'dblclick', 'fill', 'check', 'uncheck', 'selectOption', 'press', 'focus', 'hover', 'tap', 'isVisible', 'textContent', 'innerText', 'type', 'dispatchEvent', 'setInputFiles']) {
@@ -316,8 +324,22 @@ export function autoReveal(page) {
     return originalWait(selector, options);
   };
   const originalLocator = page.locator.bind(page);
+  const patchChain = (loc, selector) => {
+    for (const name of ['first', 'last', 'nth', 'locator', 'filter', 'getByText', 'getByRole']) {
+      const make = loc[name].bind(loc);
+      loc[name] = (...args) => {
+        const child = make(...args);
+        for (const action of ['click', 'fill', 'check', 'press', 'focus', 'isVisible', 'textContent', 'waitFor', 'scrollIntoViewIfNeeded', 'boundingBox']) {
+          const original = child[action].bind(child);
+          child[action] = async (...a) => { await reveal(selector); return original(...a); };
+        }
+        return patchChain(child, selector);
+      };
+    }
+    return loc;
+  };
   page.locator = (selector, ...rest) => {
-    const loc = originalLocator(selector, ...rest);
+    const loc = patchChain(originalLocator(selector, ...rest), selector);
     for (const name of ['click', 'fill', 'check', 'uncheck', 'selectOption', 'press', 'focus', 'isVisible', 'textContent', 'innerText', 'scrollIntoViewIfNeeded', 'boundingBox', 'waitFor', 'allTextContents', 'screenshot']) {
       const original = loc[name].bind(loc);
       loc[name] = async (...args) => {

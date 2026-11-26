@@ -279,7 +279,7 @@ describe('memorisation lab', () => {
     assert.deepEqual(constraints.audio.noiseSuppression, { ideal: true });
     assert.deepEqual(constraints.audio.autoGainControl, { ideal: true });
     assert.match(await text(page, '#micDevice'), /USB Microphone/);
-    await page.keyboard.press('Escape'); // closing the lab releases the microphone
+    await page.click('.side-link[data-route="home"]'); // leaving the lab page releases the microphone
     await page.waitForFunction(() => window.__tracksStopped === 1);
     await close(ok);
 
@@ -491,11 +491,12 @@ describe('preservation, accessibility and PWA', () => {
     });
   }
 
-  for (const [dialog, opener] of [['settingsModal', '[data-open="settingsModal"]'], ['lessonModal', '#lessonGrid [data-id="sahw"]'], ['courseModal', '#courseGrid [data-id="prayer"]']]) {
+  for (const [dialog, opener] of [['settingsModal', '.side-link[data-route="settings"]'], ['lessonModal', '#lessonGrid [data-id="sahw"]'], ['courseModal', '#courseGrid [data-id="prayer"]']]) {
     test(`axe: dialog #${dialog}`, async () => {
       const s = await open({ bypassCSP: true });
       await s.page.locator(opener).first().click();
-      assert.ok(await s.page.evaluate((d) => document.getElementById(d).contains(document.activeElement), dialog), 'focus inside');
+      // Settings is a page now: focus moves to that page.
+      assert.ok(await s.page.evaluate((d) => (document.getElementById(d).closest('.page') || document.getElementById(d)).contains(document.activeElement), dialog), 'focus inside');
       assert.deepEqual(await axe(s.page, `#${dialog}`), []);
       await s.context.close();
     });

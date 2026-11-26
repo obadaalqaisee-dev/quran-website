@@ -121,6 +121,12 @@ describe('same-origin backend (local development: uvicorn serves the site too)',
     const context = await browser.newContext();
     await mockUpstream(context);
     await context.route(/https:\/\/api\.alquran\.cloud\/.*/, (route) => route.abort());
+    // Prayer times go through the backend's live Aladhan proxy (tested separately below); stub them here so the
+    // test does not depend on internet access (offline, the proxy answers 502 after its timeout).
+    await context.route((u) => u.href.startsWith(`${backend.url}/api/v1/prayer-times`), (route) => route.fulfill({
+      status: 200, contentType: 'application/json',
+      body: JSON.stringify({ data: { timings: defaultTimings(), date: { gregorian: '01-01-2026', hijri: { day: '9', year: '1448', month_ar: 'جُمادى الآخرة', month_en: 'Jumādá al-ākhirah' } }, timezone: 'Asia/Amman', method: 'test', location: { city: 'Amman', country: 'Jordan' } } }),
+    }));
     const page = autoReveal(await context.newPage());
     const errors = collectErrors(page);
     const response = await page.goto(`${backend.url}/`);

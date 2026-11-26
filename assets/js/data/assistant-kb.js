@@ -196,7 +196,7 @@ export const SITE_KB = [
       'On the “My progress” page, in the “Recently played” card; the insights section also shows listening statistics (time and reciters) for the last seven days.'], { route: 'progress' }),
 
   // ------------------------------------------------------------------------------------------ memorisation
-  e('memo-start', 'memorize', 'memorize', ['احفظ', 'حفظ', 'الحفظ', 'احفظ القران', 'اريد ان احفظ', 'memorize', 'memorise', 'hifz', 'memorizar', 'memoriser'],
+  e('memo-start', 'memorize', 'memorize', ['اسمع سوره', 'اسمع من حفظي', 'من حفظي', 'سمع سوره', 'احفظ', 'حفظ', 'الحفظ', 'احفظ القران', 'اريد ان احفظ', 'memorize', 'memorise', 'hifz', 'memorizar', 'memoriser'],
     ['كيف أحفظ القرآن في الموقع؟', 'How do I memorise the Quran on the site?'],
     ['افتح «التسميع والحفظ» من القائمة: اختر السورة وطريقة التسميع ثم اضغط الميكروفون واقرأ من حفظك، فيعلّم الموقع كل كلمة صحيحة أو ناقصة. وللبداية المنظمة اتبع مسار «احفظ القرآن» في «رحلتي مع القرآن».',
       'Open “Recite & memorise” from the menu: choose the surah and a mode, press the microphone and recite from memory; the site marks every word as correct or missing. For a guided start, follow the “Memorise the Quran” path in the Quran Journey.'], { route: 'memorize' }),
@@ -482,7 +482,7 @@ export const SITE_KB = [
     ['أين الإعدادات؟', 'Where are the settings?'],
     ['اضغط ⚙️ أعلى الصفحة أو «الإعدادات» في القائمة: حجم خط المصحف وسمة القراءة والترجمة والتفسير، والقارئ المفضل، وأهداف القراءة والحفظ، وتنبيهات الصلاة. يُحفظ كل تغيير فورًا.',
       'Press ⚙️ at the top or “Settings” in the menu: Mushaf font size, reading theme, translation and tafsir, preferred reciter, reading and memorisation goals, and prayer alerts. Every change is saved at once.'], { route: 'settings' }),
-  e('st-dark', 'settings', 'settings', ['الوضع الليلي', 'داكن', 'مظلم', 'ليلي', 'dark mode', 'night mode', 'dark theme', 'oscuro', 'sombre'],
+  e('st-dark', 'settings', 'settings', ['mode sombre', 'modo oscuro', 'الوضع الليلي', 'داكن', 'مظلم', 'ليلي', 'dark mode', 'night mode', 'dark theme', 'oscuro', 'sombre'],
     ['كيف أفعّل الوضع الليلي؟', 'How do I turn on dark mode?'],
     ['اضغط 🌙 أعلى الصفحة (☀️ للعودة). يتبع الموقع إعداد جهازك أول مرة، ثم يتذكر اختيارك.',
       'Press 🌙 at the top (☀️ to switch back). The site follows your device setting at first, then remembers your choice.'], { run: 'theme' }),

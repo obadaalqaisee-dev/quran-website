@@ -258,7 +258,7 @@ describe('audio player', () => {
     const { page } = s;
     await page.click('#surahGrid [data-action="play"][data-surah="1"]');
     await page.waitForFunction(() => !document.getElementById('audioPlayer').paused);
-    await page.evaluate(() => window.scrollTo(0, 0));
+    await page.click('.side-link[data-route="quran"]'); // leave the audio page: the mini player keeps control
     await page.waitForSelector('#miniPlayer:not([hidden])');
     assert.match(await page.textContent('#miniTitle'), /الفاتحة|ٱلْفَاتِحَةِ/);
     await page.click('#miniPlay');
@@ -491,7 +491,7 @@ describe('tools', () => {
     await page.reload();
     await page.waitForSelector('#surahGrid .surah-card');
     assert.equal(await page.textContent('#rosaryCounter'), '3');
-    await page.evaluate(() => document.querySelector('[data-open="adhkarModal"]').click());
+    await page.click('.side-link[data-route="adhkar"]');
     await page.click('#tab_tasbeeh');
     await page.click('#rosaryReset');
     assert.equal(await page.textContent('#rosaryCounter'), '0');

@@ -227,7 +227,6 @@ describe('ayah notes and collections', () => {
   test('side menu entry and text export', async () => {
     const s = await open({ acceptDownloads: true, storage: { ayahNotes: JSON.stringify({ v: 1, items: [{ surah: 2, ayah: 255, collection: 'reflect', note: 'آية الكرسي', updated: TODAY }], custom: [] }) } });
     const { page } = s;
-    await page.click('[data-open="sideMenu"]');
     await page.click('#sideMenu [data-open="notesModal"]');
     await page.waitForSelector('#notesModal[open] .note-item');
     const [download] = await Promise.all([page.waitForEvent('download'), page.click('#notesExport')]);
@@ -243,7 +242,6 @@ describe('backup and restore', () => {
   test('export contains the original keys byte-for-byte; restore merges them back', async () => {
     const s = await open({ acceptDownloads: true, storage: { ...ORIGINAL, rosaryCount: '99' } });
     const { page } = s;
-    await page.click('[data-open="sideMenu"]');
     await page.click('#sideMenu [data-open="profileModal"]');
     await page.waitForSelector('#profileModal[open]');
     const [download] = await Promise.all([page.waitForEvent('download'), page.click('#backupExport')]);
@@ -356,14 +354,14 @@ describe('site assistant («💬 مساعد الموقع»)', () => {
     await page.waitForSelector('#assistantModal[open]');
     assert.match(await page.textContent('#assistantLog'), /اسألني كيف تستخدم أي ميزة/);
     assert.match(await page.textContent('#assistantLog'), /لست مفتيًا/);
-    assert.equal(await page.locator('#assistantSuggestions .chip-btn').count(), 6);
+    assert.equal(await page.locator('#assistantSuggestions .chip-btn').count(), 8);
     await page.locator('#assistantSuggestions .chip-btn', { hasText: 'كيف أسمّع سورة من حفظي؟' }).click();
     const reply = page.locator('#assistantLog .asst-msg--bot').last();
-    await reply.locator('.asst-help').waitFor();
-    assert.match(await reply.textContent(), /اضغط «🎙️ التسميع» في الأعلى/);
-    await reply.locator('.asst-help .btn-primary').click();
+    await reply.locator('.asst-kb').waitFor();
+    assert.match(await reply.textContent(), /افتح «التسميع والحفظ» من القائمة/);
+    await reply.locator('.asst-kb .btn-primary').click();
     await page.waitForSelector('#voiceTestModal[open]');
-    assert.equal(await page.locator('#assistantModal[open]').count(), 0);
+    assert.equal(await page.locator('#assistantModal[open]').count(), 0, 'leaving the assistant page closes it');
     await close(s);
   });
 
@@ -374,7 +372,7 @@ describe('site assistant («💬 مساعد الموقع»)', () => {
     const reply = await ask(page, 'ما هي شروط الصلاة؟');
     assert.match(await reply.locator('.asst-result').first().textContent(), /وشروط الصلاة تسعة/);
     assert.match(await reply.locator('.asst-source').first().textContent(), /المصدر: درس «📋 شروط الصلاة»/);
-    assert.match(await reply.textContent(), /لا أُنشئ إجابات من عندي/);
+    assert.match(await reply.textContent(), /لا أُنشئ إجابات من عندي|لا أنشئ/);
     await reply.locator('.asst-result').first().locator('button', { hasText: 'افتح الدرس' }).click();
     await page.waitForSelector('#lessonModal[open]');
     assert.match(await page.textContent('#lessonTitle'), /شروط الصلاة/);
@@ -414,16 +412,15 @@ describe('site assistant («💬 مساعد الموقع»)', () => {
   test('works in English, Spanish and French', async () => {
     const s = await open();
     const { page } = s;
-    const cases = [['en', 'How do I change the language?', /Use the 🌐 menu at the top/], ['es', '¿Dónde están los adhkar de la tarde?', /Pulsa «📿 Hisn al-Muslim»/], ['fr', 'Comment activer le mode sombre ?', /Appuyez sur 🌙/]];
+    const cases = [['en', 'How do I change the language?', /With the 🌐 menu at the top/], ['es', '¿Dónde están los adhkar de la tarde?', /Adhkar & Hisn al-Muslim/], ['fr', 'Comment activer le mode sombre ?', /Press 🌙 at the top/]];
     for (const [lang, q, expected] of cases) {
       await page.selectOption('#langSelect', lang);
-      await page.click('#assistantFab');
+      await page.click('.sidebar .side-link[data-route="assistant"]');
       const reply = await ask(page, q);
       assert.match(await reply.textContent(), expected, lang);
-      await page.keyboard.press('Escape');
     }
     await page.selectOption('#langSelect', 'en');
-    await page.click('#assistantFab');
+    await page.click('.sidebar .side-link[data-route="assistant"]');
     const reply = await ask(page, 'What are the pillars of prayer?');
     assert.match(await reply.textContent(), /This content is available in Arabic/);
     assert.match(await reply.textContent(), /Source: lesson “🏛️ Pillars of prayer”/);

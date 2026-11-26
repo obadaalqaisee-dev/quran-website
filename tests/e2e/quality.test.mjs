@@ -57,7 +57,8 @@ describe('responsive layout', () => {
       assert.ok((await overflow()) <= 0, `en overflow ${await overflow()}px`);
       await page.click('[data-open="adhkarModal"]');
       const box = await page.locator('#adhkarModal').boundingBox();
-      assert.ok(box.width <= width && box.height <= height, 'dialog fits the viewport');
+      // Hisn al-Muslim is a page now: it fits the width and scrolls with the page.
+      assert.ok(box.width <= width, 'page fits the viewport width');
       if (SHOTS) await page.screenshot({ path: join(SHOTS, `adhkar-${width}.png`) });
       assert.deepEqual(errors, []);
       await context.close();
@@ -101,15 +102,23 @@ describe('accessibility (axe-core, WCAG 2.1 A/AA)', () => {
   for (const id of ['sideMenu', 'adhkarModal', 'settingsModal', 'profileModal', 'voiceTestModal', 'ayahSearchModal', 'contactModal', 'favoritesModal']) {
     test(`dialog #${id}: no violations, focus moves inside`, async () => {
       const { context, page } = await open();
-      await page.evaluate((d) => document.querySelector(`[data-open="${d}"]`).click(), id);
-      assert.ok(await page.evaluate((d) => document.getElementById(d).contains(document.activeElement), id), 'focus inside dialog');
-      assert.deepEqual(await axe(page, `#${id}`), []);
+      // Dialogs that became pages are opened from their sidebar entry.
+      await page.evaluate((d) => {
+        const page = document.getElementById(d)?.closest('.page');
+        (document.querySelector(`[data-open="${d}"]`) || document.querySelector(`.side-link[data-route="${page?.dataset.page}"]`)).click();
+      }, id);
+      // The old drawer is the sidebar; dialogs that became pages move focus to their page (its heading).
+      const scope = id === 'sideMenu' ? '#sidebar' : await page.evaluate((d) => (document.getElementById(d).hasAttribute('data-page-dialog') ? `#${document.getElementById(d).closest('.page').id}` : `#${d}`), id);
+      assert.ok(await page.evaluate((sel) => document.querySelector(sel).contains(document.activeElement), scope), `focus inside ${scope}`);
+      assert.deepEqual(await axe(page, scope), []);
       await context.close();
     });
   }
 
   test('keyboard only: skip link, open a surah, play an ayah, close a dialog', async () => {
     const { context, page } = await open();
+    await page.goto(site.url); // a fresh load of the home page
+    await page.waitForFunction(() => document.documentElement.classList.contains('js-ready'));
     await page.keyboard.press('Tab');
     assert.equal(await page.evaluate(() => document.activeElement.className), 'skip-link');
     await page.focus('#surahGrid [data-action="read"][data-surah="1"]');
@@ -118,10 +127,10 @@ describe('accessibility (axe-core, WCAG 2.1 A/AA)', () => {
     await page.focus('#ayah-3');
     await page.keyboard.press(' ');
     await page.waitForFunction(() => document.getElementById('ayah-3').classList.contains('active-ayah'));
-    await page.focus('.nav-links [data-open="islamModal"]');
+    await page.focus('.sidebar [data-open="ayahSearchModal"]');
     await page.keyboard.press('Enter');
     await page.keyboard.press('Escape');
-    assert.equal(await page.evaluate(() => document.activeElement.dataset.open), 'islamModal', 'focus returns to the opener');
+    assert.equal(await page.evaluate(() => document.activeElement.dataset.open), 'ayahSearchModal', 'focus returns to the opener');
     await context.close();
   });
 });

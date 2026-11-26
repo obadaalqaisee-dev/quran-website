@@ -39,8 +39,8 @@ export function closeModalDialogs() {
 }
 
 /** Show a page dialog in place (called by the router when its page becomes visible). */
-export function activatePageDialog(dialog) {
-  if (dialog.open) return;
+export function activatePageDialog(dialog, { refresh = false } = {}) {
+  if (dialog.open) { if (refresh) openHooks.get(dialog.id)?.(dialog); return; }
   dialog.show();
   openHooks.get(dialog.id)?.(dialog);
 }
@@ -54,6 +54,7 @@ export function openDialog(id) {
   if (!dialog && aliases.has(id)) return aliases.get(id)();
   if (isPageDialog(dialog) && goToPage && pageRoutes.has(id)) {
     if (pageOf() !== pageRoutes.get(id) || !dialog.open) goToPage(pageRoutes.get(id));
+    else openHooks.get(id)?.(dialog); // already shown: refresh it, as re-opening the dialog used to
     return dialog;
   }
   if (!dialog || dialog.open) return dialog;
