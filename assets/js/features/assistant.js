@@ -4,7 +4,7 @@
 //
 // Network use: none for the answers themselves. Ayah texts, the Tafsir al-Muyassar and translations shown in a
 // reply are loaded with the same verified API calls as the Mushaf (core/api.js), and cached like the Mushaf.
-// The engine and its knowledge base are loaded on first use (dynamic import), so the home page stays light.
+// The engine and its knowledge base are evaluated on first use (dynamic import; the files are module-preloaded).
 // The conversation context lives in memory only: nothing the visitor writes is stored or sent anywhere.
 
 import { getAyahEditions, getSurah, searchAyahs } from '../core/api.js';

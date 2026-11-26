@@ -16,7 +16,7 @@ reused):
 |---|---|---|---|---|---|---|
 | Cloud LLM API (with retrieval) | very good | can still invent rulings, ayah wording or hadith; needs strict guarding | every question leaves the device; needs a key and a server proxy | recurring cost, a backend secret | no | rejected for now |
 | On-device LLM (WebGPU / WASM, as in PR #7) | good | same hallucination risk | good | 100 MB–2 GB download, WebGPU, slow on ordinary phones | after download | rejected (reverted) |
-| **Deterministic engine over reviewed content (chosen)** | good for the domains covered; honest "I don't know" outside them | every sentence was written and reviewed in advance; ayahs come from the verified dataset | nothing leaves the page | ~250 KB of text, lazy-loaded | yes | **chosen** |
+| **Deterministic engine over reviewed content (chosen)** | good for the domains covered; honest "I don't know" outside them | every sentence was written and reviewed in advance; ayahs come from the verified dataset | nothing leaves the page | ~250 KB of text, executed only on first use | yes | **chosen** |
 
 For this site the deciding factor is religious responsibility: an assistant that may fabricate a Quranic wording,
 a hadith or a ruling is worse than one that says "I have no reliable source for this". A generative layer can be
@@ -90,7 +90,8 @@ questions: mosque, witnesses, name, Arabic, wudu/ghusl, pronunciation, doing it 
 ## 4. Privacy and performance
 * The conversation exists only in memory; «🧹 محادثة جديدة» clears it. Nothing is logged, stored or sent.
 * Ayah, tafsir and translation requests are the same ones the Mushaf makes.
-* The engine and knowledge base (~250 KB) load on first open; a reply takes well under 30 ms (unit test).
+* The engine and knowledge base (~250 KB) are module-preloaded like every module of the site, but only evaluated when
+  the assistant is first used; a reply takes well under 30 ms (unit test).
 * All new files are precached by the service worker (version 3.4.0), so the assistant works offline after a visit
   (ayah texts need to have been loaded once).
 
