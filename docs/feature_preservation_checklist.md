@@ -215,6 +215,6 @@ translation or icon was removed.** Details are in [`innovation_phase.md`](innova
 
 | Item | Before | Now | Why |
 |---|---|---|---|
-| «من أنا» nasheed | «يا ذاكر الأصحاب كن متأدباً» (`ya-dhakir-al-ashab.mp3`, 3:09) | «أبداً لا لن نحيد» (`abadan-la-lan-nahid.mp3`, 4:33); same player, autoplay and manual fallback | Requested by the site owner (see `about_page.md` §2 for source and rights) |
+| «من أنا» nasheed | «يا ذاكر الأصحاب كن متأدباً» (`ya-dhakir-al-ashab.mp3`, 3:09), then «أبداً لا لن نحيد» (`abadan-la-lan-nahid.mp3`, 4:33) | «فردوس الرحمن ظلال» («تبصرة», محمد المقيط; `firdaws-al-rahman-dhilal.mp3`, 4:30); same player, autoplay and manual fallback | Requested by the site owner (see `about_page.md` §2 for source and rights) |
 | Start-up | One failing feature stopped every later one | Each feature starts in isolation (`safely()` in `main.js`) | A corrupt stored entry made most of the page inert |
 | Memorisation history | An entry without a date crashed the page | Tolerated; malformed entries dropped on load | Robustness (regression test added) |

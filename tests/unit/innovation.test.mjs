@@ -245,19 +245,21 @@ test('daily challenge: every question comes from an existing lesson quiz; one an
 });
 
 // ------------------------------------------------------------------------------------- nasheed media
-test('nasheed «أبداً لا لن نحيد»: the shipped file is the documented recording (provenance checksum)', async () => {
+test('nasheed «فردوس الرحمن ظلال»: the shipped file is the documented recording (provenance checksum)', async () => {
   const { createHash } = await import('node:crypto');
   const { existsSync, readFileSync } = await import('node:fs');
   const { ABOUT_MEDIA, isConfigured } = await import('../../assets/js/data/about-media.js');
   const n = ABOUT_MEDIA.nasheed;
-  assert.equal(n.src, 'assets/audio/abadan-la-lan-nahid.mp3');
-  assert.equal(n.firstLine, 'أبداً لا لن نحيد');
+  assert.equal(n.src, 'assets/audio/firdaws-al-rahman-dhilal.mp3');
+  assert.equal(n.firstLine, 'فردوس الرحمن ظلال');
   assert.ok(isConfigured(n));
   const file = readFileSync(new URL(`../../${n.src}`, import.meta.url));
   assert.equal(createHash('md5').update(file).digest('hex'), n.md5, 'byte-identical to the Internet Archive copy');
   assert.equal(file.subarray(0, 3).toString('latin1'), 'ID3', 'a real MP3, not a placeholder');
   assert.ok(file.length > 4_000_000);
-  assert.ok(!existsSync(new URL('../../assets/audio/ya-dhakir-al-ashab.mp3', import.meta.url)), 'the replaced recording is not shipped');
+  for (const old of ['ya-dhakir-al-ashab.mp3', 'abadan-la-lan-nahid.mp3']) {
+    assert.ok(!existsSync(new URL(`../../assets/audio/${old}`, import.meta.url)), `the replaced recording ${old} is not shipped`);
+  }
 });
 
 // ----------------------------------------------------------------------------------- site assistant

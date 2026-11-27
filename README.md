@@ -19,7 +19,7 @@ A bilingual (Arabic-first, also English, Spanish and French) Quran platform:
 - juz/page navigation, reading themes, ayah-range repeat, a sleep timer and a play queue;
 - prayer times with a live countdown and notifications;
 - Hisn al-Muslim adhkar with the electronic rosary (its own tab), the daily wird, favourites, settings and a local profile;
-- a «من أنا» page (`about.html`) introducing the developers and the site's dedication, with an autoplaying player for the nasheed «أبداً لا لن نحيد»;
+- a «من أنا» page (`about.html`) introducing the developers and the site's dedication, with an autoplaying player for the nasheed «فردوس الرحمن ظلال» («تبصرة», محمد المقيط);
 - **«بصيرة» insights** on the dashboard: the next step with its reason, a 12-week activity map and streaks, a khatma
   planner, listening statistics, the suggested revision order, ayahs and words that need strengthening, and recitation accuracy;
 - **ayah notes and collections** (reflection, memorisation, review, Quranic supplications, or your own), a daily
