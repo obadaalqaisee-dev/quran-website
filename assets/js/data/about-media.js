@@ -1,28 +1,20 @@
-// Media of the «من أنا» page (about.html): the photograph of the Al-Aqsa Mosque compound and the nasheed.
+// Media of the «من أنا» page (about.html): the owner's video of the Al-Aqsa Mosque courtyard and the nasheed.
 //
-// Both are stored locally and documented here (source and licence). The page shows the photo and plays
-// the nasheed only when `src` is a local path and `sourceUrl` and `license` are filled in (isConfigured).
+// Both are stored locally and documented here (source and licence). The page plays the nasheed only when
+// `src` is a local path and `sourceUrl` and `license` are filled in (isConfigured).
 
 export const ABOUT_MEDIA = Object.freeze({
-  image: Object.freeze({
-    // المسجد الأقصى المبارك (الحرم القدسي الشريف), aerial view from the south (15 November 2013): the whole
-    // compound, with المسجد القبلي in the foreground and قبة الصخرة المشرفة (and قبة السلسلة beside it) in the
-    // centre of the courtyard. Wikimedia Commons, photographer Andrew Shiva (uploaded by Godot13), CC BY-SA 4.0.
-    // Not cropped: only resized (from the Commons 1920 px rendition) and converted to WebP, 1440×892 (~340 KB)
-    // and 800×495 (~105 KB). See docs/about_page.md §2.
-    src: 'assets/img/about/al-aqsa-compound-1440.webp',
-    width: 1440,
-    height: 892,
-    srcset: Object.freeze([
-      Object.freeze({ src: 'assets/img/about/al-aqsa-compound-800.webp', width: 800 }),
-      Object.freeze({ src: 'assets/img/about/al-aqsa-compound-1440.webp', width: 1440 }),
-    ]),
-    sizes: '(min-width: 1140px) 1060px, calc(100vw - 32px)',
-    alt: 'المسجد الأقصى المبارك من الجو: المسجد القبلي في المقدمة، وقبة الصخرة المشرفة في وسط الساحة',
-    credit: 'Andrew Shiva / Wikipedia',
-    license: 'CC BY-SA 4.0',
-    licenseUrl: 'https://creativecommons.org/licenses/by-sa/4.0/',
-    sourceUrl: 'https://commons.wikimedia.org/wiki/File:Jerusalem-A-Quds-2013(2)-Aerial-Al-Aqsa_Mosque_Compound-(south_exposure).jpg',
+  video: Object.freeze({
+    // The site owner's own video of المسجد الأقصى المبارك: the courtyard and المسجد القبلي (27 s, 478×850 portrait,
+    // 30 fps). Provided by the owner on 2026-11-27; it replaced the aerial photograph of the compound. Re-encoded
+    // (H.264, faststart) with the audio track removed so it can never make sound. Referenced directly in about.html
+    // (autoplay, muted, loop, playsinline, no controls). See docs/about_page.md §2.
+    src: 'assets/video/about/al-aqsa-courtyard.mp4',
+    poster: 'assets/video/about/al-aqsa-courtyard-poster.webp',
+    width: 478,
+    height: 850,
+    durationSec: 27.03,
+    credit: 'Site owner (own recording)',
   }),
   nasheed: Object.freeze({
     // نشيد «فردوس الرحمن ظلال»: the nasheed «تبصرة» by محمد المقيط (2016), widely known by its line

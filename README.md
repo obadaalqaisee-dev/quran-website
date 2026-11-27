@@ -19,7 +19,7 @@ A bilingual (Arabic-first, also English, Spanish and French) Quran platform:
 - juz/page navigation, reading themes, ayah-range repeat, a sleep timer and a play queue;
 - prayer times with a live countdown and notifications;
 - Hisn al-Muslim adhkar with the electronic rosary (its own tab), the daily wird, favourites, settings and a local profile;
-- a «من أنا» page (`about.html`) introducing the developers and the site's dedication, with an autoplaying player for the nasheed «فردوس الرحمن ظلال» («تبصرة», محمد المقيط);
+- a «من أنا» page (`about.html`) introducing the developers and the site's dedication, with a silent looping video of Al-Aqsa and the nasheed «فردوس الرحمن ظلال» («تبصرة», محمد المقيط) playing in the background;
 - **«بصيرة» insights** on the dashboard: the next step with its reason, a 12-week activity map and streaks, a khatma
   planner, listening statistics, the suggested revision order, ayahs and words that need strengthening, and recitation accuracy;
 - **ayah notes and collections** (reflection, memorisation, review, Quranic supplications, or your own), a daily
@@ -44,7 +44,7 @@ The site is a static frontend served by **GitHub Pages**. An optional **Python (
 | [docs/platform_transformation.md](docs/platform_transformation.md) | The platform transformation (2026-11-26): feature inventory and new locations, pages and sidebar, Quran Journey, assistant, tests, limitations |
 | [docs/assistant_questions.md](docs/assistant_questions.md) | Every question the assistant's knowledge bases answer |
 | [docs/innovation_phase.md](docs/innovation_phase.md) | The innovation phase (2026-11-25): research, evaluated ideas, what was built and why, privacy |
-| [docs/about_page.md](docs/about_page.md) | The «من أنا» page, its media (Al-Aqsa photo, nasheed) and autoplay behaviour; the rosary and prayer-learning reorganisation |
+| [docs/about_page.md](docs/about_page.md) | The «من أنا» page, its media (Al-Aqsa video, nasheed) and autoplay behaviour; the rosary and prayer-learning reorganisation |
 | [docs/evolution_audit.md](docs/evolution_audit.md) | Audit before the platform evolution: test baseline, findings and resolutions, content policy |
 | [docs/technical_audit.md](docs/technical_audit.md) | Audit of the original site: features, defects, security, performance, SEO |
 | [docs/feature_preservation_checklist.md](docs/feature_preservation_checklist.md) | Every reciter, page, dialog, icon and behaviour that must be preserved, with verification status |

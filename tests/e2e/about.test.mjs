@@ -1,9 +1,10 @@
 // The «من أنا» page (about.html), the rosary in Hisn al-Muslim, and the prayer lesson migrated into the
 // academy. The site is served like GitHub Pages; third-party APIs are answered from the verified datasets.
 //
-// Media: the page ships an aerial photograph of the Al-Aqsa Mosque compound and the nasheed «فردوس الرحمن ظلال» («تبصرة», محمد
-// المقيط; it replaced «أبداً لا لن نحيد», which had replaced «يا ذاكر الأصحاب كن متأدباً», at the site owner's request),
-// both local files configured in about-media.js. The tests play the real files.
+// Media: the page ships the site owner's silent, looping video of the Al-Aqsa courtyard (it replaced the aerial photograph)
+// and the nasheed «فردوس الرحمن ظلال» («تبصرة», محمد المقيط; it replaced «أبداً لا لن نحيد», which had replaced «يا ذاكر
+// الأصحاب كن متأدباً», at the site owner's request), played in the background with no visible player. Both are local
+// files; the tests play the real files.
 
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
@@ -37,7 +38,9 @@ async function open(browser, { path = 'about.html', viewport = { width: 1366, he
 }
 const close = async ({ context, errors }) => { await context.close(); assert.deepEqual(errors, [], 'no JavaScript errors'); };
 const text = (page, sel) => page.textContent(sel);
-const state = (page) => page.evaluate(() => document.getElementById('nasheedStatus').dataset.state);
+const state = (page) => page.evaluate(() => document.getElementById('nasheedAudio').dataset.state);
+const waitState = (page, value) => page.waitForFunction((v) => document.getElementById('nasheedAudio')?.dataset.state === v, value);
+const media = (page, id) => page.evaluate((i) => { const m = document.getElementById(i); return { paused: m.paused, muted: m.muted, volume: m.volume, loop: m.loop, controls: m.controls, currentTime: m.currentTime, readyState: m.readyState }; }, id);
 
 // ===================================================================== page and navigation
 describe('«من أنا» page', () => {
@@ -81,16 +84,16 @@ describe('«من أنا» page', () => {
     assert.equal(await text(page, '.dedication-names'), 'عبادة أبو فردة ويونس أبو صعيلك.');
     assert.equal(await page.getAttribute('html', 'dir'), 'rtl');
     assert.equal(await page.getAttribute('.dev-grid', 'dir'), 'rtl');
-    // The page shows the nasheed only, without a Quranic verse (the former Al-Isra 17:1 header was removed).
+    // No Quranic verse on the page (the former Al-Isra 17:1 header was removed).
     await page.waitForFunction(() => !document.getElementById('aqsaFigure').hidden);
     assert.equal(await page.locator('#aqsaVerse, .about-lead').count(), 0);
     assert.doesNotMatch(await text(page, 'main'), /[﴿﴾]|الإسراء/);
-    // No visible header above the photograph: the title is for screen readers only, and the photo opens the page.
+    // No visible header above the video: the title is for screen readers only, and the video opens the page.
     assert.equal(await page.locator('.about-hero').count(), 0);
     assert.equal(await page.locator('h1').count(), 1);
     assert.ok(await page.locator('h1').evaluate((h) => h.classList.contains('visually-hidden') && h.getBoundingClientRect().width <= 1));
-    const [photoTop, cardTop] = await page.locator('#aqsaFigure, .nasheed-card').evaluateAll((els) => els.map((e) => e.getBoundingClientRect().top));
-    assert.ok(photoTop < cardTop && photoTop < 200, 'the photograph comes first, right under the site header (the old header band pushed it below 300 px)');
+    const [videoTop, devTop] = await page.locator('#aqsaFigure, .developers').evaluateAll((els) => els.map((e) => e.getBoundingClientRect().top));
+    assert.ok(videoTop < devTop && videoTop < 200, 'the video comes first, right under the site header');
     await close(s);
   });
 
@@ -106,97 +109,115 @@ describe('«من أنا» page', () => {
         assert.ok(b.top >= a.bottom - 1, `${viewport.width}: stacked`);
       }
       assert.ok((await s.page.evaluate(() => document.documentElement.scrollWidth - innerWidth)) <= 0, `${viewport.width}: no overflow`);
-      // The photograph is shown whole, at its natural proportions (1440×892 / 800×495), within the viewport width.
-      await s.page.waitForFunction(() => { const i = document.getElementById('aqsaImage'); return i.complete && i.naturalWidth > 0; });
-      const img = await s.page.locator('#aqsaImage').evaluate((i) => ({ ...i.getBoundingClientRect().toJSON(), fit: getComputedStyle(i).objectFit, nw: i.naturalWidth, nh: i.naturalHeight }));
-      assert.ok(Math.abs(img.width / img.height - img.nw / img.nh) < 0.01, `${viewport.width}: not cropped or distorted`);
-      assert.equal(img.fit, 'fill');
-      assert.ok(img.left >= 0 && img.right <= viewport.width, `${viewport.width}: fits the screen`);
-      assert.ok(img.width >= Math.min(viewport.width - 40, 1000), `${viewport.width}: shown large`);
+      // The portrait video (478×850) is shown whole at its natural proportions, centred, within the viewport's width and height.
+      await s.page.waitForFunction(() => document.getElementById('aboutVideo').readyState >= 2);
+      const v = await s.page.locator('#aboutVideo').evaluate((e) => ({ ...e.getBoundingClientRect().toJSON(), vw: e.videoWidth, vh: e.videoHeight }));
+      assert.deepEqual([v.vw, v.vh], [478, 850]);
+      assert.ok(Math.abs(v.width / v.height - 478 / 850) < 0.01, `${viewport.width}: not cropped or distorted`);
+      assert.ok(v.left >= 0 && v.right <= viewport.width, `${viewport.width}: fits the screen width`);
+      assert.ok(v.height <= viewport.height * 0.8 + 1, `${viewport.width}: the whole frame fits the screen height`);
+      assert.ok(v.width >= Math.min(viewport.width - 40, 440, viewport.height * 0.78 * 478 / 850) - 3, `${viewport.width}: shown as large as the screen allows`);
+      assert.ok(Math.abs((v.left + v.right) / 2 - viewport.width / 2) < 20, `${viewport.width}: centred`);
       await close(s);
     }
   });
 
-  test('shipped media: the Al-Aqsa compound photograph and the nasheed «فردوس الرحمن ظلال» load', async () => {
+  test('shipped media: the owner\'s video replaced the photograph; the nasheed «فردوس الرحمن ظلال» is still shipped', async () => {
     const s = await open(allowAutoplay);
     const { page } = s;
-    await page.waitForFunction(() => { const i = document.getElementById('aqsaImage'); return i.complete && i.naturalWidth > 0; });
-    assert.equal(await page.getAttribute('#aqsaImage', 'src'), 'assets/img/about/al-aqsa-compound-1440.webp');
-    assert.equal(await page.getAttribute('#aqsaImage', 'srcset'), 'assets/img/about/al-aqsa-compound-800.webp 800w, assets/img/about/al-aqsa-compound-1440.webp 1440w');
-    assert.match(await page.evaluate(() => document.getElementById('aqsaImage').currentSrc), /al-aqsa-compound-1440\.webp$/, 'desktop: the large file');
-    assert.equal(await page.getAttribute('#aqsaImage', 'alt'), 'المسجد الأقصى المبارك من الجو: المسجد القبلي في المقدمة، وقبة الصخرة المشرفة في وسط الساحة');
-    assert.equal(await text(page, '.about-photo-label'), 'المسجد الأقصى المبارك: المسجد القبلي في المقدمة، وقبة الصخرة المشرفة في وسط الساحة');
-    assert.doesNotMatch(await text(page, '#aqsaFigure'), /dome-of-the-rock|Dome_of_the_Rock_%26_Chain/);
-    const links = await page.locator('#aqsaCredit a').evaluateAll((as) => as.map((a) => [a.textContent, a.getAttribute('href')]));
-    assert.deepEqual(links, [
-      ['Andrew Shiva / Wikipedia', 'https://commons.wikimedia.org/wiki/File:Jerusalem-A-Quds-2013(2)-Aerial-Al-Aqsa_Mosque_Compound-(south_exposure).jpg'],
-      ['CC BY-SA 4.0', 'https://creativecommons.org/licenses/by-sa/4.0/'],
-    ]);
-    assert.equal(await text(page, '#nasheedLine'), 'فردوس الرحمن ظلال');
-    assert.equal(await text(page, '#nasheedMeta'), 'نشيد فردوس الرحمن ظلال (تبصرة) — محمد المقيط');
-    assert.doesNotMatch(await text(page, '.nasheed-card'), /يا ذاكر الأصحاب|لن نحيد/, 'the previous nasheeds are no longer shown');
+    assert.equal(await page.locator('#aqsaImage, .about-photo img').count(), 0, 'the old photograph is gone');
+    assert.equal(await page.locator('#aqsaCredit').count(), 0, 'its photo credit is gone with it');
+    assert.equal(await page.getAttribute('#aboutVideo source', 'src'), 'assets/video/about/al-aqsa-courtyard.mp4');
+    assert.equal(await page.getAttribute('#aboutVideo source', 'type'), 'video/mp4');
+    assert.equal(await page.getAttribute('#aboutVideo', 'poster'), 'assets/video/about/al-aqsa-courtyard-poster.webp');
+    assert.equal(await text(page, '.about-photo-label'), 'المسجد الأقصى المبارك');
+    await page.waitForFunction(() => document.getElementById('aboutVideo').readyState >= 1);
+    assert.ok(Math.abs((await page.evaluate(() => document.getElementById('aboutVideo').duration)) - 27.03) < 0.2);
+    // The nasheed file is unchanged and loads: its real duration (4:30) is read from the file.
     assert.equal(await page.getAttribute('#nasheedAudio', 'src'), 'assets/audio/firdaws-al-rahman-dhilal.mp3');
-    // The audio file loads: its real duration (4:30) is read from the file.
     await page.waitForFunction(() => document.getElementById('nasheedAudio').readyState >= 1);
     assert.ok(Math.abs((await page.evaluate(() => document.getElementById('nasheedAudio').duration)) - 270.86) < 1);
-    assert.equal(await text(page, '#nasheedDuration'), '4:30');
     assert.notEqual(await state(page), 'unavailable');
-    assert.doesNotMatch(await text(page, '.nasheed-card'), /لم يُضف/);
-    assert.ok(!(await page.isDisabled('#nasheedPlay')));
     await close(s);
   });
 
-  test('photo with credit, nasheed autoplays from the start, controls work', async () => {
+  test('silent, control-free, looping video and the audible nasheed play at the same time, independently', async () => {
     const s = await open(allowAutoplay);
     const { page } = s;
-    await page.waitForFunction(() => document.getElementById('nasheedStatus').dataset.state === 'playing');
-    assert.ok(!(await page.evaluate(() => document.getElementById('nasheedAudio').paused)));
-    assert.ok((await page.evaluate(() => document.getElementById('nasheedAudio').currentTime)) < 3, 'from the beginning');
-    assert.equal(await text(page, '#nasheedStatus'), '▶ يُشغَّل الآن');
-    assert.ok(await page.isVisible('#aqsaFigure'));
-    assert.ok(await page.isVisible('.about-photo-label'));
-    assert.equal(await page.getAttribute('#aqsaCredit a', 'rel'), 'noopener noreferrer');
-    assert.match(await text(page, '#aqsaCredit'), /Andrew Shiva \/ Wikipedia · CC BY-SA 4\.0/);
-    // Pause / play, volume (remembered), progress and time.
-    await page.click('#nasheedPlay');
-    await page.waitForFunction(() => document.getElementById('nasheedStatus').dataset.state === 'paused');
-    await page.fill('#nasheedVolume', '0.4');
-    assert.equal(await page.evaluate(() => document.getElementById('nasheedAudio').volume), 0.4);
-    assert.equal(await page.evaluate(() => localStorage.getItem('nasheedVolume')), '0.4');
-    await page.click('#nasheedPlay');
-    await page.waitForFunction(() => document.getElementById('nasheedStatus').dataset.state === 'playing');
-    await page.waitForFunction(() => document.getElementById('nasheedDuration').textContent !== '0:00');
-    // Switching language or theme re-labels the player without restarting the audio.
-    const before = await page.evaluate(() => document.getElementById('nasheedAudio').currentTime);
+    await waitState(page, 'playing');
+    await page.waitForFunction(() => { const v = document.getElementById('aboutVideo'); return !v.paused && v.currentTime > 0.3; });
+    const video = await media(page, 'aboutVideo');
+    assert.deepEqual([video.paused, video.muted, video.loop, video.controls], [false, true, true, false], 'video: playing, muted, looping, no controls');
+    for (const attr of ['autoplay', 'muted', 'loop', 'playsinline']) assert.ok(await page.locator('#aboutVideo').evaluate((v, a) => v.hasAttribute(a), attr), attr);
+    assert.equal(await page.locator('#aboutVideo[controls]').count(), 0);
+    // The video file has no audio track at all.
+    assert.equal(await page.evaluate(() => { const v = document.getElementById('aboutVideo'); return v.audioTracks ? v.audioTracks.length : (v.webkitAudioDecodedByteCount ?? 0); }), 0);
+    const audio = await media(page, 'nasheedAudio');
+    assert.deepEqual([audio.paused, audio.muted, audio.volume], [false, false, 1], 'nasheed: playing, not muted, full volume');
+    assert.ok(audio.currentTime < 3, 'from the beginning');
+    // Muting is per element: forcing the video muted again never mutes the nasheed.
+    await page.evaluate(() => { const v = document.getElementById('aboutVideo'); v.muted = false; });
+    assert.equal((await media(page, 'aboutVideo')).muted, true, 'the video cannot be unmuted');
+    assert.equal((await media(page, 'nasheedAudio')).muted, false);
+    // Seamless loop: seek near the end and see the video wrap around while the nasheed keeps going.
+    await page.evaluate(() => { const v = document.getElementById('aboutVideo'); v.currentTime = v.duration - 0.5; });
+    await page.waitForFunction(() => { const v = document.getElementById('aboutVideo'); return !v.paused && v.currentTime < 3; }, null, { timeout: 5000 });
+    assert.equal((await media(page, 'nasheedAudio')).paused, false);
+    // The video does not take clicks (no native controls, no context menu toggles).
+    assert.equal(await page.locator('#aboutVideo').evaluate((v) => getComputedStyle(v).pointerEvents), 'none');
+    // Switching language or theme never restarts or stops the media.
+    const before = (await media(page, 'nasheedAudio')).currentTime;
     await page.selectOption('#langSelect', 'en');
     await page.click('#themeToggle');
-    assert.equal(await text(page, '#nasheedStatus'), '▶ Now playing');
-    assert.ok((await page.evaluate(() => document.getElementById('nasheedAudio').currentTime)) >= before);
+    assert.ok((await media(page, 'nasheedAudio')).currentTime >= before);
+    assert.equal(await state(page), 'playing');
+    assert.equal((await media(page, 'aboutVideo')).paused, false);
     assert.ok(await page.evaluate(() => document.documentElement.classList.contains('dark-mode')));
     await close(s);
   });
 
-  test('autoplay blocked by the browser: one-tap button, no false "playing", then plays', async () => {
+  test('no visible audio player: the nasheed has no card, icon, button, timeline, time, volume or status', async () => {
+    for (const viewport of [{ width: 1366, height: 900 }, { width: 390, height: 844 }]) {
+      const s = await open(allowAutoplay, { viewport });
+      const { page } = s;
+      await waitState(page, 'playing');
+      assert.equal(await page.locator('.nasheed-card, .nasheed-icon, .nasheed-player, #nasheedPlay, #nasheedStart, #nasheedSeek, #nasheedVolume, #nasheedDuration, #nasheedStatus, input[type="range"]').count(), 0);
+      assert.ok(await page.isHidden('#nasheedAudio'));
+      assert.equal(await page.locator('audio[controls], video[controls]').count(), 0);
+      assert.doesNotMatch(await text(page, 'main'), /🎵|🔊|نشيد|يُشغَّل/);
+      await close(s);
+    }
+  });
+
+  test('audible autoplay blocked by the browser: no player comes back; the first tap anywhere starts the nasheed', async () => {
     const s = await open(blockAutoplay, { viewport: { width: 390, height: 844 } });
     const { page } = s;
-    await page.waitForFunction(() => document.getElementById('nasheedStatus').dataset.state === 'blocked');
-    // Mobile downloads the small photograph only.
-    await page.waitForFunction(() => { const i = document.getElementById('aqsaImage'); return i.complete && i.naturalWidth > 0; });
-    assert.match(await page.evaluate(() => document.getElementById('aqsaImage').currentSrc), /al-aqsa-compound-800\.webp$/);
-    assert.ok(await page.isVisible('#nasheedStart'));
-    assert.ok(await page.evaluate(() => document.getElementById('nasheedAudio').paused));
-    assert.doesNotMatch(await text(page, '#nasheedStatus'), /يُشغَّل/);
-    assert.match(await text(page, '#nasheedStatus'), /منع المتصفح التشغيل التلقائي/);
-    await page.click('#nasheedStart');
-    await page.waitForFunction(() => document.getElementById('nasheedStatus').dataset.state === 'playing');
-    assert.ok(await page.isHidden('#nasheedStart'));
+    await waitState(page, 'blocked');
+    assert.ok((await media(page, 'nasheedAudio')).paused, 'no false "playing"');
+    // The muted video is allowed to autoplay even under this policy.
+    await page.waitForFunction(() => { const v = document.getElementById('aboutVideo'); return !v.paused && v.currentTime > 0.3; });
+    assert.equal(await page.locator('#nasheedStart, .nasheed-card, button:visible:has-text("▶")').count(), 0, 'no visible fallback player');
+    await page.locator('.dev-card').first().click();
+    await waitState(page, 'playing');
+    const audio = await media(page, 'nasheedAudio');
+    assert.deepEqual([audio.paused, audio.muted, audio.volume], [false, false, 1]);
+    assert.equal((await media(page, 'aboutVideo')).muted, true, 'the video stays silent');
+    await close(s);
+  });
+
+  test('blocked autoplay: a key press also starts the nasheed', async () => {
+    const s = await open(blockAutoplay);
+    const { page } = s;
+    await waitState(page, 'blocked');
+    await page.keyboard.press('Tab');
+    await waitState(page, 'playing');
     await close(s);
   });
 
   test('leaving the page pauses the nasheed; it never plays on the home page; re-entering starts from the beginning', async () => {
     const s = await open(allowAutoplay);
     const { page } = s;
-    await page.waitForFunction(() => document.getElementById('nasheedStatus').dataset.state === 'playing');
+    await waitState(page, 'playing');
     // Registered after the page's own pagehide handler, so it sees the state that handler left.
     await page.evaluate(() => {
       window.addEventListener('pagehide', () => {
@@ -209,8 +230,9 @@ describe('«من أنا» page', () => {
     assert.equal(await page.locator('#nasheedAudio').count(), 0, 'no nasheed element on the home page');
     assert.ok(await page.evaluate(() => [...document.querySelectorAll('audio')].every((a) => a.paused)));
     await page.goBack(); // re-enter the page (possibly restored from the back/forward cache)
-    await page.waitForFunction(() => document.getElementById('nasheedStatus')?.dataset.state === 'playing');
+    await waitState(page, 'playing');
     assert.ok((await page.evaluate(() => document.getElementById('nasheedAudio').currentTime)) < 3);
+    await page.waitForFunction(() => !document.getElementById('aboutVideo').paused);
     await close(s);
   });
 
@@ -237,7 +259,7 @@ describe('«من أنا» page', () => {
     await page.goto(`${site.url}about.html`);
     await page.waitForSelector('.dev-card');
     assert.equal(await text(page, '.dedication-names'), 'عبادة أبو فردة ويونس أبو صعيلك.');
-    // The service worker never caches audio, so offline the nasheed file itself cannot load; that request is the only allowed error.
+    // The service worker never caches audio or video, so offline those files cannot load; those requests are the only allowed errors.
     s.errors.splice(0, s.errors.length, ...s.errors.filter((e) => !e.includes('net::ERR_INTERNET_DISCONNECTED')));
     await close(s);
   });
@@ -254,8 +276,8 @@ describe('«من أنا» page', () => {
     assert.doesNotMatch(about, /\sstyle="/i);
     for (const [tag] of about.matchAll(/<a\b[^>]*target="_blank"[^>]*>/g)) assert.match(tag, /rel="noopener noreferrer"/);
     const sw = readFileSync(join(REPO, 'sw.js'), 'utf8');
-    for (const f of ['about.html', 'assets/js/about.js', 'assets/js/data/about-media.js', 'assets/img/about/al-aqsa-compound-800.webp', 'assets/img/about/al-aqsa-compound-1440.webp']) assert.ok(sw.includes(`'${f}'`), f);
-    assert.doesNotMatch(sw, /dome-of-the-rock/);
+    for (const f of ['about.html', 'assets/js/about.js', 'assets/js/data/about-media.js', 'assets/video/about/al-aqsa-courtyard-poster.webp']) assert.ok(sw.includes(`'${f}'`), f);
+    assert.doesNotMatch(sw, /dome-of-the-rock|al-aqsa-compound|al-aqsa-courtyard\.mp4/, 'the replaced photo is not precached; the video is streamed, not precached');
     assert.doesNotMatch(about, /aqsaVerse|core\/api\.js|core\/arabic\.js/, 'the verse markup and its preloads are gone');
     assert.match(readFileSync(join(REPO, 'sitemap.xml'), 'utf8'), /about\.html/);
   });

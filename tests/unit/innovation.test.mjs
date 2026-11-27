@@ -262,25 +262,25 @@ test('nasheed «فردوس الرحمن ظلال»: the shipped file is the docu
   }
 });
 
-test('about photo: the Al-Aqsa compound aerial view, licensed, real WebP files at the documented sizes', async () => {
+test('about video: the owner\'s Al-Aqsa courtyard video replaced the photo; a real MP4 with no audio track', async () => {
   const { existsSync, readFileSync } = await import('node:fs');
-  const { ABOUT_MEDIA, isConfigured } = await import('../../assets/js/data/about-media.js');
-  const img = ABOUT_MEDIA.image;
-  assert.ok(isConfigured(img));
-  assert.equal(img.license, 'CC BY-SA 4.0');
-  assert.equal(img.licenseUrl, 'https://creativecommons.org/licenses/by-sa/4.0/');
-  assert.match(img.sourceUrl, /^https:\/\/commons\.wikimedia\.org\/wiki\/File:.*Al-Aqsa_Mosque_Compound/);
-  assert.match(img.alt, /المسجد القبلي/);
-  assert.match(img.alt, /قبة الصخرة/);
-  assert.ok(img.srcset.some((s) => s.src === img.src && s.width === img.width));
-  for (const { src, width } of img.srcset) {
-    const file = readFileSync(new URL(`../../${src}`, import.meta.url));
-    assert.equal(file.subarray(0, 4).toString('latin1'), 'RIFF');
-    assert.equal(file.subarray(8, 12).toString('latin1'), 'WEBP');
-    assert.ok(file.length < 400_000, `${src}: kept light`);
-    assert.match(src, new RegExp(`-${width}\\.webp$`));
+  const { ABOUT_MEDIA } = await import('../../assets/js/data/about-media.js');
+  const v = ABOUT_MEDIA.video;
+  assert.equal(v.src, 'assets/video/about/al-aqsa-courtyard.mp4');
+  assert.equal(ABOUT_MEDIA.image, undefined, 'the photograph is no longer configured');
+  const file = readFileSync(new URL(`../../${v.src}`, import.meta.url));
+  assert.equal(file.subarray(4, 8).toString('latin1'), 'ftyp', 'a real MP4');
+  // faststart: the 'moov' index comes before the media data, so playback starts before the download ends.
+  assert.ok(file.indexOf('moov') > 0 && file.indexOf('moov') < file.indexOf('mdat'));
+  // Video-only: the file has a video handler and no sound handler, so it can never produce sound.
+  assert.ok(file.includes('vide'));
+  assert.ok(!file.includes('soun'), 'no audio track');
+  assert.ok(file.length < 4_000_000, 'kept light');
+  const poster = readFileSync(new URL(`../../${v.poster}`, import.meta.url));
+  assert.equal(poster.subarray(8, 12).toString('latin1'), 'WEBP');
+  for (const old of ['al-aqsa-compound-800.webp', 'al-aqsa-compound-1440.webp', 'dome-of-the-rock.webp']) {
+    assert.ok(!existsSync(new URL(`../../assets/img/about/${old}`, import.meta.url)), `the replaced photo ${old} is not shipped`);
   }
-  assert.ok(!existsSync(new URL('../../assets/img/about/dome-of-the-rock.webp', import.meta.url)), 'the close-up photo is no longer shipped');
 });
 
 // ----------------------------------------------------------------------------------- site assistant
