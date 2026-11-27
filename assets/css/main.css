@@ -853,6 +853,9 @@ input[type="number"] { min-height: 42px; padding: 6px 12px; border: 2px solid va
 .about-photo figcaption { padding: 12px clamp(14px, 3vw, 22px) 14px; display: grid; gap: 4px; text-align: center; }
 .about-photo-label { font-family: var(--font-quran); font-size: clamp(1.05rem, 2.2vw, 1.25rem); line-height: 1.8; color: var(--primary-strong); }
 .about-photo-credit { color: var(--muted); }
+/* The owner's portrait video (478×850): sized so the whole frame fits the viewport height on any screen, centred. */
+.about-video { width: min(100%, 440px, calc(78vh * 478 / 850)); width: min(100%, 440px, calc(78svh * 478 / 850)); }
+.about-video-media { display: block; width: 100%; height: auto; aspect-ratio: 478 / 850; object-fit: cover; background: var(--primary-soft); pointer-events: none; }
 .about-body { display: grid; gap: clamp(28px, 5vw, 48px); padding-block: clamp(28px, 5vw, 56px); }
 .about-section-title { font-family: var(--font-display); text-align: center; color: var(--primary-strong); font-size: clamp(1.6rem, 3.4vw, 2.1rem); margin-bottom: 18px; }
 

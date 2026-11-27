@@ -10,8 +10,8 @@ tokens, light/dark theme, language selector and Content Security Policy. The CSP
 | Part | Content |
 |---|---|
 | Title | «من أنا» is the page's `h1` for screen readers and the browser tab; it is not shown on screen (at the site owner's request, 2026-11-27). The former header band (pointed-arch artwork with the visible title and Al-Isra 17:1) was removed. At the owner's request the page no longer shows a Quranic verse, and the code that loaded it was removed. |
-| Photo | An aerial view of the whole Al-Aqsa Mosque compound, at the top of the page, at its natural proportions (see §2). |
-| Nasheed | An autoplaying player (see §3). |
+| Video | The site owner's own video of the Al-Aqsa courtyard and the Qibli Mosque, at the top of the page: silent, no controls, autoplaying in an endless loop (see §2). It replaced the aerial photograph on 2026-11-27. |
+| Nasheed | Plays automatically in the background; no player is shown (see §3). |
 | Developers | Two cards with exactly the information supplied: **عبادة أبو فردة**, طالب في جامعة الزيتونة الأردنية, التخصص: الذكاء الاصطناعي; **يونس أبو صعيلك**, طالب في الجامعة الهاشمية. Side by side from 721 px wide, stacked below. No other personal details were added. |
 | Dedication | «تم تطوير هذا الموقع لوجه الله تعالى، ابتغاء الأجر والثواب، وخدمةً لكتاب الله وسنة نبيه ﷺ.» / بواسطة: / «عبادة أبو فردة ويونس أبو صعيلك.» |
 
@@ -23,27 +23,22 @@ visit. `sitemap.xml` lists it. In development, the backend serves it like `index
 
 Both files are local and configured in `assets/js/data/about-media.js` with their source and licence:
 
-* **Photo (since 2026-11-27):** `assets/img/about/al-aqsa-compound-1440.webp` (1440 × 892, ~340 KB) and
-  `al-aqsa-compound-800.webp` (800 × 495, ~105 KB): **المسجد الأقصى المبارك (الحرم القدسي الشريف)** photographed from
-  the air from the south on 15 November 2013. The whole compound is visible: **المسجد القبلي** (the mosque with the
-  grey lead dome, often mistakenly called "Al-Aqsa Mosque" on its own) in the foreground on the southern wall, and
-  **قبة الصخرة المشرفة** (the golden dome), with **قبة السلسلة** beside it, on the raised platform in the centre.
-  Both buildings are within the Al-Aqsa Mosque compound; they are different buildings, and the caption names each.
-  * **Source:** Wikimedia Commons,
-    [File:Jerusalem-A-Quds-2013(2)-Aerial-Al-Aqsa Mosque Compound-(south exposure).jpg](https://commons.wikimedia.org/wiki/File:Jerusalem-A-Quds-2013(2)-Aerial-Al-Aqsa_Mosque_Compound-(south_exposure).jpg)
-    (6426 × 3979), itself extracted from the featured picture
-    [Jerusalem-2013(2)-Aerial-Temple Mount-(south exposure).jpg](https://commons.wikimedia.org/wiki/File:Jerusalem-2013(2)-Aerial-Temple_Mount-(south_exposure).jpg).
-    The file page's Arabic description identifies the Qibli Mosque in front and the Dome of the Rock and Dome of the
-    Chain behind it, and states that the whole compound is Al-Aqsa Mosque.
-  * **Licence:** CC BY-SA 4.0 (verified on the file page, 2026-11-27). The author's required credit line is
-    "Andrew Shiva / Wikipedia" (uploaded by Godot13). The caption shows that credit, linked to the file page, and the
-    licence, linked to its deed.
-  * **Changes:** not cropped. Resized from the Commons 1920 px rendition and converted to WebP. The adapted files are
-    shared under the same licence (CC BY-SA 4.0).
-  * **Display:** the image opens the page, in a rounded card, as wide as the content (up to 1060 px), with
-    `height: auto`. Its width and height attributes give the browser the aspect ratio before it loads, and nothing is
-    cropped (`object-fit` is not used). `srcset`/`sizes` let phones download the 800 px file and larger screens the
-    1440 px one. The service worker precaches both.
+* **Video (since 2026-11-27):** `assets/video/about/al-aqsa-courtyard.mp4` (478 × 850 portrait, 27 s, 30 fps,
+  ~3.4 MB) and its first frame `al-aqsa-courtyard-poster.webp` (~24 KB): the site owner's own recording of the
+  courtyard of المسجد الأقصى المبارك with المسجد القبلي. Provided by the owner; it replaced the aerial photograph.
+  * **Changes:** re-encoded to H.264 (`-crf 25`, `+faststart`, so playback starts before the download ends) and
+    **the audio track was removed**, so the video can never make sound whatever the browser does.
+  * **Display:** `<video autoplay muted loop playsinline preload="auto" disablepictureinpicture disableremoteplayback>`
+    with no `controls`, in the same rounded card the photo used, captioned «المسجد الأقصى المبارك». It is centred
+    and sized so the whole portrait frame fits the screen: `width: min(100%, 440px, 78svh × 478/850)`. It ignores
+    pointer events. `about.js` also sets the `muted` property and re-mutes it if anything unmutes it. That
+    only ever touches the video element, never the nasheed or any page-wide setting.
+  * **Offline:** the service worker does not intercept or precache the MP4 (it is streamed with range requests).
+    The poster is precached, so offline the first frame is shown.
+* **Previous photo (2026-11-27, same day):** `al-aqsa-compound-1440.webp` / `-800.webp`, an aerial view of the
+  compound (Andrew Shiva / Wikipedia, CC BY-SA 4.0, from
+  [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Jerusalem-A-Quds-2013(2)-Aerial-Al-Aqsa_Mosque_Compound-(south_exposure).jpg)).
+  Replaced by the owner's video. It is no longer shipped; it remains in the git history.
 * **Previous photo (until 2026-11-26):** `dome-of-the-rock.webp`, a close crop of the Dome of the Rock (Andrew
   Shiva, CC BY-SA 4.0). It was replaced because it did not show the compound. It is no longer shipped; it remains in
   the git history.
@@ -70,27 +65,31 @@ Both files are local and configured in `assets/js/data/about-media.js` with thei
   from the Internet Archive item [ya-dakera-ass7abi](https://archive.org/details/ya-dakera-ass7abi). It is no longer
   shipped; it remains in the git history.
 
-The page shows the photo and plays the nasheed only when `src` is a local path **and** `sourceUrl` and `license`
-are filled in (`isConfigured()`).
+The page plays the nasheed only when its `src` is a local path **and** `sourceUrl` and `license` are filled in
+(`isConfigured()`).
 
 ## 3. Nasheed playback and browser autoplay rules
 
 * **On entering the page** (a normal load, or coming back with Back/Forward), playback starts immediately,
   **from the beginning**.
-* **Autoplay blocked:** browsers decide whether a page may start audio by itself. Desktop Chrome and Edge usually
-  allow it once the visitor has interacted with the site, for example by clicking «من أنا». Safari and mobile
-  browsers often refuse. When the browser refuses (`NotAllowedError`), the page shows a large «▶ اضغط لتشغيل النشيد»
-  button with a short, plain message, and one tap starts the nasheed. No error is shown, and the status never
-  says "playing" until sound has actually started (the media element's `playing` event).
-* **Player:** play/pause, a progress bar you can drag, current time and duration, volume (remembered in the
-  `nasheedVolume` key), and a status line.
+* **No visible player (since 2026-11-27, at the owner's request):** the card, music icon, play button, progress
+  bar, time, volume slider and status line were removed. Only a hidden `<audio id="nasheedAudio">` remains, with
+  the same file and the same playback logic, at full volume (`volume = 1`, never muted). The old `nasheedVolume`
+  key is no longer read. The state is exposed as `data-state` on the audio element (for tests).
+* **Autoplay blocked:** browsers decide whether a page may start audible audio by itself. Desktop Chrome and Edge
+  usually allow it once the visitor has interacted with the site, for example by clicking «من أنا». Safari and mobile
+  browsers often refuse. When the browser refuses (`NotAllowedError`), no player is brought back: the nasheed starts
+  on the visitor's **first interaction anywhere on the page** (tap, click or key press; `pointerdown`, `pointerup`,
+  `touchend`, `keydown`, `click`), and those listeners are removed as soon as it plays. The muted video is not
+  affected: browsers allow muted autoplay, so it plays either way.
+* **Video and nasheed are independent:** two separate media elements. The video is muted and has no audio track;
+  the nasheed is never muted. Neither changes the other.
 * **Leaving the page:** `pagehide` pauses the nasheed. No other page plays it.
-* **While on the page:** changing the language or the theme updates the labels only; the audio is not restarted.
+* **While on the page:** changing the language or the theme never restarts or stops the nasheed or the video.
 * **Offline:** the service worker does not intercept audio (range requests go straight to the file), so the
   nasheed needs a connection unless the browser has cached it.
 
-Tests (`tests/e2e/about.test.mjs`) load and play the real photo and nasheed files. They also check that the page shows no Quranic verse, that the photo keeps its natural proportions on desktop, tablet and phone widths, and that phones get the 800 px file. Autoplay is tested twice, once with Chromium allowing autoplay and once
-with it refusing autoplay without a user gesture.
+Tests (`tests/e2e/about.test.mjs`) load and play the real video and nasheed files. They check that the video and the nasheed play at the same time, with the video muted, looping and without controls, and the nasheed audible at full volume. They check that no part of the old player is rendered and that the page shows no Quranic verse. They also check that the video keeps its proportions and fits the screen at desktop, tablet and phone sizes. Autoplay is tested twice: once with Chromium allowing autoplay, and once with it refusing audible autoplay without a user gesture, where the first tap or key press starts the nasheed.
 
 ## 4. The rosary moved into Hisn al-Muslim
 

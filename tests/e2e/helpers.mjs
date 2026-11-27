@@ -38,7 +38,7 @@ export const QURAN_MP3 = readFileSync(join(REPO, 'Quran.mp3'));
 const TYPES = {
   '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8',
   '.json': 'application/json', '.png': 'image/png', '.mp3': 'audio/mpeg', '.svg': 'image/svg+xml',
-  '.xml': 'application/xml', '.txt': 'text/plain; charset=utf-8',
+  '.xml': 'application/xml', '.txt': 'text/plain; charset=utf-8', '.mp4': 'video/mp4', '.webp': 'image/webp',
 };
 
 export function startPagesServer(port = 0, prefix = '/quran-website') {

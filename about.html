@@ -70,46 +70,26 @@
 
   <main id="aboutMain" tabindex="-1">
     <div class="container about-body">
-      <!-- The page title is not shown on screen (the photograph opens the page); it stays for screen readers. -->
+      <!-- The page title is not shown on screen (the video opens the page); it stays for screen readers. -->
       <h1 id="aboutTitle" class="visually-hidden" data-i18n="about_title">من أنا</h1>
 
-      <!-- Main visual: an aerial view of the whole Al-Aqsa Mosque compound, shown at its natural proportions
-           (local, licensed photograph configured in assets/js/data/about-media.js) -->
-      <figure class="about-photo" id="aqsaFigure" hidden>
-        <img id="aqsaImage" alt="المسجد الأقصى المبارك من الجو: المسجد القبلي في المقدمة، وقبة الصخرة المشرفة في وسط الساحة" decoding="async" fetchpriority="high">
+      <!-- Main visual: the site owner's video of the Al-Aqsa Mosque courtyard (configured in assets/js/data/about-media.js).
+           Always silent (the file has no audio track and the element is muted), no controls, plays inline in a seamless loop.
+           It is independent of the nasheed below: muting the video never touches the nasheed. -->
+      <figure class="about-photo about-video" id="aqsaFigure">
+        <video id="aboutVideo" class="about-video-media" width="478" height="850" autoplay muted loop playsinline preload="auto"
+               poster="assets/video/about/al-aqsa-courtyard-poster.webp" disablepictureinpicture disableremoteplayback
+               aria-label="ساحات المسجد الأقصى المبارك والمسجد القبلي">
+          <source src="assets/video/about/al-aqsa-courtyard.mp4" type="video/mp4">
+        </video>
         <figcaption>
-          <p class="about-photo-label" lang="ar" dir="rtl">المسجد الأقصى المبارك: المسجد القبلي في المقدمة، وقبة الصخرة المشرفة في وسط الساحة</p>
-          <p class="about-photo-credit small" id="aqsaCredit"></p>
+          <p class="about-photo-label" lang="ar" dir="rtl">المسجد الأقصى المبارك</p>
         </figcaption>
       </figure>
 
-      <!-- Nasheed: autoplay on entering the page, with a graceful fallback when the browser blocks it -->
-      <section class="nasheed-card" aria-labelledby="nasheedTitle">
-        <div class="nasheed-head">
-          <span class="nasheed-icon" aria-hidden="true">🎵</span>
-          <div>
-            <h2 id="nasheedTitle" data-i18n="nasheed_heading">نشيد</h2>
-            <p class="nasheed-line" id="nasheedLine" lang="ar" dir="rtl"></p>
-            <p class="small muted" id="nasheedMeta"></p>
-          </div>
-        </div>
-        <button type="button" class="nasheed-start" id="nasheedStart" hidden data-i18n="nasheed_tap_to_play">▶ اضغط لتشغيل النشيد</button>
-        <div class="nasheed-player" id="nasheedPlayer">
-          <button type="button" class="nasheed-play" id="nasheedPlay" aria-pressed="false" data-i18n-aria-label="nasheed_play" aria-label="تشغيل"><span aria-hidden="true">▶</span></button>
-          <div class="nasheed-timeline">
-            <label class="visually-hidden" for="nasheedSeek" data-i18n="nasheed_seek">موضع التشغيل</label>
-            <input type="range" id="nasheedSeek" min="0" max="1000" value="0" step="1">
-            <p class="nasheed-time small" dir="ltr"><span id="nasheedCurrent">0:00</span> / <span id="nasheedDuration">0:00</span></p>
-          </div>
-          <label class="nasheed-volume">
-            <span aria-hidden="true">🔊</span>
-            <span class="visually-hidden" data-i18n="nasheed_volume">مستوى الصوت</span>
-            <input type="range" id="nasheedVolume" min="0" max="1" step="0.05" value="0.8">
-          </label>
-        </div>
-        <p class="nasheed-status small" id="nasheedStatus" role="status" aria-live="polite"></p>
-        <audio id="nasheedAudio" preload="auto"></audio>
-      </section>
+      <!-- Nasheed: plays in the background with no visible player. Autoplay is attempted on entering the page; if the
+           browser blocks audible autoplay, it starts on the visitor's first interaction with the page (see about.js). -->
+      <audio id="nasheedAudio" preload="auto" hidden></audio>
 
       <!-- The developers -->
       <section class="developers" aria-labelledby="devTitle">
@@ -160,7 +140,7 @@
   </footer>
 
   <noscript>
-    <div class="noscript"><p>يحتاج مشغل النشيد إلى تفعيل JavaScript. · The nasheed player needs JavaScript.</p></div>
+    <div class="noscript"><p>يحتاج تشغيل النشيد إلى تفعيل JavaScript. · The nasheed needs JavaScript.</p></div>
   </noscript>
 </body>
 </html>
