@@ -52,7 +52,21 @@ LIVE_URL=https://obadaalqaisee-dev.github.io/quran-website/ LIVE_MAP_TO=127.0.0.
 
 Set `SCREENSHOT_DIR=/some/dir` when running `quality.test.mjs` to save screenshots of every viewport.
 
-## Latest results (2026-11-25, innovation phase, `feature/quran-innovative-enhancements`)
+## Latest results (2026-11-27, «من أنا»: verse removed, Al-Aqsa compound photo, no header band)
+
+| Suite | Result |
+|---|---|
+| Backend pytest · ruff | **107 passed**, 0 failed · clean |
+| Frontend unit (`node:test`) | **69 passed**, 0 failed (1 new: the photo's licence, sources and WebP files) |
+| Playwright end-to-end | **135 passed, 0 failed**, 1 skipped (`live.test.mjs` without `LIVE_URL`) |
+
+Changes to `about.test.mjs` (none removed or skipped): the verse assertion now checks that the page shows **no**
+Quranic verse and no visible header band (the `h1` is screen-reader only and the photo opens the page). The media test
+expects the new photo (src, srcset, alt, caption, credit and licence links), and the layout test checks the photo's
+natural proportions, with no cropping, at 1366, 768, 390 and 320 px. The blocked-autoplay test checks that phones get
+the 800 px file. The service-worker check lists the two new image files.
+
+## Results (2026-11-25, innovation phase, `feature/quran-innovative-enhancements`)
 
 The network for this run allowed the site's real upstream services, so the live tests ran too.
 

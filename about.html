@@ -31,8 +31,6 @@
   </script>
   <link rel="modulepreload" href="assets/js/about.js">
   <link rel="modulepreload" href="assets/js/data/about-media.js">
-  <link rel="modulepreload" href="assets/js/core/api.js">
-  <link rel="modulepreload" href="assets/js/core/arabic.js">
   <link rel="modulepreload" href="assets/js/core/i18n.js">
   <link rel="modulepreload" href="assets/js/core/dom.js">
   <link rel="modulepreload" href="assets/js/core/storage.js">
@@ -71,21 +69,20 @@
   </header>
 
   <main id="aboutMain" tabindex="-1">
-    <!-- Main visual: the Dome of the Rock, Al-Aqsa Mosque (local, licensed photograph configured in assets/js/data/about-media.js) -->
-    <section class="about-hero" aria-labelledby="aboutTitle">
-      <figure class="about-photo" id="aqsaFigure" hidden>
-        <img id="aqsaImage" alt="قبة الصخرة المشرفة في المسجد الأقصى المبارك" decoding="async" fetchpriority="high">
-        <figcaption class="about-photo-credit" id="aqsaCredit"></figcaption>
-      </figure>
-      <div class="about-hero-text container">
-        <p class="eyebrow eyebrow--dark about-photo-label" lang="ar">قبة الصخرة المشرفة · المسجد الأقصى المبارك</p>
-        <h1 id="aboutTitle" data-i18n="about_title">من أنا</h1>
-        <!-- Al-Isra 17:1, loaded from the verified Quran text (never typed by hand) -->
-        <p class="about-lead" id="aqsaVerse" lang="ar" dir="rtl" hidden></p>
-      </div>
-    </section>
-
     <div class="container about-body">
+      <!-- The page title is not shown on screen (the photograph opens the page); it stays for screen readers. -->
+      <h1 id="aboutTitle" class="visually-hidden" data-i18n="about_title">من أنا</h1>
+
+      <!-- Main visual: an aerial view of the whole Al-Aqsa Mosque compound, shown at its natural proportions
+           (local, licensed photograph configured in assets/js/data/about-media.js) -->
+      <figure class="about-photo" id="aqsaFigure" hidden>
+        <img id="aqsaImage" alt="المسجد الأقصى المبارك من الجو: المسجد القبلي في المقدمة، وقبة الصخرة المشرفة في وسط الساحة" decoding="async" fetchpriority="high">
+        <figcaption>
+          <p class="about-photo-label" lang="ar" dir="rtl">المسجد الأقصى المبارك: المسجد القبلي في المقدمة، وقبة الصخرة المشرفة في وسط الساحة</p>
+          <p class="about-photo-credit small" id="aqsaCredit"></p>
+        </figcaption>
+      </figure>
+
       <!-- Nasheed: autoplay on entering the page, with a graceful fallback when the browser blocks it -->
       <section class="nasheed-card" aria-labelledby="nasheedTitle">
         <div class="nasheed-head">

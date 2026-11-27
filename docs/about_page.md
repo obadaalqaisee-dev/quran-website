@@ -9,8 +9,8 @@ tokens, light/dark theme, language selector and Content Security Policy. The CSP
 
 | Part | Content |
 |---|---|
-| Header | A pointed-arch artwork with the title «من أنا». Al-Isra 17:1 is loaded from the verified Quran dataset; it is never typed by hand. |
-| Photo | The Dome of the Rock in Al-Aqsa Mosque (see §2). |
+| Title | «من أنا» is the page's `h1` for screen readers and the browser tab; it is not shown on screen (at the site owner's request, 2026-11-27). The former header band (pointed-arch artwork with the visible title and Al-Isra 17:1) was removed. At the owner's request the page no longer shows a Quranic verse, and the code that loaded it was removed. |
+| Photo | An aerial view of the whole Al-Aqsa Mosque compound, at the top of the page, at its natural proportions (see §2). |
 | Nasheed | An autoplaying player (see §3). |
 | Developers | Two cards with exactly the information supplied: **عبادة أبو فردة**, طالب في جامعة الزيتونة الأردنية, التخصص: الذكاء الاصطناعي; **يونس أبو صعيلك**, طالب في الجامعة الهاشمية. Side by side from 721 px wide, stacked below. No other personal details were added. |
 | Dedication | «تم تطوير هذا الموقع لوجه الله تعالى، ابتغاء الأجر والثواب، وخدمةً لكتاب الله وسنة نبيه ﷺ.» / بواسطة: / «عبادة أبو فردة ويونس أبو صعيلك.» |
@@ -23,11 +23,30 @@ visit. `sitemap.xml` lists it. In development, the backend serves it like `index
 
 Both files are local and configured in `assets/js/data/about-media.js` with their source and licence:
 
-* **Photo:** `assets/img/about/dome-of-the-rock.webp`, قبة الصخرة المشرفة in Al-Aqsa Mosque, with the Dome of
-  the Chain in front. A Wikimedia Commons featured picture by Andrew Shiva, CC BY-SA 4.0
-  ([file page](https://commons.wikimedia.org/wiki/File:Jerusalem-2013-Temple_Mount-Dome_of_the_Rock_%26_Chain_02.jpg)).
-  It was cropped to 1280 × 800 around the golden dome and saved as WebP (~100 KB). The caption credits the photographer
-  and links the file page, and the service worker precaches it.
+* **Photo (since 2026-11-27):** `assets/img/about/al-aqsa-compound-1440.webp` (1440 × 892, ~340 KB) and
+  `al-aqsa-compound-800.webp` (800 × 495, ~105 KB): **المسجد الأقصى المبارك (الحرم القدسي الشريف)** photographed from
+  the air from the south on 15 November 2013. The whole compound is visible: **المسجد القبلي** (the mosque with the
+  grey lead dome, often mistakenly called "Al-Aqsa Mosque" on its own) in the foreground on the southern wall, and
+  **قبة الصخرة المشرفة** (the golden dome), with **قبة السلسلة** beside it, on the raised platform in the centre.
+  Both buildings are within the Al-Aqsa Mosque compound; they are different buildings, and the caption names each.
+  * **Source:** Wikimedia Commons,
+    [File:Jerusalem-A-Quds-2013(2)-Aerial-Al-Aqsa Mosque Compound-(south exposure).jpg](https://commons.wikimedia.org/wiki/File:Jerusalem-A-Quds-2013(2)-Aerial-Al-Aqsa_Mosque_Compound-(south_exposure).jpg)
+    (6426 × 3979), itself extracted from the featured picture
+    [Jerusalem-2013(2)-Aerial-Temple Mount-(south exposure).jpg](https://commons.wikimedia.org/wiki/File:Jerusalem-2013(2)-Aerial-Temple_Mount-(south_exposure).jpg).
+    The file page's Arabic description identifies the Qibli Mosque in front and the Dome of the Rock and Dome of the
+    Chain behind it, and states that the whole compound is Al-Aqsa Mosque.
+  * **Licence:** CC BY-SA 4.0 (verified on the file page, 2026-11-27). The author's required credit line is
+    "Andrew Shiva / Wikipedia" (uploaded by Godot13). The caption shows that credit, linked to the file page, and the
+    licence, linked to its deed.
+  * **Changes:** not cropped. Resized from the Commons 1920 px rendition and converted to WebP. The adapted files are
+    shared under the same licence (CC BY-SA 4.0).
+  * **Display:** the image opens the page, in a rounded card, as wide as the content (up to 1060 px), with
+    `height: auto`. Its width and height attributes give the browser the aspect ratio before it loads, and nothing is
+    cropped (`object-fit` is not used). `srcset`/`sizes` let phones download the 800 px file and larger screens the
+    1440 px one. The service worker precaches both.
+* **Previous photo (until 2026-11-26):** `dome-of-the-rock.webp`, a close crop of the Dome of the Rock (Andrew
+  Shiva, CC BY-SA 4.0). It was replaced because it did not show the compound. It is no longer shipped; it remains in
+  the git history.
 * **Nasheed (since 2026-11-27):** `assets/audio/firdaws-al-rahman-dhilal.mp3`, «فردوس الرحمن ظلال» (4:30, MP3
   128 kbps, 44.1 kHz stereo). It replaced «أبداً لا لن نحيد» at the site owner's request; the player, autoplay
   behaviour and controls are unchanged.
@@ -70,7 +89,7 @@ are filled in (`isConfigured()`).
 * **Offline:** the service worker does not intercept audio (range requests go straight to the file), so the
   nasheed needs a connection unless the browser has cached it.
 
-Tests (`tests/e2e/about.test.mjs`) load and play the real photo and nasheed files. Autoplay is tested twice, once with Chromium allowing autoplay and once
+Tests (`tests/e2e/about.test.mjs`) load and play the real photo and nasheed files. They also check that the page shows no Quranic verse, that the photo keeps its natural proportions on desktop, tablet and phone widths, and that phones get the 800 px file. Autoplay is tested twice, once with Chromium allowing autoplay and once
 with it refusing autoplay without a user gesture.
 
 ## 4. The rosary moved into Hisn al-Muslim

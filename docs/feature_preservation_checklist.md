@@ -216,5 +216,7 @@ translation or icon was removed.** Details are in [`innovation_phase.md`](innova
 | Item | Before | Now | Why |
 |---|---|---|---|
 | «من أنا» nasheed | «يا ذاكر الأصحاب كن متأدباً» (`ya-dhakir-al-ashab.mp3`, 3:09), then «أبداً لا لن نحيد» (`abadan-la-lan-nahid.mp3`, 4:33) | «فردوس الرحمن ظلال» («تبصرة», محمد المقيط; `firdaws-al-rahman-dhilal.mp3`, 4:30); same player, autoplay and manual fallback | Requested by the site owner (see `about_page.md` §2 for source and rights) |
+| «من أنا» header verse | Al-Isra 17:1 under the title, fetched from the Quran API (`initVerse()` in `about.js`) | No verse and no visible header band on this page (the title is a screen-reader-only `h1`); the markup, script, its imports/preloads and CSS were removed. Verses everywhere else on the site are unchanged. | Requested by the site owner |
+| «من أنا» photo | Close crop of the Dome of the Rock as the header background (`object-fit: cover`) | Aerial view of the whole Al-Aqsa compound (Qibli Mosque and Dome of the Rock), shown uncropped below the header with a caption, credit and licence (`about_page.md` §2) | Requested by the site owner |
 | Start-up | One failing feature stopped every later one | Each feature starts in isolation (`safely()` in `main.js`) | A corrupt stored entry made most of the page inert |
 | Memorisation history | An entry without a date crashed the page | Tolerated; malformed entries dropped on load | Robustness (regression test added) |

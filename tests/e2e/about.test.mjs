@@ -1,7 +1,7 @@
 // The «من أنا» page (about.html), the rosary in Hisn al-Muslim, and the prayer lesson migrated into the
 // academy. The site is served like GitHub Pages; third-party APIs are answered from the verified datasets.
 //
-// Media: the page ships a photograph of the Dome of the Rock and the nasheed «فردوس الرحمن ظلال» («تبصرة», محمد
+// Media: the page ships an aerial photograph of the Al-Aqsa Mosque compound and the nasheed «فردوس الرحمن ظلال» («تبصرة», محمد
 // المقيط; it replaced «أبداً لا لن نحيد», which had replaced «يا ذاكر الأصحاب كن متأدباً», at the site owner's request),
 // both local files configured in about-media.js. The tests play the real files.
 
@@ -12,7 +12,7 @@ import { createRequire } from 'node:module';
 import { join } from 'node:path';
 import { after, before, describe, test } from 'node:test';
 
-import { AYAHS, REPO, chromium, autoReveal, collectErrors, mockUpstream, startPagesServer } from './helpers.mjs';
+import { REPO, chromium, autoReveal, collectErrors, mockUpstream, startPagesServer } from './helpers.mjs';
 
 const require = createRequire(import.meta.url);
 const AXE = readFileSync(require.resolve('axe-core/axe.min.js'), 'utf8');
@@ -68,7 +68,7 @@ describe('«من أنا» page', () => {
     await close(s);
   });
 
-  test('developers, dedication and the verse are exact; RTL', async () => {
+  test('developers and dedication are exact; RTL; no Quranic verse on this page', async () => {
     const s = await open(allowAutoplay);
     const { page } = s;
     const cards = await page.locator('.dev-card').evaluateAll((els) => els.map((e) => [...e.querySelectorAll('h3, p')].map((x) => x.textContent.trim())));
@@ -81,10 +81,16 @@ describe('«من أنا» page', () => {
     assert.equal(await text(page, '.dedication-names'), 'عبادة أبو فردة ويونس أبو صعيلك.');
     assert.equal(await page.getAttribute('html', 'dir'), 'rtl');
     assert.equal(await page.getAttribute('.dev-grid', 'dir'), 'rtl');
-    // Quran 17:1 comes from the verified dataset (basmala prefix shown separately, as everywhere on the site).
-    await page.waitForSelector('#aqsaVerse:not([hidden])');
-    const ayah = AYAHS.find((a) => a.surah === 17 && a.numberInSurah === 1).text;
-    assert.ok(ayah.endsWith((await text(page, '#aqsaVerse')).replace(/^﴿|﴾ \[الإسراء: 1\]$/g, '')));
+    // The page shows the nasheed only, without a Quranic verse (the former Al-Isra 17:1 header was removed).
+    await page.waitForFunction(() => !document.getElementById('aqsaFigure').hidden);
+    assert.equal(await page.locator('#aqsaVerse, .about-lead').count(), 0);
+    assert.doesNotMatch(await text(page, 'main'), /[﴿﴾]|الإسراء/);
+    // No visible header above the photograph: the title is for screen readers only, and the photo opens the page.
+    assert.equal(await page.locator('.about-hero').count(), 0);
+    assert.equal(await page.locator('h1').count(), 1);
+    assert.ok(await page.locator('h1').evaluate((h) => h.classList.contains('visually-hidden') && h.getBoundingClientRect().width <= 1));
+    const [photoTop, cardTop] = await page.locator('#aqsaFigure, .nasheed-card').evaluateAll((els) => els.map((e) => e.getBoundingClientRect().top));
+    assert.ok(photoTop < cardTop && photoTop < 200, 'the photograph comes first, right under the site header (the old header band pushed it below 300 px)');
     await close(s);
   });
 
@@ -100,19 +106,32 @@ describe('«من أنا» page', () => {
         assert.ok(b.top >= a.bottom - 1, `${viewport.width}: stacked`);
       }
       assert.ok((await s.page.evaluate(() => document.documentElement.scrollWidth - innerWidth)) <= 0, `${viewport.width}: no overflow`);
+      // The photograph is shown whole, at its natural proportions (1440×892 / 800×495), within the viewport width.
+      await s.page.waitForFunction(() => { const i = document.getElementById('aqsaImage'); return i.complete && i.naturalWidth > 0; });
+      const img = await s.page.locator('#aqsaImage').evaluate((i) => ({ ...i.getBoundingClientRect().toJSON(), fit: getComputedStyle(i).objectFit, nw: i.naturalWidth, nh: i.naturalHeight }));
+      assert.ok(Math.abs(img.width / img.height - img.nw / img.nh) < 0.01, `${viewport.width}: not cropped or distorted`);
+      assert.equal(img.fit, 'fill');
+      assert.ok(img.left >= 0 && img.right <= viewport.width, `${viewport.width}: fits the screen`);
+      assert.ok(img.width >= Math.min(viewport.width - 40, 1000), `${viewport.width}: shown large`);
       await close(s);
     }
   });
 
-  test('shipped media: the Dome of the Rock photograph and the nasheed «فردوس الرحمن ظلال» load', async () => {
+  test('shipped media: the Al-Aqsa compound photograph and the nasheed «فردوس الرحمن ظلال» load', async () => {
     const s = await open(allowAutoplay);
     const { page } = s;
     await page.waitForFunction(() => { const i = document.getElementById('aqsaImage'); return i.complete && i.naturalWidth > 0; });
-    assert.equal(await page.getAttribute('#aqsaImage', 'src'), 'assets/img/about/dome-of-the-rock.webp');
-    assert.equal(await page.evaluate(() => document.getElementById('aqsaImage').naturalWidth), 1280);
-    assert.equal(await page.getAttribute('#aqsaImage', 'alt'), 'قبة الصخرة المشرفة في المسجد الأقصى المبارك');
-    assert.equal(await text(page, '.about-photo-label'), 'قبة الصخرة المشرفة · المسجد الأقصى المبارك');
-    assert.equal(await page.getAttribute('#aqsaCredit a', 'href'), 'https://commons.wikimedia.org/wiki/File:Jerusalem-2013-Temple_Mount-Dome_of_the_Rock_%26_Chain_02.jpg');
+    assert.equal(await page.getAttribute('#aqsaImage', 'src'), 'assets/img/about/al-aqsa-compound-1440.webp');
+    assert.equal(await page.getAttribute('#aqsaImage', 'srcset'), 'assets/img/about/al-aqsa-compound-800.webp 800w, assets/img/about/al-aqsa-compound-1440.webp 1440w');
+    assert.match(await page.evaluate(() => document.getElementById('aqsaImage').currentSrc), /al-aqsa-compound-1440\.webp$/, 'desktop: the large file');
+    assert.equal(await page.getAttribute('#aqsaImage', 'alt'), 'المسجد الأقصى المبارك من الجو: المسجد القبلي في المقدمة، وقبة الصخرة المشرفة في وسط الساحة');
+    assert.equal(await text(page, '.about-photo-label'), 'المسجد الأقصى المبارك: المسجد القبلي في المقدمة، وقبة الصخرة المشرفة في وسط الساحة');
+    assert.doesNotMatch(await text(page, '#aqsaFigure'), /dome-of-the-rock|Dome_of_the_Rock_%26_Chain/);
+    const links = await page.locator('#aqsaCredit a').evaluateAll((as) => as.map((a) => [a.textContent, a.getAttribute('href')]));
+    assert.deepEqual(links, [
+      ['Andrew Shiva / Wikipedia', 'https://commons.wikimedia.org/wiki/File:Jerusalem-A-Quds-2013(2)-Aerial-Al-Aqsa_Mosque_Compound-(south_exposure).jpg'],
+      ['CC BY-SA 4.0', 'https://creativecommons.org/licenses/by-sa/4.0/'],
+    ]);
     assert.equal(await text(page, '#nasheedLine'), 'فردوس الرحمن ظلال');
     assert.equal(await text(page, '#nasheedMeta'), 'نشيد فردوس الرحمن ظلال (تبصرة) — محمد المقيط');
     assert.doesNotMatch(await text(page, '.nasheed-card'), /يا ذاكر الأصحاب|لن نحيد/, 'the previous nasheeds are no longer shown');
@@ -161,6 +180,9 @@ describe('«من أنا» page', () => {
     const s = await open(blockAutoplay, { viewport: { width: 390, height: 844 } });
     const { page } = s;
     await page.waitForFunction(() => document.getElementById('nasheedStatus').dataset.state === 'blocked');
+    // Mobile downloads the small photograph only.
+    await page.waitForFunction(() => { const i = document.getElementById('aqsaImage'); return i.complete && i.naturalWidth > 0; });
+    assert.match(await page.evaluate(() => document.getElementById('aqsaImage').currentSrc), /al-aqsa-compound-800\.webp$/);
     assert.ok(await page.isVisible('#nasheedStart'));
     assert.ok(await page.evaluate(() => document.getElementById('nasheedAudio').paused));
     assert.doesNotMatch(await text(page, '#nasheedStatus'), /يُشغَّل/);
@@ -232,7 +254,9 @@ describe('«من أنا» page', () => {
     assert.doesNotMatch(about, /\sstyle="/i);
     for (const [tag] of about.matchAll(/<a\b[^>]*target="_blank"[^>]*>/g)) assert.match(tag, /rel="noopener noreferrer"/);
     const sw = readFileSync(join(REPO, 'sw.js'), 'utf8');
-    for (const f of ['about.html', 'assets/js/about.js', 'assets/js/data/about-media.js', 'assets/img/about/dome-of-the-rock.webp']) assert.ok(sw.includes(`'${f}'`), f);
+    for (const f of ['about.html', 'assets/js/about.js', 'assets/js/data/about-media.js', 'assets/img/about/al-aqsa-compound-800.webp', 'assets/img/about/al-aqsa-compound-1440.webp']) assert.ok(sw.includes(`'${f}'`), f);
+    assert.doesNotMatch(sw, /dome-of-the-rock/);
+    assert.doesNotMatch(about, /aqsaVerse|core\/api\.js|core\/arabic\.js/, 'the verse markup and its preloads are gone');
     assert.match(readFileSync(join(REPO, 'sitemap.xml'), 'utf8'), /about\.html/);
   });
 });

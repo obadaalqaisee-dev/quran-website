@@ -262,6 +262,27 @@ test('nasheed «فردوس الرحمن ظلال»: the shipped file is the docu
   }
 });
 
+test('about photo: the Al-Aqsa compound aerial view, licensed, real WebP files at the documented sizes', async () => {
+  const { existsSync, readFileSync } = await import('node:fs');
+  const { ABOUT_MEDIA, isConfigured } = await import('../../assets/js/data/about-media.js');
+  const img = ABOUT_MEDIA.image;
+  assert.ok(isConfigured(img));
+  assert.equal(img.license, 'CC BY-SA 4.0');
+  assert.equal(img.licenseUrl, 'https://creativecommons.org/licenses/by-sa/4.0/');
+  assert.match(img.sourceUrl, /^https:\/\/commons\.wikimedia\.org\/wiki\/File:.*Al-Aqsa_Mosque_Compound/);
+  assert.match(img.alt, /المسجد القبلي/);
+  assert.match(img.alt, /قبة الصخرة/);
+  assert.ok(img.srcset.some((s) => s.src === img.src && s.width === img.width));
+  for (const { src, width } of img.srcset) {
+    const file = readFileSync(new URL(`../../${src}`, import.meta.url));
+    assert.equal(file.subarray(0, 4).toString('latin1'), 'RIFF');
+    assert.equal(file.subarray(8, 12).toString('latin1'), 'WEBP');
+    assert.ok(file.length < 400_000, `${src}: kept light`);
+    assert.match(src, new RegExp(`-${width}\\.webp$`));
+  }
+  assert.ok(!existsSync(new URL('../../assets/img/about/dome-of-the-rock.webp', import.meta.url)), 'the close-up photo is no longer shipped');
+});
+
 // ----------------------------------------------------------------------------------- site assistant
 const assistant = await import('../../assets/js/core/assistant.js');
 const { LESSONS: P_LESSONS } = await import('../../assets/js/data/prayer-lessons.js');

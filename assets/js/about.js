@@ -10,8 +10,6 @@
 //   * Leaving the page (pagehide) pauses the nasheed; it does not autoplay anywhere else on the site.
 //   * Language or theme changes re-render labels only; they never restart the audio.
 
-import { getSurah } from './core/api.js';
-import { stripBasmala } from './core/arabic.js';
 import { initialLanguage, onLanguageChange, setLanguage, t } from './core/i18n.js';
 import { KEYS, getString, setString } from './core/storage.js';
 import { ABOUT_MEDIA, isConfigured } from './data/about-media.js';
@@ -102,29 +100,25 @@ function initNasheed() {
 function initPhoto() {
   const media = ABOUT_MEDIA.image;
   if (!isConfigured(media)) return; // no verified Al-Aqsa photograph configured: no substitute is shown
-  el.img.src = media.src;
+  // width/height give the browser the photo's natural aspect ratio before it loads (no layout shift);
+  // srcset lets small screens download the smaller file.
   el.img.width = media.width;
   el.img.height = media.height;
   el.img.alt = media.alt;
-  el.img.addEventListener('error', () => { el.figure.hidden = true; document.body.classList.remove('has-aqsa-photo'); }, { once: true });
-  const credit = document.createElement('a');
-  credit.href = media.sourceUrl;
-  credit.target = '_blank';
-  credit.rel = 'noopener noreferrer';
-  credit.textContent = [media.credit, media.license].filter(Boolean).join(' · ');
-  el.credit.replaceChildren(document.createTextNode(`${t('about_photo_credit')} `), credit);
+  if (media.srcset?.length) {
+    el.img.srcset = media.srcset.map((s) => `${s.src} ${s.width}w`).join(', ');
+    el.img.sizes = media.sizes;
+  }
+  el.img.src = media.src;
+  el.img.addEventListener('error', () => { el.figure.hidden = true; }, { once: true });
+  const link = (href, label) => Object.assign(document.createElement('a'), { href, target: '_blank', rel: 'noopener noreferrer', textContent: label });
+  el.credit.replaceChildren(
+    document.createTextNode(`${t('about_photo_credit')} `),
+    link(media.sourceUrl, media.credit),
+    document.createTextNode(' · '),
+    link(media.licenseUrl, media.license),
+  );
   el.figure.hidden = false;
-  document.body.classList.add('has-aqsa-photo');
-}
-
-async function initVerse() {
-  try {
-    const data = await getSurah(17);
-    const ayah = data.ayahs.find((a) => a.numberInSurah === 1);
-    if (!ayah) return;
-    el.verse.textContent = `﴿${stripBasmala(ayah.text, 17, 1)}﴾ [الإسراء: 1]`;
-    el.verse.hidden = false;
-  } catch { /* offline and never loaded: the verse is simply not shown */ }
 }
 
 function boot() {
@@ -145,7 +139,6 @@ function boot() {
     figure: document.getElementById('aqsaFigure'),
     img: document.getElementById('aqsaImage'),
     credit: document.getElementById('aqsaCredit'),
-    verse: document.getElementById('aqsaVerse'),
   });
   const lang = document.getElementById('langSelect');
   lang.value = document.documentElement.lang;
@@ -153,7 +146,6 @@ function boot() {
   onLanguageChange(() => setState(player.state)); // labels only; the audio is not restarted
   initPhoto();
   initNasheed();
-  initVerse();
   if ('serviceWorker' in navigator && location.protocol !== 'file:') {
     window.addEventListener('load', () => navigator.serviceWorker.register('sw.js', { scope: './' }).catch(() => {}));
   }
